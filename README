@@ -1,0 +1,16 @@
+auf basis von milton
+http://milton.ettrema.com/index.html
+und (step 2)
+pure-ftp/pro-ftp/java-ftp-server-library
+
+eine vernünftige "cloud-storage"-lösung aufsetzen, die
+ - umlaute kann
+ - keine bekacktes locking NICHT versteht
+ - nicht völlig absurd kompliziert immer irgendwelche apache-configs schreibt (und überhaupt apache braucht)
+ - mir keinen unnötigen scheiß an die hand gibt, damit ich meine festplatte übers web partitionieren kann
+ - flexibel ist
+ - macht, was sie soll
+ - keine bekackte scriptsprache als grundlage hat
+ - os-agnostic: ubuntu/centos/whatdoicare
+
+
