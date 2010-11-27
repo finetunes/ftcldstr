@@ -1,5 +1,5 @@
-auf basis von milton
-http://milton.ettrema.com/index.html
+auf basis von webdav.pl
+http://amor.cms.hu-berlin.de/~rohdedan/webdav/
 und (step 2)
 pure-ftp/pro-ftp/java-ftp-server-library
 
@@ -11,6 +11,8 @@ eine vernünftige "cloud-storage"-lösung aufsetzen, die
  - flexibel ist
  - macht, was sie soll
  - keine bekackte scriptsprache als grundlage hat
- - os-agnostic: ubuntu/centos/whatdoicare
+ - os-agnostic: ubuntu/centos/whatdoicare; yep. ok. aber ein *nix sollte es sein.
 
+
+btw.: http://amor.cms.hu-berlin.de/~rohdedan/webdav/ - wahnsinnig sauber!!!
 
