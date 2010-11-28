@@ -6,94 +6,85 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import com.bradmcevoy.http.*;
-import com.bradmcevoy.http.http11.*;
-import com.bradmcevoy.http.webdav.*;
-
 public class MServlet extends HttpServlet {
 	ServletConfig config;
 //	HttpManager httpManager;
 //	AuthenticationService authService;
 
-	private static final ThreadLocal<HttpServletRequest> originalRequest = new ThreadLocal<HttpServletRequest>();
-	private static final ThreadLocal<HttpServletResponse> originalResponse = new ThreadLocal<HttpServletResponse>();
+//	private static final ThreadLocal<HttpServletRequest> rawRequest = new ThreadLocal<HttpServletRequest>();
+//	private static final ThreadLocal<HttpServletResponse> rawResponse = new ThreadLocal<HttpServletResponse>();
 
-	public static HttpServletRequest request() {
-		return originalRequest.get();
-	}
+//	public static HttpServletRequest getRawRequest() {
+//		return rawRequest.get();
+//	}
+//
+//	public static HttpServletResponse getRawResponse() {
+//		return rawResponse.get();
+//	}
 
-	public static HttpServletResponse response() {
-		return originalResponse.get();
-	}
-
-	public static void forward(String url) {
-		try {
-			request().getRequestDispatcher(url).forward(originalRequest.get(),
-					originalResponse.get());
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ServletException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+//	public static void forward(String url) {
+//		try {
+//			HttpServletRequest re = getRawRequest();
+//			HttpServletResponse rs = getRawResponse();
+//			
+//			re.getRequestDispatcher(url).forward(
+//					re,
+//					rs);
+//		} catch (IOException ex) {
+//			throw new RuntimeException(ex);
+//		} catch (ServletException ex) {
+//			throw new RuntimeException(ex);
+//		}
+//	}
 
 	public void init(ServletConfig config) throws ServletException {
-		try {
-			this.config = config;
-			httpManager = new HttpManager(getResourceFactory(),
-					getCompressingHandler(), getAuthService());
-		} catch (Throwable ex) {
-			ex.printStackTrace();
-			throw new RuntimeException(ex);
-		}
+		super.init(config);
+		
+//		try {
+//			this.config = config;
+//		} catch (Throwable ex) {
+//			ex.printStackTrace();
+//			throw new RuntimeException(ex);
+//		}
 	}
 
-	public void service(javax.servlet.ServletRequest servletRequest,
-			javax.servlet.ServletResponse servletResponse)
-			throws ServletException, IOException {
-		HttpServletRequest req = (HttpServletRequest) servletRequest;
-		HttpServletResponse resp = (HttpServletResponse) servletResponse;
-		try {
-			originalRequest.set(req);
-			originalResponse.set(resp);
-			WebdavServletRequest request = new WebdavServletRequest(req);
-			ServletResponse response = new ServletResponse(resp);
-			httpManager.process(request, response);
-		} finally {
-			originalRequest.remove();
-			originalResponse.remove();
-			servletResponse.getOutputStream().flush();
-			servletResponse.flushBuffer();
-		}
+	public void service(
+			javax.servlet.http.HttpServletRequest servletRequest,
+			javax.servlet.http.HttpServletResponse servletResponse)
+		throws ServletException, IOException {
+		
+		System.out.println("MServlet::service::METHOD: "+servletRequest.getMethod());
+		super.service(servletRequest, servletResponse);
+		
+//		HttpServletRequest req = (HttpServletRequest)servletRequest;
+//		HttpServletResponse resp = (HttpServletResponse)servletResponse;
+//		try {
+//			rawRequest.set(req);
+//			rawResponse.set(resp);
+//			
+////			WebdavServletRequest request = new WebdavServletRequest(req);
+////			ServletResponse response = new ServletResponse(resp);
+////			httpManager.process(request, response);
+//		} 
+//		finally {
+//			rawRequest.remove();
+//			rawResponse.remove();
+//			servletResponse.getOutputStream().flush();
+//			servletResponse.flushBuffer();
+//		}
 	}
 
 	public String getServletInfo() {
-		return "WebdavServlet";
+		return "MServlet - based on webdav.pl";
 	}
 
 	public ServletConfig getServletConfig() {
-		return config;
+		return super.getServletConfig();
+//		return config;
 	}
 
 	public void destroy() {
+		super.destroy();
 	}
-
-	private ResourceFactory getResourceFactory() {
-		return new WebdavResourceFactory();
-	}
-
-	private AuthenticationService getAuthService() {
-		if (authService == null) {
-			List<AuthenticationHandler> handlers = new ArrayList<AuthenticationHandler>();
-			handlers.add(new BasicAuthHandler());
-			authService = new AuthenticationService(handlers);
-		}
-		return authService;
-	}
-
-	private WebDavResponseHandler getCompressingHandler() {
-		return new CompressingResponseHandler(new DefaultWebDavResponseHandler(
-				getAuthService()));
-	}
-
 }
+
