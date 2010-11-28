@@ -12,6 +12,7 @@ eine vernünftige "cloud-storage"-lösung aufsetzen, die
  - macht, was sie soll
  - keine bekackte scriptsprache als grundlage hat
  - os-agnostic: ubuntu/centos/whatdoicare; yep. ok. aber ein *nix sollte es sein.
+ - gut wäre es auch, daraus einzelne files "sharen" zu können - in dem sinne, daß über einen speziellen link (passwort?) darauf von anderen zugegriffen werden kann...
 
 
 btw.: http://amor.cms.hu-berlin.de/~rohdedan/webdav/ - wahnsinnig sauber!!!
