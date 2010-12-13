@@ -2,11 +2,19 @@ package net.finetunes.ftcldstr.helpers.xml;
 
 public class XMLService {
 	
-	public static void createXMLData() {
+	// TODO: check parameter types
+	public static String createXMLData(String w, String d, String xmlns) {
 		
+		// TODO: implement
+		return "";
 	}
 	
-	public static void createXML() {
+	
+	// TODO: first parameter should represent an xml tree as an array structure
+	public static String createXML(String dataRef, boolean withoutp) {
+		
+		// TODO: implement
+		return "";
 		
 	}
 

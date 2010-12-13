@@ -2,15 +2,18 @@ package net.finetunes.ftcldstr.handlers.properties;
 
 public class ACLActions {
 	
-	public static void getACLSupportedPrivilegeSet() {
+	// TODO: returns an array to build an xml from (using createXML)
+	public static void getACLSupportedPrivilegeSet(String filename) {
 		
 	}
 	
-	public static void getACLCurrentUserPrivilegeSet() {
+	// TODO: returns an array to build an xml from (using createXML)
+	public static void getACLCurrentUserPrivilegeSet(String filename) {
 		
 	}
 	
-	public static void getACLProp() {
+	// TODO: returns an array to build an xml from (using createXML)
+	public static void getACLProp(String mode) {
 		
 	}
 

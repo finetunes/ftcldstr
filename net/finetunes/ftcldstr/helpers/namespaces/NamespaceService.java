@@ -2,16 +2,22 @@ package net.finetunes.ftcldstr.helpers.namespaces;
 
 public class NamespaceService {
 	
-	public static void getNameSpace() {
+	public static String getNameSpace(String property) {
 		
+		// TODO: implement
+		return "";
 	}
 	
-	public static void getNameSpaceUri() {
-		
+	public static String getNameSpaceUri(String property) {
+	
+		// TODO: implement
+		return "";
 	}
 	
-	public static void nonamespace() {
+	public static String nonamespace(String property) {
 		
+		// TODO: implement
+		return "";
 	}
 
 }
