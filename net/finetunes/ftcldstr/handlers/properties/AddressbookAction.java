@@ -2,8 +2,10 @@ package net.finetunes.ftcldstr.handlers.properties;
 
 public class AddressbookAction {
 	
-	public static void getAddressbookHomeSet() {
+	public static String getAddressbookHomeSet(String uri) {
 		
+		// TODO: implement
+		return null;
 	}
 
 }

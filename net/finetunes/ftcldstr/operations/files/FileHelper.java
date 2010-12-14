@@ -1,24 +1,45 @@
 package net.finetunes.ftcldstr.operations.files;
 
+import net.finetunes.ftcldstr.operations.files.types.QuotaInfo;
+
 public class FileHelper {
 	
+	// TODO: parameters and resulttype (comparison)
 	public static void cmp_files() {
 		
 	}
 	
-	public static void getfancyfilename() {
+	// TODO: find out what all these filename parameters mean
+	public static String getfancyfilename(
+			String fullName,
+			String filename,
+			String mimeType,
+			String fn) {
+		
+		// TODO: implement
+		return null;
 		
 	}
 	
-	public static void moveToTrash() {
+	public static boolean moveToTrash(String filename) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void deltree() {
+	// TODO: parameters
+	public static int deltree() {
 		
+		// TODO: implement
+		return -1;
+
 	}
 	
-	public static void getQuota() {
+	public static QuotaInfo getQuota() {
+		
+		// TODO: implement
+		return new QuotaInfo();
 		
 	}
 

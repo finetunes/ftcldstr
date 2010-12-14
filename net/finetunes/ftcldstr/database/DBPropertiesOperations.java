@@ -1,36 +1,64 @@
 package net.finetunes.ftcldstr.database;
 
+import java.awt.List;
+
 public class DBPropertiesOperations {
 	
-	public static void db_insertProperty() {
+	public static boolean db_insertProperty(String filename, 
+			String propertyName, String propertyValue) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void db_updateProperty() {
+	public static boolean db_updateProperty(String filename, 
+			String propertyName, String propertyValue) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void db_moveProperties() {
+	public static boolean db_moveProperties(String source, String destination) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void db_copyProperties() {
+	public static boolean db_copyProperties(String source, String destination) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void db_deleteProperties() {
+	public static boolean db_deleteProperties(String filename) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void db_getProperties() {
+	public static List db_getProperties(String filename) {
+		
+		// TODO: implement
+		return new List();
 		
 	}
 	
-	public static void db_getProperty() {
+	public static String db_getProperty(String filename, String propertyName) {
+		
+		// TODO: implement
+		return null;
 		
 	}
 	
-	public static void db_removeProperty() {
+	public static boolean db_removeProperty(String filename, String propertyName) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 

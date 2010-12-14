@@ -1,5 +1,7 @@
 package net.finetunes.ftcldstr.helpers.xml;
 
+import org.w3c.dom.Element;
+
 public class XMLService {
 	
 	// TODO: check parameter types
@@ -11,7 +13,7 @@ public class XMLService {
 	
 	
 	// TODO: first parameter should represent an xml tree as an array structure
-	public static String createXML(String dataRef, boolean withoutp) {
+	public static String createXML(Element dataRef, boolean withoutp) {
 		
 		// TODO: implement
 		return "";

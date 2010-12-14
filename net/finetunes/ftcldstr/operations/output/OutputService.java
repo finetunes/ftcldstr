@@ -1,21 +1,23 @@
 package net.finetunes.ftcldstr.operations.output;
 
 public class OutputService {
-	
-	public static void start_html() {
-		
-	}
-	
-	public static void getPageNavBar() {
-		
-	}
-	
-	public static void getQuickNavPath() {
-		
-	}
-	
-	public static void createMsgQuery() {
-		
-	}
 
+	/**
+	 * Sends the header and the content directly to the out
+	 */
+	public static void printHeaderAndContent(String status, 
+			String type, String content, String addHeader) {
+		
+		// TODO: implement
+		
+	}
+	
+	/**
+	 * sends header directly to the out
+	 */
+	public static void printFileHeader(String filename) {
+		
+		// TODO: implement
+		
+	}
 }

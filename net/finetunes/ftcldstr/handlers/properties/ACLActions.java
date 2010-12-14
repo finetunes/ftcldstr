@@ -1,20 +1,30 @@
 package net.finetunes.ftcldstr.handlers.properties;
 
+import org.w3c.dom.Element;
+
 public class ACLActions {
 	
-	// TODO: returns an array to build an xml from (using createXML)
-	public static void getACLSupportedPrivilegeSet(String filename) {
+	// returns an array to build an xml from (using createXML)
+	public static Element getACLSupportedPrivilegeSet(String filename) {
 		
+		// TODO: implement
+		return null;
+
 	}
 	
-	// TODO: returns an array to build an xml from (using createXML)
-	public static void getACLCurrentUserPrivilegeSet(String filename) {
+	// returns an array to build an xml from (using createXML)
+	public static Element getACLCurrentUserPrivilegeSet(String filename) {
 		
+		// TODO: implement
+		return null;
+
 	}
 	
-	// TODO: returns an array to build an xml from (using createXML)
-	public static void getACLProp(String mode) {
+	public static Element getACLProp(String mode) {
 		
+		// TODO: implement
+		return null;
+
 	}
 
 }

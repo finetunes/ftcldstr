@@ -1,36 +1,64 @@
 package net.finetunes.ftcldstr.operations.locking;
 
+import java.util.HashMap;
+
+import net.finetunes.ftcldstr.operations.locking.types.LockInfo;
+
 public class LockingService {
 	
-	public static void isLockedRecurse() {
+	public static boolean isLockedRecurse(String filename) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void isLocked() {
+	public static boolean isLocked(String filename) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void isLockable() {
+	// TODO: second parameter should be an XML structure array
+	public static boolean isLockable(String filename) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void getLockDiscovery() {
+	public static LockInfo getLockDiscovery(String filename) {
+		
+		// TODO: implement
+		return new LockInfo();
 		
 	}
 	
+	// TODO: parameters and return type
 	public static void lockResource() {
 		
 	}
 	
-	public static void unlockResource() {
+	
+	public static boolean unlockResource(String filename, String token) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void isAllowed() {
+	public static boolean isAllowed(String filename, boolean recurse) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 	
-	public static void inheritLock() {
+	public static boolean inheritLock(String fileaname, boolean checkContent, HashMap visited) {
+		
+		// TODO: implement
+		return false;
 		
 	}
 
