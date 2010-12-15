@@ -7,6 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.finetunes.ftcldstr.handlers.request.MethodsMap;
+
 @SuppressWarnings("serial")
 public class DavServlet extends MyServlet {
 
@@ -31,12 +33,17 @@ public class DavServlet extends MyServlet {
         
         try {
         	response.getOutputStream().write(("Hallo, I'm a WebDAV servlet.").getBytes());
+        	response.getOutputStream().write(("<br><br><a href=\"/\">GET me</a>").getBytes());
+        	response.getOutputStream().write(("<br><form method=\"post\" action=\"/\"><input type=submit name=\"b\" value=\"POST me\"></form>").getBytes());
         }
         catch (IOException e) {
         	System.out.println("Something went wrong.");
         }
         
         // Call method map here and handle the request
+        
+        MethodsMap methodsMap = new MethodsMap();
+        methodsMap.handleRequest(request, response, method);
         
     }
 
