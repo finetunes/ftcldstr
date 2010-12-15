@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class MyServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
 
+	private static final long serialVersionUID = 1L;
     private ServletContext context;
 
     public MyServlet() throws Exception {
