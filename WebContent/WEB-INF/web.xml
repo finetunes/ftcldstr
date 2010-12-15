@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+  <display-name>RoyaltyTool</display-name>
+
+  <!-- listener>
+    <listener-class>net.finetunes.royaltytool.helpers.LoggerManager$Log4jInit</listener-class>
+  </listener -->
+
+  <servlet>
+    <servlet-name>DavServlet</servlet-name>
+    <servlet-class>net.finetunes.ftcldstr.handlers.servlet.DavServlet</servlet-class>
+    <init-param>
+      <param-name>acceptRanges</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>dirAllowed</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>welcomeServlets</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>redirectWelcome</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>maxCacheSize</param-name>
+      <param-value>256000000</param-value>
+    </init-param>
+    <init-param>
+      <param-name>maxCachedFileSize</param-name>
+      <param-value>10000000</param-value>
+    </init-param>
+    <init-param>
+      <param-name>maxCachedFiles</param-name>
+      <param-value>1000</param-value>
+    </init-param>
+    <init-param>
+      <param-name>cacheType</param-name>
+      <param-value>both</param-value>
+    </init-param>
+    <init-param>
+      <param-name>gzip</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>useFileMappedBuffer</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <!--
+    <init-param>
+      <param-name>cacheControl</param-name>
+      <param-value>max-age=3600,public</param-value>
+    </init-param>
+    -->
+    <load-on-startup>0</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>DavServlet</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+  <!-- servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/css/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/script/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/images/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/lib/*</url-pattern>
+  </servlet-mapping -->
+
+  <servlet-mapping>
+    <servlet-name>DavServlet</servlet-name>
+    <url-pattern>/DavServlet/*</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>/DavServlet</welcome-file>
+  </welcome-file-list>
+  <!-- security-constraint>
+    <web-resource-collection>
+      <web-resource-name>A Protected Page</web-resource-name>
+      <url-pattern>/DavServlet/Admin/*</url-pattern>
+      <url-pattern>/DavServlet/NewUser/*</url-pattern>
+      <url-pattern>/DavServlet/UserDetails/*</url-pattern>
+      <http-method>GET</http-method>
+      <http-method>POST</http-method>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+    <user-data-constraint>
+      <transport-guarantee>NONE</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint -->
+
+  <!-- login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>MyRealm</realm-name>
+  </login-config -->
+
+  <security-role>
+    <role-name>admin</role-name>
+  </security-role>
+
+  <session-config>
+    <session-timeout>15</session-timeout>
+  </session-config>
+
+</web-app>
