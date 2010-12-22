@@ -8,8 +8,9 @@
   </listener -->
 
   <servlet>
-    <servlet-name>DavServlet</servlet-name>
-    <servlet-class>net.finetunes.ftcldstr.handlers.servlet.DavServlet</servlet-class>
+    <servlet-name>ActionServlet</servlet-name>
+    <!-- servlet-class>net.finetunes.ftcldstr.handlers.servlet.DavServlet</servlet-class -->
+    <servlet-class>net.finetunes.ftcldstr.ActionServlet</servlet-class>
     <init-param>
       <param-name>acceptRanges</param-name>
       <param-value>true</param-value>
@@ -60,7 +61,7 @@
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>DavServlet</servlet-name>
+    <servlet-name>ActionServlet</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
 
@@ -85,18 +86,18 @@
   </servlet-mapping -->
 
   <servlet-mapping>
-    <servlet-name>DavServlet</servlet-name>
-    <url-pattern>/DavServlet/*</url-pattern>
+    <servlet-name>ActionServlet</servlet-name>
+    <url-pattern>/ActionServlet/*</url-pattern>
   </servlet-mapping>
   <welcome-file-list>
-    <welcome-file>/DavServlet</welcome-file>
+    <welcome-file>/ActionServlet</welcome-file>
   </welcome-file-list>
   <!-- security-constraint>
     <web-resource-collection>
       <web-resource-name>A Protected Page</web-resource-name>
-      <url-pattern>/DavServlet/Admin/*</url-pattern>
-      <url-pattern>/DavServlet/NewUser/*</url-pattern>
-      <url-pattern>/DavServlet/UserDetails/*</url-pattern>
+      <url-pattern>/ActionServlet/Admin/*</url-pattern>
+      <url-pattern>/ActionServlet/NewUser/*</url-pattern>
+      <url-pattern>/ActionServlet/UserDetails/*</url-pattern>
       <http-method>GET</http-method>
       <http-method>POST</http-method>
     </web-resource-collection>
