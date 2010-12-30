@@ -1,20 +1,20 @@
-package net.finetunes.ftcldstr.servlet;
+package net.finetunes.ftcldstr;
 
 import java.util.Hashtable;
 
-public final class PropertiesContainer
+public final class PropertiesContainerSnippet
 {
-    private static PropertiesContainer instance = null;
+    private static PropertiesContainerSnippet instance = null;
     private static Hashtable<String, String> properties = null;
  
-    public static synchronized PropertiesContainer getInstance() {
+    public static synchronized PropertiesContainerSnippet getInstance() {
         if (instance == null)
-            instance = new PropertiesContainer();
+            instance = new PropertiesContainerSnippet();
  
         return instance;
     }
  
-    private PropertiesContainer() {
+    private PropertiesContainerSnippet() {
     	properties = new Hashtable<String, String>();
     	
     	properties.put("a", "1");

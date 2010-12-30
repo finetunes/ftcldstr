@@ -9,7 +9,6 @@
 
   <servlet>
     <servlet-name>ActionServlet</servlet-name>
-    <!-- servlet-class>net.finetunes.ftcldstr.handlers.servlet.DavServlet</servlet-class -->
     <servlet-class>net.finetunes.ftcldstr.ActionServlet</servlet-class>
     <init-param>
       <param-name>acceptRanges</param-name>

@@ -1,4 +1,4 @@
-package net.finetunes.ftcldstr.servlet.config;
+package net.finetunes.ftcldstr.config;
 
 /**
  * Config class to store global configuration values

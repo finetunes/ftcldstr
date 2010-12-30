@@ -1,4 +1,4 @@
-package net.finetunes.ftcldstr.servlet.logging;
+package net.finetunes.ftcldstr.logging;
 
 public class LogAction {
 	
