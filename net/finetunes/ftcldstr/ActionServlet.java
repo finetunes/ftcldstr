@@ -10,7 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.finetunes.ftcldstr.protocol.MethodsMap;
 
 public class ActionServlet extends MServlet {
 
@@ -82,7 +81,7 @@ public class ActionServlet extends MServlet {
         MethodsMap methodsMap = new MethodsMap();
         methodsMap.handleRequest(request, response, method);
         
-    }    
+    }
     
 }
 
