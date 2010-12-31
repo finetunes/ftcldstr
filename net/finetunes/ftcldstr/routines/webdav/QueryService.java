@@ -1,13 +1,12 @@
 package net.finetunes.ftcldstr.routines.webdav;
 
-import net.finetunes.ftcldstr.routines.webdav.types.HeaderComponents;
 
 public class QueryService {
 	
-	public static HeaderComponents getIfHeaderComponents(String header) {
+	public static Object[] getIfHeaderComponents(String header) {
 
 		// TODO: implement
-		return new HeaderComponents();
+		return new Object[]{};
 	}
 	
 	public static String getQueryParams() {

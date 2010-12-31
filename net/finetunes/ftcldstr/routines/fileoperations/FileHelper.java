@@ -1,6 +1,5 @@
 package net.finetunes.ftcldstr.routines.fileoperations;
 
-import net.finetunes.ftcldstr.routines.fileoperations.types.QuotaInfo;
 
 public class FileHelper {
 	
@@ -36,10 +35,10 @@ public class FileHelper {
 
 	}
 	
-	public static QuotaInfo getQuota() {
+	public static Object[] getQuota() {
 		
 		// TODO: implement
-		return new QuotaInfo();
+		return new Object[]{};
 		
 	}
 

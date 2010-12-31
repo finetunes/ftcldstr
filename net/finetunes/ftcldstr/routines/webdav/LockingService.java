@@ -2,8 +2,6 @@ package net.finetunes.ftcldstr.routines.webdav;
 
 import java.util.HashMap;
 
-import net.finetunes.ftcldstr.routines.webdav.types.LockInfo;
-
 public class LockingService {
 	
 	public static boolean isLockedRecurse(String filename) {
@@ -28,10 +26,10 @@ public class LockingService {
 		
 	}
 	
-	public static LockInfo getLockDiscovery(String filename) {
+	public static Object[] getLockDiscovery(String filename) {
 		
 		// TODO: implement
-		return new LockInfo();
+		return new Object[]{};
 		
 	}
 	

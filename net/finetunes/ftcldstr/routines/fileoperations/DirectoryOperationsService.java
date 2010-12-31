@@ -2,8 +2,6 @@ package net.finetunes.ftcldstr.routines.fileoperations;
 
 import java.util.HashMap;
 
-import net.finetunes.ftcldstr.routines.fileoperations.types.FolderListInfo;
-
 public class DirectoryOperationsService {
 	
 	// TODO: hrefs array of strings (filenames) recursively passed by reference
@@ -17,10 +15,10 @@ public class DirectoryOperationsService {
 		// TODO: implement
 	}
 	
-	public static FolderListInfo getFolderList(String fn, String ru, String filter) {
+	public static Object[] getFolderList(String fn, String ru, String filter) {
 		
 		// TODO: implement
-		return new FolderListInfo();
+		return new Object[]{};
 		
 	}
 	

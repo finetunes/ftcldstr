@@ -1,4 +1,4 @@
-package net.finetunes.ftcldstr.routines.common.handlers;
+package net.finetunes.ftcldstr.routines.handlers;
 
 public class SupportedMethodsHandler {
 	

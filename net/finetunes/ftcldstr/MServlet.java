@@ -51,6 +51,7 @@ public class MServlet extends HttpServlet {
 		}
 	}
 
+	/*
 	public void service(
 			javax.servlet.http.HttpServletRequest servletRequest,
 			javax.servlet.http.HttpServletResponse servletResponse)
@@ -79,6 +80,7 @@ public class MServlet extends HttpServlet {
 		servletResponse.getOutputStream().flush();
 		servletResponse.flushBuffer();
 	}
+	*/
 
 	public String getServletInfo() {
 		return "MServlet - based on webdav.pl";

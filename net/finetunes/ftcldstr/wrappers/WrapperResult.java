@@ -1,4 +1,4 @@
-package net.finetunes.ftcldstr.wrappers.types;
+package net.finetunes.ftcldstr.wrappers;
 
 /**
  * Class to store the raw result from a wrapper.

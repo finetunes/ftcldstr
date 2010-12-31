@@ -3,8 +3,6 @@ package net.finetunes.ftcldstr.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.finetunes.ftcldstr.wrappers.types.ReadDirectoryResult;
-import net.finetunes.ftcldstr.wrappers.types.WrapperResult;
 
 public class ReadDirectoryContentWrapper extends AbstractWrapper {
     

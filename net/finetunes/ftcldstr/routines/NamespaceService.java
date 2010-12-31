@@ -1,4 +1,4 @@
-package net.finetunes.ftcldstr.routines.common.namespaces;
+package net.finetunes.ftcldstr.routines;
 
 public class NamespaceService {
 	
@@ -18,6 +18,6 @@ public class NamespaceService {
 		
 		// TODO: implement
 		return "";
-	}
+	}  
 
 }

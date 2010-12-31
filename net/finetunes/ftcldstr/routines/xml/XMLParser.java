@@ -1,4 +1,4 @@
-package net.finetunes.ftcldstr.routines.common.xml;
+package net.finetunes.ftcldstr.routines.xml;
 
 public class XMLParser {
 	

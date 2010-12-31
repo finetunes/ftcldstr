@@ -1,4 +1,4 @@
-package net.finetunes.ftcldstr.routines.webdav.search;
+package net.finetunes.ftcldstr.routines.webdav;
 
 public class SearchHandler {
 

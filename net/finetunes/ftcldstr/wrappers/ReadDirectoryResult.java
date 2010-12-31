@@ -1,4 +1,4 @@
-package net.finetunes.ftcldstr.wrappers.types;
+package net.finetunes.ftcldstr.wrappers;
 
 import java.util.List;
 

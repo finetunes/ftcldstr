@@ -1,6 +1,7 @@
 package net.finetunes.ftcldstr;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Random;
@@ -10,9 +11,24 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.base.NotSupportedMethodActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.GetActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.HeadActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.PostActionHandler;
+
 
 public class ActionServlet extends MServlet {
 
+    public static final String NOT_SUPPORTED = "NOT_SUPPORTED";
+    private HashMap<String, AbstractActionHandler> methods;    
+    
+    public ActionServlet() {
+        super();
+        initMethods();
+    }
+    
+    
 	public void bla() {
 //		super.doDelete(req, resp);
 //		super.doGet(req, resp);
@@ -27,10 +43,11 @@ public class ActionServlet extends MServlet {
         throws ServletException, IOException {
     
         String requestedMethod = request.getMethod();
-        System.out.println("Requested method: " + requestedMethod);
+        System.out.println("MServlet::service::METHOD: " + requestedMethod);
         handleRequest(request, response, requestedMethod);
     
-        // super.service(request, response);
+        response.getOutputStream().flush();
+        response.flushBuffer();
     }
 
     //@SuppressWarnings("unchecked")
@@ -46,9 +63,21 @@ public class ActionServlet extends MServlet {
 
         System.out.println("Pathinfo: [" + pathinfo + "]");
 
-        String cmd = null;
+        // Handle the request
+        // with the corresponding method handler
+        AbstractActionHandler actionHandler = getMethodHandler(method);
         
+        if (actionHandler == null) {
+            actionHandler = getMethodHandler(ActionServlet.NOT_SUPPORTED);
+        }
+        
+        // do some work
+        // actionHandler.handle();
+
+        
+        // some temporary output stuff here
         try {
+            response.getOutputStream().write(("<br><br><br>Got " + method + " request").getBytes());
             response.getOutputStream().write(("<html><head></head><body>Hallo, I'm a WebDAV servlet.").getBytes());
             response.getOutputStream().write(("<br><br><a href=\"/\">GET me</a>").getBytes());
             response.getOutputStream().write(("<br><form method=\"post\" action=\"/\"><input type=submit name=\"b\" value=\"POST me\"></form>").getBytes());
@@ -62,7 +91,7 @@ public class ActionServlet extends MServlet {
             
             String r = "";
             Set<String> keys = properties.keySet();
-            Iterator it = keys.iterator();
+            Iterator<String> it = keys.iterator();
             
             while (it.hasNext()) {
                 String key = (String)it.next();
@@ -70,18 +99,33 @@ public class ActionServlet extends MServlet {
             }
             
             response.getOutputStream().write(("<br><br>" + r).getBytes());
-            
         }
         catch (IOException e) {
-            System.out.println("Something went wrong.");
-        }
+            System.out.println("Something went wrong with the output.");
+        }        
         
-        // Call method map here and handle the request
-        
-        MethodsMap methodsMap = new MethodsMap();
-        methodsMap.handleRequest(request, response, method);
         
     }
+    
+    public void initMethods() {
+        
+        methods = new HashMap<String, AbstractActionHandler>();
+        addMethodHandler("GET", new GetActionHandler());
+        addMethodHandler("HEAD", new HeadActionHandler());
+        addMethodHandler("POST", new PostActionHandler());
+        
+        // TODO: add the rest of the method handlers
+        
+        addMethodHandler(ActionServlet.NOT_SUPPORTED, new NotSupportedMethodActionHandler());
+    }
+    
+    public void addMethodHandler(String method, AbstractActionHandler handler) {
+        methods.put(method, handler);
+    }
+    
+    public AbstractActionHandler getMethodHandler(String method) {
+        return methods.get(method);
+    }    
     
 }
 

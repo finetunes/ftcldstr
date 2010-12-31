@@ -1,4 +1,4 @@
-package net.finetunes.ftcldstr.wrappers.types;
+package net.finetunes.ftcldstr.wrappers;
 
 public class AbstractWrapperResult {
 

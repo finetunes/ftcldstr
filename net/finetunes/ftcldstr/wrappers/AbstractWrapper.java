@@ -2,7 +2,6 @@ package net.finetunes.ftcldstr.wrappers;
 
 import java.io.IOException;
 
-import net.finetunes.ftcldstr.wrappers.types.WrapperResult;
 
 public class AbstractWrapper {
     
