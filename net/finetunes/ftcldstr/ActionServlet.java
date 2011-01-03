@@ -72,9 +72,9 @@ public class ActionServlet extends MServlet {
         }
         
         // do some work
-        // actionHandler.handle();
+        actionHandler.handle();
 
-        
+/*        
         // some temporary output stuff here
         try {
             response.getOutputStream().write(("<br><br><br>Got " + method + " request").getBytes());
@@ -103,7 +103,7 @@ public class ActionServlet extends MServlet {
         catch (IOException e) {
             System.out.println("Something went wrong with the output.");
         }        
-        
+*/        
         
     }
     

@@ -12,6 +12,24 @@ public class OutputService {
 		
 	}
 	
+    public static void printHeaderAndContent(String status, 
+            String type, String content) {
+        printHeaderAndContent(status, type, content, null);
+    }
+
+    public static void printHeaderAndContent(String status, 
+            String type) {
+        printHeaderAndContent(status, type, "");
+    }
+
+    public static void printHeaderAndContent(String status) {
+        printHeaderAndContent(status, "text/plain");
+    }
+    
+    public static void printHeaderAndContent() {
+        printHeaderAndContent("403 Forbidden");
+    }	
+    
 	/**
 	 * sends header directly to the out
 	 */

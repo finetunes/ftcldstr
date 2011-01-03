@@ -41,5 +41,19 @@ public class FileOperationsService {
 		return null;
 		
 	}
+	
+    public static boolean is_directory(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }	
+    
+    public static boolean file_exits(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }       
 
 }
