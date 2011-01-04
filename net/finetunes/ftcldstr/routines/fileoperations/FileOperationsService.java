@@ -42,6 +42,8 @@ public class FileOperationsService {
 		
 	}
 	
+	// additional methods
+	
     public static boolean is_directory(String filename) {
         
         // TODO: implement
@@ -56,4 +58,20 @@ public class FileOperationsService {
         
     }       
 
+    // determines whether the file is a plain file (not a link, directory, pipe, etc.)
+    public static boolean is_plain_file(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }
+    
+    // determines whether the file is readable with the effective uid/gid
+    public static boolean is_file_readable(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }       
+    
 }

@@ -52,7 +52,7 @@ public class ConfigService {
         ); 
 */        
         
-    /**
+    /*
      * -- FANCYINDEXING
      * enables/disables fancy indexing for GET requests on folders
      * if disabled you get a 404 error for a GET request on a folder
@@ -60,21 +60,26 @@ public class ConfigService {
      */
     public static final boolean FANCYINDEXING = true;
     
-    
-/*    
-    ## -- MAXFILENAMESIZE 
-    ## Web interface: width of filename column
-    $MAXFILENAMESIZE = 30;
+    /*
+     * -- MAXFILENAMESIZE
+     * Web interface: width of filename column
+     */
+    public static final int MAXFILENAMESIZE = 30;
 
-    ## -- MAXLASTMODIFIEDSIZE
-    ## Web interface: width of last modified column
-    $MAXLASTMODIFIEDSIZE = 20;
+    /*
+     * -- MAXLASTMODIFIEDSIZE
+     * Web interface: width of last modified column
+     */
+    public static final int MAXLASTMODIFIEDSIZE = 20;
 
-    ## -- MAXSIZESIZE
-    ## Web interface: width of size column
-    $MAXSIZESIZE = 12;
+    /*
+     * -- MAXSIZESIZE
+     * Web interface: width of size column
+     */
+    public static final int MAXSIZESIZE = 12;
 
-
+    // TODO: Translate paths and hash
+    /*
     ## -- ICONS
     ## for fancy indexing (you need a server alias /icons to your Apache icons directory):
     %ICONS = (
@@ -93,19 +98,26 @@ public class ConfigService {
         'video/mpeg'=>'/icons/movie.gif', 'video/quicktime'=>'/icons/movie.gif',
         default => '/icons/unknown.gif',
     );
+    */
 
-    ## -- ICON_WIDTH
-    ## specifies the icon width for the folder listings of the Web interface
-    ## DEFAULT: $ICON_WIDTH = 22;
-    $ICON_WIDTH = 22;
+    /*
+     * -- ICON_WIDTH
+     * specifies the icon width for the folder listings of the Web interface
+     * DEFAULT: $ICON_WIDTH = 22;
+     */
+    public static final int ICON_WIDTH = 22;
 
-    ## -- FORBIDDEN_UID
-    ## a comman separated list of UIDs to block 
-    ## (process id of this CGI will be checked against this list)
-    ## common "forbidden" UIDs: root, Apache process owner UID
-    ## DEFAULT: @FORBIDDEN_UID = ( 0 );
-    @FORBIDDEN_UID = ( 0 );
+    /*
+     * ## -- FORBIDDEN_UID
+     * ## a comman separated list of UIDs to block
+     * ## (process id of this CGI will be checked against this list)
+     * ## common "forbidden" UIDs: root, Apache process owner UID
+     * ## DEFAULT: @FORBIDDEN_UID = ( 0 );
+     */
+    // TODO
+    // @FORBIDDEN_UID = ( 0 );
 
+    /*
     ## -- HIDDEN 
     ## hide some special files/folders (GET/PROPFIND) 
     ## EXAMPLES: @HIDDEN = ( '.DAV/?$', '~$', '.bak$' );
@@ -332,14 +344,17 @@ public class ConfigService {
     ##  enables server-side search (WebDAV SEARCH/DASL, RFC5323)
     ## EXAMPLE: $ENABLE_SEARCH = 1;
     $ENABLE_SEARCH = 1;
+*/
+    /*
+     * -- ENABLE_THUMBNAIL
+     * enables image thumbnail support for folder listings of the Web interface.
+     * If enabled the default icons for images will be replaced by thumbnails
+     * and if the mouse is over a icon the icon will be zoomed to the size of $THUMBNAIL_WIDTH.
+     * DEFAULT: $ENABLE_THUMBNAIL = 0;
+     */ 
+    public static final boolean ENABLE_THUMBNAIL = true;
 
-    ## -- ENABLE_THUMBNAIL
-    ## enables image thumbnail support for folder listings of the Web interface.
-    ## If enabled the default icons for images will be replaced by thumbnails
-    ## and if the mouse is over a icon the icon will be zoomed to the size of $THUMBNAIL_WIDTH.
-    ## DEFAULT: $ENABLE_THUMBNAIL = 0;
-    $ENABLE_THUMBNAIL = 1;
-
+    /*
     ## -- ENABLE_THUMBNAIL_CACHE
     ## enable image thumbnail caching (improves performance - 2x faster)
     ## DEFAULT: $ENABLE_THUMBNAIL_CACHE = 0;
