@@ -72,7 +72,8 @@ public class ActionServlet extends MServlet {
         }
         
         // do some work
-        actionHandler.handle();
+        String pathTranslated = "/"; // PZ: TODO: get path translated value by filename
+        actionHandler.handle(request, response, pathTranslated);
 
 /*        
         // some temporary output stuff here

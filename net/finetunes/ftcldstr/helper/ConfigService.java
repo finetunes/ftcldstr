@@ -262,15 +262,20 @@ public class ConfigService {
     ## lock owner if not given by client
     ## EXAMPLE: $DEFAULT_LOCK_OWNER=$ENV{REMOTE_USER}.'@'.$ENV{REMOTE_ADDR}; ## loggin user @ ip
     $DEFAULT_LOCK_OWNER= { href=> ($ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}).'@'.$ENV{REMOTE_ADDR} };
-
-    ## -- CHARSET
-    ## change it if you get trouble with special characters
-    ## DEFAULT: $CHARSET='utf-8';
-    $CHARSET='utf-8';
+*/
+    
+    /*
+     * -- CHARSET
+     * change it if you get trouble with special characters
+     * DEFAULT: $CHARSET='utf-8';
+     */
+    public static final String CHARSET = "utf-8";
+/*    
     # and Perl's UTF-8 pragma for the right string length:
     # use utf8;
     # no utf8;
 
+    
     ## -- BUFSIZE
     ## buffer size for read and write operations
     $BUFSIZE = 1073741824;
@@ -392,5 +397,27 @@ public class ConfigService {
 //		return null;
 //		
 //	}
+    
+    public static String getSupportedDAVClasses() {
+        // TODO: implement
+        
+        /*
+## supported DAV compliant classes:
+our $DAV='1';
+$DAV.=', 2' if $ENABLE_LOCK;
+$DAV.=', 3, <http://apache.org/dav/propset/fs/1>, extended-mkcol';
+$DAV.=', access-control' if $ENABLE_ACL || $ENABLE_CALDAV || $ENABLE_CARDDAV;
+$DAV.=', calendar-access, calendarserver-private-comments' if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE; 
+$DAV.=', calendar-auto-schedule' if  $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE;
+$DAV.=', addressbook' if $ENABLE_CARDDAV;
+$DAV.=', bind' if $ENABLE_BIND;         
+         
+         */
+        
+        
+        return "";
+        
+    }
+    
 
 }

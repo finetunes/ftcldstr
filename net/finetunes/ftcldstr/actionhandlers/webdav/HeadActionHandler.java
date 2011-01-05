@@ -40,7 +40,7 @@ public class HeadActionHandler extends AbstractActionHandler {
 
         if (FileOperationsService.is_directory(fn)) {
             Logger.debug("HEAD: " + fn + " is a folder!");
-            OutputService.printHeaderAndContent("200 OK", "httpd/unix-directory");
+            OutputService.printHeaderAndContent(request, response, "200 OK", "httpd/unix-directory");
         }
         else if (FileOperationsService.file_exits(fn)) {
             Logger.debug("HEAD: " + fn + " exists!");
@@ -48,7 +48,7 @@ public class HeadActionHandler extends AbstractActionHandler {
         }
         else {
             Logger.debug("HEAD: " + fn + " does not exist!");
-            OutputService.printHeaderAndContent("404 Not Found");
+            OutputService.printHeaderAndContent(request, response, "404 Not Found");
         }
     }
     

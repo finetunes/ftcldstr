@@ -44,10 +44,10 @@ public class GetActionHandler extends AbstractActionHandler {
         Logger.debug("GET: " + fn);
         
         if (FileOperationsService.is_hidden(fn)) {
-            OutputService.printHeaderAndContent("404 Not Found", "text/plain", "404 - NOT FOUND");
+            OutputService.printHeaderAndContent(request, response, pathTranslated, "404 Not Found", "text/plain", "404 - NOT FOUND");
         }
         else if (FileOperationsService.is_directory(fn) && !ConfigService.FANCYINDEXING) {
-            OutputService.printHeaderAndContent("404 Not Found", "text/plain", "404 - NOT FOUND");
+            OutputService.printHeaderAndContent(request, response, pathTranslated, "404 Not Found", "text/plain", "404 - NOT FOUND");
         }
         else if (FileOperationsService.file_exits(fn) && 
                 request.getParameter("action") != null && request.getParameter("action").equals("davmount")) {
@@ -66,14 +66,14 @@ public class GetActionHandler extends AbstractActionHandler {
         }
         else if (FileOperationsService.file_exits(fn) &&
                 !FileOperationsService.is_file_readable(fn)) {
-            OutputService.printHeaderAndContent("403 Forbidden", "text/plain", "403 Forbidden");
+            OutputService.printHeaderAndContent(request, response, pathTranslated, "403 Forbidden", "text/plain", "403 Forbidden");
         }
         else if (FileOperationsService.file_exits(fn)) {
             doFileExists(fn);
         }
         else {
             Logger.debug("GET: " + fn + " NOT FOUND!");
-            OutputService.printHeaderAndContent("404 Not Found", "text/plain", "404 - FILE NOT FOUND");
+            OutputService.printHeaderAndContent(request, response, pathTranslated, "404 Not Found", "text/plain", "404 - FILE NOT FOUND");
         }
     }
     

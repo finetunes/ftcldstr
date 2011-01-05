@@ -16,7 +16,7 @@ public class PropertiesHelper {
 	public static String getETag(String filename) {
 		
 		// TODO: implement
-		return null;
+		return "";
 		
 	}
 
