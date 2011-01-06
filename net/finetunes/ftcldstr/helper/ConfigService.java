@@ -122,70 +122,98 @@ public class ConfigService {
     ## hide some special files/folders (GET/PROPFIND) 
     ## EXAMPLES: @HIDDEN = ( '.DAV/?$', '~$', '.bak$' );
     @HIDDEN = ('/.ht','/.DAV');
+*/
 
-    ## -- ALLOW_INFINITE_PROPFIND
-    ## enables/disables infinite PROPFIND requests
-    ## if disabled the default depth is set to 1
-    $ALLOW_INFINITE_PROPFIND = 1;
+    /*
+     * -- ALLOW_INFINITE_PROPFIND
+     * enables/disables infinite PROPFIND requests
+     * if disabled the default depth is set to 1
+     */
+    public static final boolean ALLOW_INFINITE_PROPFIND = true;
 
-    ## -- ALLOW_FILE_MANAGEMENT
-    ## enables file management with a web browser
-    ## ATTENTATION: locks will be ignored
-    $ALLOW_FILE_MANAGEMENT = 1;
+    /*
+     * -- ALLOW_FILE_MANAGEMENT
+     * enables file management with a web browser
+     * ATTENTATION: locks will be ignored
+     */
+    public static final boolean ALLOW_FILE_MANAGEMENT = true;
 
-    ## -- ALLOW_SEARCH
-    ## enable file/folder search in the Web interface
-    $ALLOW_SEARCH = 1;
+    /*
+     * -- ALLOW_SEARCH
+     * enable file/folder search in the Web interface
+     */
+    public static final boolean ALLOW_SEARCH = true;
 
-    ## -- ALLOW_ZIP_UPLOAD
-    ## enable zip file upload (incl. extraction)
-    $ALLOW_ZIP_UPLOAD = 1;
+    /*
+     * -- ALLOW_ZIP_UPLOAD
+     * enable zip file upload (incl. extraction)
+     */
+    public static final boolean ALLOW_ZIP_UPLOAD = true;
 
-    ## -- ALLOW_ZIP_DOWNLOAD
-    ## enable zip file download 
-    $ALLOW_ZIP_DOWNLOAD = 1;
+    /*
+     * -- ALLOW_ZIP_DOWNLOAD
+     * enable zip file download
+     */ 
+    public static final boolean ALLOW_ZIP_DOWNLOAD = true;
 
-    ## -- SHOW_STAT
-    ## shows file statistics after file/folder list in the Web interface
-    $SHOW_STAT = 1;
+    /*
+     * -- SHOW_STAT
+     * shows file statistics after file/folder list in the Web interface
+     */
+    public static final boolean SHOW_STAT = true;
 
-    ## -- PAGE_LIMIT
-    ## limits number of files/folders shown in the Web interface
-    ## EXAMPLE: $PAGE_LIMIT = 20;
-    $PAGE_LIMIT=15;
+    /*
+     * -- PAGE_LIMIT
+     * limits number of files/folders shown in the Web interface
+     * EXAMPLE: $PAGE_LIMIT = 20;
+     */
+    public static final int PAGE_LIMIT = 15;
 
-    ## -- ALLOW_POST_UPLOADS
-    ## enables a upload form in a fancy index of a folder (browser access)
-    ## ATTENTATION: locks will be ignored
-    ## Apache configuration:
-    ## DEFAULT: $ALLOW_POST_UPLOADS = 1;
-    $ALLOW_POST_UPLOADS = 1;
+    /*
+     * -- ALLOW_POST_UPLOADS
+     * enables a upload form in a fancy index of a folder (browser access)
+     * ATTENTATION: locks will be ignored
+     * Apache configuration:
+     * DEFAULT: $ALLOW_POST_UPLOADS = 1;
+     */
+    public static final boolean ALLOW_POST_UPLOADS = true;
 
-    ## -- POST_MAX_SIZE
-    ## maximum post size (only POST requests)
-    ## EXAMPLE: $POST_MAX_SIZE = 1073741824; # 1GB
-    $POST_MAX_SIZE = 1073741824;
-    #$POST_MAX_SIZE = 10240000;
+    /*
+     * -- POST_MAX_SIZE
+     * maximum post size (only POST requests)
+     * EXAMPLE: $POST_MAX_SIZE = 1073741824; # 1GB
+     */
+    public static final int POST_MAX_SIZE = 1073741824;
+    // public static final int POST_MAX_SIZE = 10240000;
 
-    ## -- SHOW_QUOTA
-    ## enables/disables quota information for fancy indexing
-    ## DEFAULT: $SHOW_QUOTA = 0;
-    $SHOW_QUOTA = 1;
+    /*
+     * -- SHOW_QUOTA
+     * enables/disables quota information for fancy indexing
+     * DEFAULT: $SHOW_QUOTA = 0;
+     */
+    public static final boolean SHOW_QUOTA = true;
 
-    ## -- SHOW_PERM
-    ## show file permissions
-    ## DEFAULT: $SHOW_PERM = 0;
-    $SHOW_PERM = 1;
+    /*
+     * -- SHOW_PERM
+     * show file permissions
+     * DEFAULT: $SHOW_PERM = 0;
+     */
+    public static final boolean SHOW_PERM = true;
 
-    ## -- ALLOW_CHANGEPERM
-    ## allow users to change file permissions
-    ## DEFAULT: ALLOW_CHANGEPERM = 0;
-    $ALLOW_CHANGEPERM = 1;
+    /*
+     * -- ALLOW_CHANGEPERM
+     * allow users to change file permissions
+     * DEFAULT: ALLOW_CHANGEPERM = 0;
+     */
+    public static final boolean ALLOW_CHANGEPERM = true;
 
-    ## -- ALLOW_CHANGEPERMRECURSIVE
-    ## allow users to change file/folder permissions recursively
-    $ALLOW_CHANGEPERMRECURSIVE = 1;
+    /*
+     * -- ALLOW_CHANGEPERMRECURSIVE
+     * allow users to change file/folder permissions recursively
+     */
+    public static final boolean ALLOW_CHANGEPERMRECURSIVE = true;
 
+/*
     ## -- PERM_USER
     # if ALLOW_CHANGEPERM is set to 1 the PERM_USER variable 
     # defines the file/folder permissions for user/owner allowed to change
@@ -290,16 +318,22 @@ public class ConfigService {
     ## ($FS - will be replaced by the filesystem (filename/folder))
     ## EXAMPLE: $GFSQUOTA='/usr/sbin/gfs2_quota -f';
     $GFSQUOTA='/usr/sbin/gfs_quota -f';
+*/
+    
+    /*
+     * -- ENABLE_LOCK
+     * enable/disable lock/unlock support (WebDAV compiance class 2)
+     * if disabled it's unsafe for shared collections/files but improves performance
+     */ 
+    public static final boolean ENABLE_LOCK = true;
 
-    ## -- ENABLE_LOCK
-    ## enable/disable lock/unlock support (WebDAV compiance class 2) 
-    ## if disabled it's unsafe for shared collections/files but improves performance 
-    $ENABLE_LOCK = 1;
+    /*
+     * -- ENABLE_ACL
+     * enable ACL support: only Unix like read/write access changes for user/group/other are supported
+     */
+    public static final boolean ENABLE_ACL = true;
 
-    ## -- ENABLE_ACL
-    ## enable ACL support: only Unix like read/write access changes for user/group/other are supported
-    $ENABLE_ACL = 1;
-
+/*
     ## --- CURRENT_USER_PRINCIPAL
     ## a virtual URI for ACL principals
     ## for Apple's iCal &  Addressbook
@@ -309,47 +343,66 @@ public class ConfigService {
     ## don't change it for MacOS X Addressbook support
     ## DEFAULT: $PRINCIPAL_COLLECTION_SET = '/directory/';
     $PRINCIPAL_COLLECTION_SET = '/directory/';
+*/
+    
+    /*
+     * -- ENABLE_CALDAV
+     * enable CalDAV support for Lightning/Sunbird/iCal/iPhone calender/task support
+     */
+    public static final boolean ENABLE_CALDAV = true;
 
-    ## -- ENABLE_CALDAV
-    ## enable CalDAV support for Lightning/Sunbird/iCal/iPhone calender/task support
-    $ENABLE_CALDAV = 1;
-
+/*
     ## -- CALENDAR_HOME_SET
     ## maps UID numbers or remote users (accounts) to calendar folders
     %CALENDAR_HOME_SET = ( default=> '/', 1000 =>  '/caldav'  );
+*/
 
-    ## -- ENABLE_CALDAV_SCHEDULE
-    ## really incomplete (ALPHA) - properties exists but POST requests are not supported yet
-    $ENABLE_CALDAV_SCHEDULE = 0;
+    /*
+     * -- ENABLE_CALDAV_SCHEDULE
+     * really incomplete (ALPHA) - properties exists but POST requests are not supported yet
+     */
+    public static final boolean ENABLE_CALDAV_SCHEDULE = false;
 
-    ## -- ENABLE_CARDDAV
-    ## enable CardDAV support for Apple's Addressbook
-    $ENABLE_CARDDAV = 1;
+    /*
+     * -- ENABLE_CARDDAV
+     * enable CardDAV support for Apple's Addressbook
+     */
+    public static final boolean ENABLE_CARDDAV = true;
 
+/*
     ## -- ADDRESSBOOK_HOME_SET
     ## maps UID numbers or remote users to addressbook folders 
     %ADDRESSBOOK_HOME_SET = ( default=> '/',  1000 => '/carddav/'  );
+*/
+    
+    /*
+     * -- ENABLE_TRASH
+     * enables the server-side trash can (don't forget to setup $TRASH_FOLDER)
+     */
+    public static final boolean ENABLE_TRASH = false;
 
-    ## -- ENABLE_TRASH
-    ## enables the server-side trash can (don't forget to setup $TRASH_FOLDER)
-    $ENABLE_TRASH = 0;
-
+/*
     ## -- TRASH_FOLDER
     ## neccessary if you enable trash 
     ## it should be writable by your users (chmod a+rwxt <trash folder>)
     ## EXAMPLE: $TRASH_FOLDER = '/tmp/trash';
     $TRASH_FOLDER = '/usr/local/www/var/trash';
-
-    ## -- ENABLE_GROUPDAV
-    ## enables GroupDAV (http://groupdav.org/draft-hess-groupdav-01.txt)
-    ## EXAMPLE: $ENABLE_GROUPDAV = 0;
-    $ENABLE_GROUPDAV = 1;
-
-    ## -- ENABLE_SEARCH
-    ##  enables server-side search (WebDAV SEARCH/DASL, RFC5323)
-    ## EXAMPLE: $ENABLE_SEARCH = 1;
-    $ENABLE_SEARCH = 1;
 */
+    
+    /*
+     * -- ENABLE_GROUPDAV
+     * enables GroupDAV (http://groupdav.org/draft-hess-groupdav-01.txt)
+     * EXAMPLE: $ENABLE_GROUPDAV = 0;
+     */
+    public static final boolean ENABLE_GROUPDAV = true;
+
+    /*
+     * -- ENABLE_SEARCH
+     * enables server-side search (WebDAV SEARCH/DASL, RFC5323)
+     * EXAMPLE: $ENABLE_SEARCH = 1;
+     */
+    public static final boolean ENABLE_SEARCH = true;
+
     /*
      * -- ENABLE_THUMBNAIL
      * enables image thumbnail support for folder listings of the Web interface.
@@ -360,30 +413,39 @@ public class ConfigService {
     public static final boolean ENABLE_THUMBNAIL = true;
 
     /*
-    ## -- ENABLE_THUMBNAIL_CACHE
-    ## enable image thumbnail caching (improves performance - 2x faster)
-    ## DEFAULT: $ENABLE_THUMBNAIL_CACHE = 0;
-    $ENABLE_THUMBNAIL_CACHE = 1;
+     * -- ENABLE_THUMBNAIL_CACHE
+     * enable image thumbnail caching (improves performance - 2x faster)
+     * DEFAULT: $ENABLE_THUMBNAIL_CACHE = 0;
+     */
+    public static final boolean ENABLE_THUMBNAIL_CACHE = true;
 
-    ## -- THUMBNAIL_WIDTH
-    ## defines the width of a image thumbnail
-    $THUMBNAIL_WIDTH=110;
+    /*
+     * -- THUMBNAIL_WIDTH
+     * defines the width of a image thumbnail
+     */
+    public static final int THUMBNAIL_WIDTH = 110;
 
+/*
     ## -- THUMBNAIL_CACHEDIR
     ## defines the path to a cache directory for image thumbnails
     ## this is neccessary if you enable the thumbnail cache ($ENABLE_THUMBNAIL_CACHE)
     ## EXAMPLE: $THUMBNAIL_CACHEDIR=".thumbs";
     $THUMBNAIL_CACHEDIR="/usr/local/www/tmp/thumbs";
+*/
+    
+    /*
+     * -- ENABLE_BIND
+     * enables BIND/UNBIND/REBIND methods defined in http://tools.ietf.org/html/draft-ietf-webdav-bind-27
+     */
+    public static final boolean ENABLE_BIND = true;
 
-    ## -- ENABLE_BIND
-    ## enables BIND/UNBIND/REBIND methods defined in http://tools.ietf.org/html/draft-ietf-webdav-bind-27
-    $ENABLE_BIND = 1;
-
-    ## -- DEBUG
-    ## enables/disables debug output
-    ## you can find the debug output in your web server error log
-    $DEBUG = 0;
-
+    /*
+     * -- DEBUG
+     * enables/disables debug output
+     * you can find the debug output in your web server error log
+     */
+    public static final boolean DEBUG = false;
+/*
     ############  S E T U P - END ###########################################
     #########################################################################
 */    
