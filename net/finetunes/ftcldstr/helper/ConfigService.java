@@ -425,13 +425,15 @@ public class ConfigService {
      */
     public static final int THUMBNAIL_WIDTH = 110;
 
-/*
-    ## -- THUMBNAIL_CACHEDIR
-    ## defines the path to a cache directory for image thumbnails
-    ## this is neccessary if you enable the thumbnail cache ($ENABLE_THUMBNAIL_CACHE)
-    ## EXAMPLE: $THUMBNAIL_CACHEDIR=".thumbs";
-    $THUMBNAIL_CACHEDIR="/usr/local/www/tmp/thumbs";
-*/
+    /*
+     * -- THUMBNAIL_CACHEDIR
+     * defines the path to a cache directory for image thumbnails
+     * this is neccessary if you enable the thumbnail cache ($ENABLE_THUMBNAIL_CACHE)
+     * EXAMPLE: $THUMBNAIL_CACHEDIR=".thumbs";
+     */
+    // TODO: PZ: set the proper path here 
+    // public static final String THUMBNAIL_CACHEDIR = "/usr/local/www/tmp/thumbs";
+    public static final String THUMBNAIL_CACHEDIR = "e:\\webdav\\thumbs";
     
     /*
      * -- ENABLE_BIND
@@ -460,26 +462,7 @@ public class ConfigService {
 //		
 //	}
     
-    public static String getSupportedDAVClasses() {
-        // TODO: implement
-        
-        /*
-## supported DAV compliant classes:
-our $DAV='1';
-$DAV.=', 2' if $ENABLE_LOCK;
-$DAV.=', 3, <http://apache.org/dav/propset/fs/1>, extended-mkcol';
-$DAV.=', access-control' if $ENABLE_ACL || $ENABLE_CALDAV || $ENABLE_CARDDAV;
-$DAV.=', calendar-access, calendarserver-private-comments' if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE; 
-$DAV.=', calendar-auto-schedule' if  $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE;
-$DAV.=', addressbook' if $ENABLE_CARDDAV;
-$DAV.=', bind' if $ENABLE_BIND;         
-         
-         */
-        
-        
-        return "";
-        
-    }
+    public static String DAV = null;
     
 
 }

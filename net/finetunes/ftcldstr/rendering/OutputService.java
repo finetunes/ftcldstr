@@ -41,7 +41,7 @@ public class OutputService {
         }
         
         response.addHeader("MS-Author-Via", "DAV");
-        response.addHeader("DAV", ConfigService.getSupportedDAVClasses());
+        response.addHeader("DAV", ConfigService.DAV);
 
         // adding extra headers
         if (headers != null) {

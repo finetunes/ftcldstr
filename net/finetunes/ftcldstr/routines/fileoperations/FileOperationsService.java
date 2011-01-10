@@ -54,6 +54,7 @@ public class FileOperationsService {
     public static boolean file_exits(String filename) {
         
         // TODO: implement
+        // should work both for file and directory
         return false;
         
     }       

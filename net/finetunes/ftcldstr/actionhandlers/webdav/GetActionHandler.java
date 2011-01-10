@@ -3,11 +3,13 @@ package net.finetunes.ftcldstr.actionhandlers.webdav;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.wrappers.FileOperationsWrapper;
 
 /**
  * The GET method means retrieve whatever information (in the form of an
@@ -35,45 +37,46 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
 public class GetActionHandler extends AbstractActionHandler {
     
-    public void handle(final HttpServletRequest request, final HttpServletResponse response,
-            String pathTranslated) {
+    public void handle(final RequestParams requestParams) {
         
-        // TODO: use full path name in the filesystem for pathTranslated 
-        
-        String fn = pathTranslated;
+        String fn = requestParams.getPathTranslated();
         Logger.debug("GET: " + fn);
         
         if (FileOperationsService.is_hidden(fn)) {
-            OutputService.printHeaderAndContent(request, response, pathTranslated, "404 Not Found", "text/plain", "404 - NOT FOUND");
+            OutputService.printHeaderAndContent(requestParams.getRequest(), requestParams.getResponse(), 
+                    requestParams.getPathTranslated(), "404 Not Found", "text/plain", "404 - NOT FOUND");
         }
         else if (FileOperationsService.is_directory(fn) && !ConfigService.FANCYINDEXING) {
-            OutputService.printHeaderAndContent(request, response, pathTranslated, "404 Not Found", "text/plain", "404 - NOT FOUND");
+            OutputService.printHeaderAndContent(requestParams.getRequest(), requestParams.getResponse(), 
+                    requestParams.getPathTranslated(), "404 Not Found", "text/plain", "404 - NOT FOUND");
         }
         else if (FileOperationsService.file_exits(fn) && 
-                request.getParameter("action") != null && request.getParameter("action").equals("davmount")) {
+                requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("davmount")) {
             doDavmountRequest(fn);
         }
         else if (ConfigService.ENABLE_THUMBNAIL && FileOperationsService.is_plain_file(fn) &&
                 FileOperationsService.is_file_readable(fn) &&
-                request.getParameter("action") != null && request.getParameter("action").equals("thumb")) {
+                requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("thumb")) {
             doThumbnailRequest(fn);
         }
         else if (FileOperationsService.file_exits(fn) &&
-                request.getParameter("action") != null && request.getParameter("action").equals("props")) {
+                requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("props")) {
             doFileIsDirectory(fn);
         }
         else if (FileOperationsService.is_directory(fn)) {
         }
         else if (FileOperationsService.file_exits(fn) &&
                 !FileOperationsService.is_file_readable(fn)) {
-            OutputService.printHeaderAndContent(request, response, pathTranslated, "403 Forbidden", "text/plain", "403 Forbidden");
+            OutputService.printHeaderAndContent(requestParams.getRequest(), requestParams.getResponse(), 
+                    requestParams.getPathTranslated(), "403 Forbidden", "text/plain", "403 Forbidden");
         }
         else if (FileOperationsService.file_exits(fn)) {
             doFileExists(fn);
         }
         else {
             Logger.debug("GET: " + fn + " NOT FOUND!");
-            OutputService.printHeaderAndContent(request, response, pathTranslated, "404 Not Found", "text/plain", "404 - FILE NOT FOUND");
+            OutputService.printHeaderAndContent(requestParams.getRequest(), requestParams.getResponse(), 
+                    requestParams.getPathTranslated(), "404 Not Found", "text/plain", "404 - FILE NOT FOUND");
         }
     }
     
@@ -90,18 +93,32 @@ public class GetActionHandler extends AbstractActionHandler {
     
     // TODO
     private void doThumbnailRequest(String fn) {
+        
 //      my $image = Graphics::Magick->new;
-//      my $width = $THUMBNAIL_WIDTH || $ICON_WIDTH || 22;
-//      if ($ENABLE_THUMBNAIL_CACHE) {
-//          my $uniqname = $fn;
-//          $uniqname=~s/\//_/g;
-//          my $cachefile = "$THUMBNAIL_CACHEDIR/$uniqname.thumb";
-//          mkdir($THUMBNAIL_CACHEDIR) if ! -e $THUMBNAIL_CACHEDIR;
-//          if (! -e $cachefile || (stat($fn))[9] > (stat($cachefile))[9]) {
+        
+        int width = 22;
+        if (ConfigService.THUMBNAIL_WIDTH > 0) {
+            width = ConfigService.THUMBNAIL_WIDTH;
+        }
+        else if (ConfigService.ICON_WIDTH > 0) {
+            width = ConfigService.ICON_WIDTH;
+        }
+        
+        if (ConfigService.ENABLE_THUMBNAIL_CACHE) {
+            String uniqname = fn;
+//          $uniqname=~s/\//_/g; // TODO
+            
+            String cachefile = ConfigService.THUMBNAIL_CACHEDIR + "/" + uniqname + ".thumb";
+            if (!FileOperationsService.file_exits(ConfigService.THUMBNAIL_CACHEDIR)) {
+                // create directory using wrapper (THUMBNAIL_CACHEDIR) // TODO
+            }
+            
+            if (!FileOperationsService.file_exits(cachefile) ||
+                    FileOperationsWrapper.getFileModificationDate(fn).after(FileOperationsWrapper.getFileModificationDate(cachefile))) {
 //              $image->Read($fn);
 //              $image->Resize(geometry=>$width,filter=>'Gaussian');
 //              $image->Write($cachefile);
-//          }
+            }
 //          if (open(my $cf, "<$cachefile")) {
 //              print $cgi->header(-status=>'200 OK',-type=>getMIMEType($fn), -ETag=>getETag($cachefile), -Content-length=>(stat($cachefile))[7]);
 //              binmode $cf;
@@ -109,6 +126,8 @@ public class GetActionHandler extends AbstractActionHandler {
 //              print while(<$cf>);
 //              close($cf);
 //          }
+        }
+
 //      } else {
 //          print $cgi->header(-status=>'200 OK',-type=>getMIMEType($fn), -ETag=>getETag($fn));
 //          $image->Read($fn);

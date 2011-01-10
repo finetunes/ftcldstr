@@ -16,6 +16,7 @@ import net.finetunes.ftcldstr.actionhandlers.base.NotSupportedMethodActionHandle
 import net.finetunes.ftcldstr.actionhandlers.webdav.GetActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.HeadActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.PostActionHandler;
+import net.finetunes.ftcldstr.helper.InitializationService;
 
 
 public class ActionServlet extends MServlet {
@@ -25,6 +26,7 @@ public class ActionServlet extends MServlet {
     
     public ActionServlet() {
         super();
+        InitializationService.init();
         initMethods();
     }
     
@@ -42,21 +44,21 @@ public class ActionServlet extends MServlet {
     public void service(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException {
     
-        String requestedMethod = request.getMethod();
-        System.out.println("MServlet::service::METHOD: " + requestedMethod);
-        handleRequest(request, response, requestedMethod);
+        RequestParams requestParams = InitializationService.initRequestParams(request, response);
+        
+        System.out.println("MServlet::service::METHOD: " + requestParams.getRequestedMethod());
+        handleRequest(requestParams);
     
         response.getOutputStream().flush();
         response.flushBuffer();
     }
 
     //@SuppressWarnings("unchecked")
-    public void handleRequest(final HttpServletRequest request, final HttpServletResponse response,
-            final String method) {
+    public void handleRequest(RequestParams requestParams) {
         
         // request processing
 
-        String pathinfo = request.getPathInfo();
+        String pathinfo = requestParams.getRequest().getPathInfo();
         if (pathinfo == null) {
             pathinfo = "";
         }
@@ -65,7 +67,7 @@ public class ActionServlet extends MServlet {
 
         // Handle the request
         // with the corresponding method handler
-        AbstractActionHandler actionHandler = getMethodHandler(method);
+        AbstractActionHandler actionHandler = getMethodHandler(requestParams.getRequestedMethod());
         
         if (actionHandler == null) {
             actionHandler = getMethodHandler(ActionServlet.NOT_SUPPORTED);
@@ -73,7 +75,7 @@ public class ActionServlet extends MServlet {
         
         // do some work
         String pathTranslated = "/"; // PZ: TODO: get path translated value by filename
-        actionHandler.handle(request, response, pathTranslated);
+        actionHandler.handle(requestParams);
 
 /*        
         // some temporary output stuff here
