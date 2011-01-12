@@ -22,6 +22,11 @@ public class DirectoryOperationsService {
 		
 	}
 	
+    public static Object[] getFolderList(String fn, String ru) {
+     
+        return getFolderList(fn, ru, null);
+    }	
+	
 	public static int getDirInfo(String filename, String propertyName) {
 		
 		// TODO: implement

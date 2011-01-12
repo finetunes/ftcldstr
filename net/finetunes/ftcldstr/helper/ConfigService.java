@@ -1,5 +1,9 @@
 package net.finetunes.ftcldstr.helper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 /**
  * Config class to store global configuration values
  *
@@ -213,38 +217,55 @@ public class ConfigService {
      */
     public static final boolean ALLOW_CHANGEPERMRECURSIVE = true;
 
+    /*
+     * -- PERM_USER
+     * if ALLOW_CHANGEPERM is set to 1 the PERM_USER variable
+     * defines the file/folder permissions for user/owner allowed to change
+     * EXAMPLE: $PERM_USER = [ 'r','w','x','s' ];
+     */
+    public final static ArrayList<String> PERM_USER = new ArrayList<String>(Arrays.asList("r", "w", "x", "s"));
+
+    /*
+     * -- PERM_GROUP
+     * if ALLOW_CHANGEPERM is set to 1 the PERM_GROUP variable
+     * defines the file/folder permissions for group allowed to change
+     * EXMAMPLE: $PERM_GROUP = [ 'r','w','x','s' ];
+     */
+    public final static ArrayList<String> PERM_GROUP = new ArrayList<String>(Arrays.asList("r", "w", "x", "s"));
+
+    /*
+     * -- PERM_OTHERS
+     * if ALLOW_CHANGEPERM is set to 1 the PERM_OTHERS variable
+     * defines the file/folder permissions for other users allowed to change
+     * EXAMPLE: $PERM_OTHERS = [ 'r','w','x','t' ];
+     */
+    public final static ArrayList<String> PERM_OTHERS = new ArrayList<String>(Arrays.asList("r", "w", "x", "t"));
+
+
+//    PZ: no language support
+//    ## -- LANGSWITCH
+//    ## a simple language switch
+//    $LANGSWITCH = '<div style="font-size:0.6em;text-align:right;border:0px;padding:0px;"><a href="?lang=default">[EN]</a> <a href="?lang=de">[DE]</a></div>';
+
+    /*
+     * -- HEADER
+     * content after body tag in the Web interface
+     */
+    public static final String HEADER = "<div style=\"padding-left:3px;background-color:#444444;color:#ffffff;\">" +
+    		"WebDAV CGI - Web interface: You are logged in as " + 
+            // TODO: get current user name
+            // ($ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}) + 
+    		"<b>TODO</b>" + 
+    		".</div>";
+
+    /*
+     * -- SIGNATURE
+     * for fancy indexing
+     * EXAMPLE: $SIGNATURE=$ENV{SERVER_SIGNATURE};
+     */
+    public static final String SIGNATURE = "<div style=\"padding-left:3px;background-color:#444444;color:#ffffff;\">&copy; ZE CMS, Humboldt-Universit&auml;t zu Berlin | Written 2010 by <a style=\"color:#ffffff;\" href=\"http://amor.cms.hu-berlin.de/~rohdedan/webdav/\">Daniel Rohde</a></div>";
+
 /*
-    ## -- PERM_USER
-    # if ALLOW_CHANGEPERM is set to 1 the PERM_USER variable 
-    # defines the file/folder permissions for user/owner allowed to change
-    # EXAMPLE: $PERM_USER = [ 'r','w','x','s' ];
-    $PERM_USER = [ 'r','w','x','s' ];
-
-    ## -- PERM_GROUP
-    # if ALLOW_CHANGEPERM is set to 1 the PERM_GROUP variable 
-    # defines the file/folder permissions for group allowed to change
-    # EXMAMPLE: $PERM_GROUP = [ 'r','w','x','s' ];
-    $PERM_GROUP = [ 'r','w','x','s' ];
-
-    ## -- PERM_OTHERS
-    # if ALLOW_CHANGEPERM is set to 1 the PERM_OTHERS variable 
-    # defines the file/folder permissions for other users allowed to change
-    # EXAMPLE: $PERM_OTHERS = [ 'r','w','x','t' ];
-    $PERM_OTHERS = [ 'r','w','x','t' ];
-
-    ## -- LANGSWITCH
-    ## a simple language switch
-    $LANGSWITCH = '<div style="font-size:0.6em;text-align:right;border:0px;padding:0px;"><a href="?lang=default">[EN]</a> <a href="?lang=de">[DE]</a></div>';
-
-    ## -- HEADER
-    ## content after body tag in the Web interface
-    $HEADER = '<div style="padding-left:3px;background-color:#444444;color:#ffffff;">WebDAV CGI - Web interface: You are logged in as '.($ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}).'.</div>';
-
-    ## -- SIGNATURE
-    ## for fancy indexing
-    ## EXAMPLE: $SIGNATURE=$ENV{SERVER_SIGNATURE};
-    $SIGNATURE = '<div style="padding-left:3px;background-color:#444444;color:#ffffff;">&copy; ZE CMS, Humboldt-Universit&auml;t zu Berlin | Written 2010 by <a style="color:#ffffff;" href="http://amor.cms.hu-berlin.de/~rohdedan/webdav/">Daniel Rohde</a></div>';
-
     ## -- LANG
     ## defines the default language for the Web interface
     ## see %TRANSLATION option for supported languages
@@ -382,6 +403,8 @@ public class ConfigService {
     public static final boolean ENABLE_TRASH = false;
 
 /*
+ * PZ: the variable must have the trailing slash if a directory
+ * 
     ## -- TRASH_FOLDER
     ## neccessary if you enable trash 
     ## it should be writable by your users (chmod a+rwxt <trash folder>)
@@ -463,6 +486,9 @@ public class ConfigService {
 //	}
     
     public static String DAV = null;
+    
+    // phrases
+    public static HashMap<String, String> stringMessages = null;
     
 
 }

@@ -13,8 +13,16 @@ public class SearchService {
 		
 		// TODO: implement
 		return null;
-		
 	}
+	
+    public static String getSearchResult(String searchString,
+            String filename, String ru) {
+        
+        // TODO: implement
+        // call getSearchResult with default params
+        return null;
+    }
+	
 	
 	// TODO: define xmlref type and return type
 	public static void buildExprFromBasicSearchWhereClause(

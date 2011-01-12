@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
 
@@ -21,27 +22,26 @@ public class OutputService {
 	 * Sends the header and the content directly to the out
 	 */
 	public static void printHeaderAndContent(
-	        HttpServletRequest request, HttpServletResponse response,
-	        String pathTranslated,
+	        RequestParams requestParams,
 	        String status, String type, String content, HashMap<String, String> headers) {
 	    
 	    // print header
 	    
 	    if (status != null && !status.isEmpty()) {
-	        response.setStatus(extractStatusCode(status));
+	        requestParams.getResponse().setStatus(extractStatusCode(status));
 	    }
 	    
-        response.addHeader("Content-Type", type + "; charset=" + ConfigService.CHARSET);
-        response.addHeader("Content-Length", String.valueOf(getContentLength(content)));
-        response.addHeader("ETag", PropertiesHelper.getETag(pathTranslated));
+	    requestParams.getResponse().addHeader("Content-Type", type + "; charset=" + ConfigService.CHARSET);
+	    requestParams.getResponse().addHeader("Content-Length", String.valueOf(getContentLength(content)));
+	    requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams.getPathTranslated()));
 
-        if (request.getHeader("Translate") != null &&
-                !request.getHeader("Translate").isEmpty()) {
-            response.addHeader("Translate", "f");
+        if (requestParams.getRequest().getHeader("Translate") != null &&
+                !requestParams.getRequest().getHeader("Translate").isEmpty()) {
+            requestParams.getResponse().addHeader("Translate", "f");
         }
         
-        response.addHeader("MS-Author-Via", "DAV");
-        response.addHeader("DAV", ConfigService.DAV);
+        requestParams.getResponse().addHeader("MS-Author-Via", "DAV");
+        requestParams.getResponse().addHeader("DAV", ConfigService.DAV);
 
         // adding extra headers
         if (headers != null) {
@@ -49,14 +49,14 @@ public class OutputService {
             Iterator<String> it = headerKeys.iterator();
             while (it.hasNext()) {
                 String key = it.next();
-                response.addHeader(key, headers.get(key));
+                requestParams.getResponse().addHeader(key, headers.get(key));
             }
         }
         
         // print content
 
         try {
-            OutputStream outStream = response.getOutputStream();
+            OutputStream outStream = requestParams.getResponse().getOutputStream();
             
             PrintWriter pw = new PrintWriter(new OutputStreamWriter(outStream, ConfigService.CHARSET));
             pw.println(content);
@@ -75,29 +75,25 @@ public class OutputService {
 	}
 	
     public static void printHeaderAndContent(
-            HttpServletRequest request, HttpServletResponse response,
-            String pathTranslated,
+            RequestParams requestParams,
             String status, String type, String content) {
-        printHeaderAndContent(request, response, pathTranslated, status, type, content, null);
+        printHeaderAndContent(requestParams, status, type, content, null);
     }
 
     public static void printHeaderAndContent(
-            HttpServletRequest request, HttpServletResponse response,
-            String pathTranslated,
+            RequestParams requestParams,
             String status, String type) {
-        printHeaderAndContent(request, response, pathTranslated, status, type, "");
+        printHeaderAndContent(requestParams, status, type, "");
     }
 
     public static void printHeaderAndContent(
-            HttpServletRequest request, HttpServletResponse response,
-            String pathTranslated,
+            RequestParams requestParams,
             String status) {
-        printHeaderAndContent(request, response, pathTranslated, status, "text/plain");
+        printHeaderAndContent(requestParams, status, "text/plain");
     }
     
-    public static void printHeaderAndContent(HttpServletRequest request, HttpServletResponse response,
-            String pathTranslated) {
-        printHeaderAndContent(request, response, pathTranslated, "403 Forbidden");
+    public static void printHeaderAndContent(RequestParams requestParams) {
+        printHeaderAndContent(requestParams, "403 Forbidden");
     }	
     
 	/*

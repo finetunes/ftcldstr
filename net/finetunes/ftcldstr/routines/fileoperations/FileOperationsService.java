@@ -1,5 +1,6 @@
 package net.finetunes.ftcldstr.routines.fileoperations;
 
+import java.io.File;
 import java.util.HashMap;
 
 public class FileOperationsService {
@@ -46,33 +47,41 @@ public class FileOperationsService {
 	
     public static boolean is_directory(String filename) {
         
-        // TODO: implement
-        return false;
-        
+        File file = new File(filename);
+        return file.isDirectory();
     }	
     
     public static boolean file_exits(String filename) {
         
-        // TODO: implement
-        // should work both for file and directory
-        return false;
-        
+        File file = new File(filename);
+        return file.exists();
     }       
 
     // determines whether the file is a plain file (not a link, directory, pipe, etc.)
     public static boolean is_plain_file(String filename) {
         
-        // TODO: implement
-        return false;
+        // TODO: implement !
+        // return false;
+        // File.isFile() ?
+        
+        return !is_directory(filename);
         
     }
     
-    // determines whether the file is readable with the effective uid/gid
+    // determines whether the file or directory is readable with the effective uid/gid
     public static boolean is_file_readable(String filename) {
         
         // TODO: implement
-        return false;
+        return true;
         
     }       
+    
+    // determines whether the file or directory is writable with the effective uid/gid
+    public static boolean is_file_writable(String filename) {
+        
+        // TODO: implement
+        return true;
+        
+    }         
     
 }

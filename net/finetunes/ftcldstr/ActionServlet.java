@@ -43,8 +43,17 @@ public class ActionServlet extends MServlet {
 	
     public void service(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException {
-    
-        RequestParams requestParams = InitializationService.initRequestParams(request, response);
+
+        RequestParams requestParams = InitializationService.initRequestParams(request, response,
+                getServletContext());
+        
+//        > System.out.println(getServletContext().getRealPath(""));
+//        > System.out.println(request.getQueryString());
+//        > System.out.println(request.getServletPath());
+//        D:\work\finetunes\ftcldstr\git\WebContent\
+//        a=b&c=d
+//        /aa        
+        
         
         System.out.println("MServlet::service::METHOD: " + requestParams.getRequestedMethod());
         handleRequest(requestParams);

@@ -3,6 +3,7 @@ package net.finetunes.ftcldstr.actionhandlers.webdav;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
@@ -33,14 +34,13 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
 public class HeadActionHandler extends AbstractActionHandler {
 
-    public void handle(final HttpServletRequest request, final HttpServletResponse response,
-            String pathTranslated) {
+    public void handle(final RequestParams requestParams) {
         
-        String fn = pathTranslated;
+        String fn = requestParams.getPathTranslated();
 
         if (FileOperationsService.is_directory(fn)) {
             Logger.debug("HEAD: " + fn + " is a folder!");
-            OutputService.printHeaderAndContent(request, response, "200 OK", "httpd/unix-directory");
+            OutputService.printHeaderAndContent(requestParams, "200 OK", "httpd/unix-directory");
         }
         else if (FileOperationsService.file_exits(fn)) {
             Logger.debug("HEAD: " + fn + " exists!");
@@ -48,7 +48,7 @@ public class HeadActionHandler extends AbstractActionHandler {
         }
         else {
             Logger.debug("HEAD: " + fn + " does not exist!");
-            OutputService.printHeaderAndContent(request, response, "404 Not Found");
+            OutputService.printHeaderAndContent(requestParams, "404 Not Found");
         }
     }
     

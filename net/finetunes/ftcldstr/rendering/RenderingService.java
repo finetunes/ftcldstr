@@ -16,7 +16,7 @@ public class RenderingService {
 	public static String start_html(String title) {
 		
 		// TODO: implement
-		return null;
+		return title;
 		
 	}
 	
@@ -41,5 +41,14 @@ public class RenderingService {
 		return null;
 		
 	}
+	
+	// additional routines
+	
+    public static String end_html() {
+        
+        // TODO: implement
+        return "";
+        
+    }	
 
 }
