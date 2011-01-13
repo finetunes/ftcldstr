@@ -1,6 +1,7 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,11 +15,15 @@ import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.rendering.OutputService;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.rendering.RenderingService;
 import net.finetunes.ftcldstr.routines.fileoperations.DirectoryOperationsService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.routines.webdav.SearchService;
+import net.finetunes.ftcldstr.serialization.DBPropertiesOperations;
 import net.finetunes.ftcldstr.wrappers.FileOperationsWrapper;
 
 /**
@@ -69,7 +74,7 @@ public class GetActionHandler extends AbstractActionHandler {
         }
         else if (FileOperationsService.file_exits(fn) &&
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("props")) {
-            doFilePropertiesRequest(fn);
+            doFilePropertiesRequest(fn, requestParams);
         }
         else if (FileOperationsService.is_directory(fn)) {
             doFileIsDirectory(fn, requestParams);
@@ -161,7 +166,7 @@ public class GetActionHandler extends AbstractActionHandler {
             String search = requestParams.getRequest().getParameter("search");
             
             String form = "";
-            form += "<form method=\"get\">"; // PZ: TODO: form action?
+            form += "<form method=\"get\">"; // PZ: TODO: form action missing?
 
             form += "<div style=\"text-align:right;font-size:0.8em;padding:2px 0 0 0;border:0;margin:0;\">";
             form += ConfigService.stringMessages.get("search");
@@ -199,10 +204,7 @@ public class GetActionHandler extends AbstractActionHandler {
             int p = 1;
             
             while (requestParams.getRequest().getParameter("p" + p) != null) {
-                // TODO: add html escaping
-                // push @params, $cgi->escapeHTML($cgi->param("p$p"));
-                
-                params.add(requestParams.getRequest().getParameter("p" + p));
+                params.add(RenderingHelper.HTMLEncode(requestParams.getRequest().getParameter("p" + p)));
                 p++;
             }
             
@@ -322,17 +324,34 @@ public class GetActionHandler extends AbstractActionHandler {
                     }
                     
                     content += "; ";
-                    // TODO
-//                          . $cgi->popup_menu(-name=>'fp_type',-values=>['a','s','r'], -labels=>{ 'a'=>_tl('add'), 's'=>_tl('set'), 'r'=>_tl('remove')})
-//                          .($ALLOW_CHANGEPERMRECURSIVE ? '; ' .$cgi->checkbox_group(-name=>'fp_recursive', -value=>['recursive'], 
-//                                  -labels=>{'recursive'=>_tl('recursive')}) : '')
-//                          . '; '.$cgi->submit(-name=>'changeperm',-value=>_tl('changepermissions'),
-//                                  -onclick=>'return window.confirm("'._tl('changepermconfirm').'");')
+                    
+                    content += "<select name=\"fp_type\">";
+                    ArrayList<String> fpType = new ArrayList<String>(Arrays.asList("a", "s", "r"));
+                    HashMap<String, String> fpTypeLabels = new HashMap<String, String>();
+                    fpTypeLabels.put("a", ConfigService.stringMessages.get("add"));
+                    fpTypeLabels.put("s", ConfigService.stringMessages.get("set"));
+                    fpTypeLabels.put("r", ConfigService.stringMessages.get("remove"));
+                    Iterator<String> li = fpType.iterator();
+                    while (li.hasNext()) {
+                        String value = li.next();
+                        String label = fpTypeLabels.get(value);
+                        content += "<option value=\"" + value + "\">" + label + "</option>";
+                    }
+                    content += "</select>";
+                    
+                    if (ConfigService.ALLOW_CHANGEPERMRECURSIVE) {
+                        content += "; ";
+                        content += "<input type=\"checkbox\" name=\"fp_recursive\" value=\"recursive\">";
+                        content += ConfigService.stringMessages.get("recursive");
+                    }
+                    
+                    content += "; ";
+                    content += "<input type=\"submit\" name=\"changeperm\" value=\"changepermissions\" " +
+                    		" onclick=\"return window.confirm('" + ConfigService.stringMessages.get("changepermconfirm") + "');\">";
                     
                     content += "<br>";
                     content += "&nbsp;&nbsp;";
                     content += ConfigService.stringMessages.get("changepermlegend");
-                    
                 }
                 
                 if (ConfigService.ALLOW_ZIP_UPLOAD || ConfigService.ALLOW_ZIP_DOWNLOAD) {
@@ -365,16 +384,27 @@ public class GetActionHandler extends AbstractActionHandler {
             }
             
             if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_file_writable(fn)) {
-                // TODO
-//              $content .= $cgi->hr().$cgi->start_multipart_form(-onsubmit=>'return window.confirm("'._tl('confirm').'");')
-//              .$cgi->hidden(-name=>'upload',-value=>1)
-//              .$cgi->span({-id=>'file_upload'},'&bull; '._tl('fileuploadtext').$cgi->filefield(-name=>'file_upload', -multiple=>'multiple' ))
-//              .$cgi->span({-id=>'moreuploads'},"").$cgi->submit(-name=>'filesubmit',-value=>_tl('fileuploadbutton'),-onclick=>'return window.confirm("'._tl('fileuploadconfirm').'");')
-//              .' '
-//              .$cgi->a({-onclick=>'javascript:document.getElementById("moreuploads").innerHTML=document.getElementById("moreuploads").innerHTML+"<br/>"+document.getElementById("file_upload").innerHTML',-href=>'#'},_tl('fileuploadmore'))
-//              .' ('.($CGI::POST_MAX / 1048576).' MB max)'
-//              .$cgi->end_form() if $ALLOW_POST_UPLOADS && -w $fn ;
                 
+                content += "<hr>";
+                content += "<form " +
+                		" enctype=\"multipart/form-data\"" +
+                		" method=\"post\"" +
+                		" onsubmit=\"return window.confirm('" + ConfigService.stringMessages.get("confirm") + "');\">";
+                content += "<input type=\"hidden\" name=\"upload\" value=\"1\" >";
+                content += "<span id=\"file_upload\">&bull; " + ConfigService.stringMessages.get("fileuploadtext");
+                content += "<input type=\"file\" name=\"file_upload\" multiple=\"multiple\">";
+                content += "</span>";
+
+                content += "<span id=\"moreuploads\"></span>";
+                content += "<input type=\"submit\" " +
+                                " name=\"filesubmit\"" +
+                                " value=\"" + ConfigService.stringMessages.get("fileuploadbutton") + "\" " +
+                                " onclick=\"return window.confirm('" + ConfigService.stringMessages.get("fileuploadconfirm") + "');\">";
+                content += " ";
+                content += "<a href=\"#\"" +
+                		" onclick=\"javascript:document.getElementById('moreuploads').innerHTML=document.getElementById('moreuploads').innerHTML+'<br/>'+document.getElementById('file_upload').innerHTML\">" + ConfigService.stringMessages.get("fileuploadmore") + "</a>";
+                content += " (" + ConfigService.POST_MAX_SIZE / 1048576 + " MB max)";
+                content += "</form>";
             }
         }
         
@@ -392,26 +422,88 @@ public class GetActionHandler extends AbstractActionHandler {
     }
   
     // TODO
-    private void doFilePropertiesRequest(String fn) {
-/*        
-        my $content = "";
-        $content .= start_html("$REQUEST_URI properties");
-        $content .= $LANGSWITCH if defined $LANGSWITCH;
-        $content .= $HEADER if defined $HEADER;
-        my $fullparent = dirname($REQUEST_URI) .'/';
-        $fullparent = '/' if $fullparent eq '//' || $fullparent eq '';
-        $content .=$cgi->h1( (-d $fn ? getQuickNavPath($REQUEST_URI,getQueryParams()) 
-                         : getQuickNavPath($fullparent,getQueryParams())
-                           .' '.$cgi->a({-href=>$REQUEST_URI}, basename($REQUEST_URI))
-                      ). _tl('properties'));
-        $content .= $cgi->a({href=>$REQUEST_URI,title=>_tl('clickforfullsize')},$cgi->img({-src=>$REQUEST_URI.($ENABLE_THUMBNAIL?'?action=thumb':''), -alt=>'image', -style=>'border:0; width:'.($ENABLE_THUMBNAIL?$THUMBNAIL_WIDTH:200)})) if getMIMEType($fn) =~ /^image\//;
-        $content .= $cgi->start_table({-style=>'width:100%;table-layout:fixed;'});
-        local(%NAMESPACEELEMENTS);
+    private void doFilePropertiesRequest(String fn, RequestParams requestParams) {
+        
+        String content = "";
+        content += RenderingService.start_html(requestParams.getRequestURI() + " properties");
+        if (ConfigService.HEADER != null && !ConfigService.HEADER.isEmpty()) {
+            content += ConfigService.HEADER;
+        }
+
+        // PZ: original perl code
+        // my $fullparent = dirname($REQUEST_URI) .'/';
+        // PZ: a strange trick, since dirname() may work wrong for some names
+        
+        String fullparent = "";
+        String basename = "";
+        String ru = requestParams.getRequestURI();
+        if (ru != null && !ru.isEmpty()) {
+            int index = ru.lastIndexOf("/");
+            if (index > 0) {
+                fullparent = ru.substring(0, index);
+            }
+            else {
+                fullparent = "/";
+            }
+            
+            if (index + 1 < ru.length()) {
+                basename = ru.substring(index + 1);
+            }
+        }
+        
+        if (fullparent == null || fullparent.isEmpty() || fullparent == "//") {
+            fullparent = "/";
+        }
+        
+        content += "<h1>";
+        if (FileOperationsService.is_directory(fn)) {
+            content += RenderingService.getQuickNavPath(ru, QueryService.getQueryParams());
+        }
+        else {
+            content += RenderingService.getQuickNavPath(fullparent, QueryService.getQueryParams());
+            content += " ";
+            content += "<a href=\"" + ru + "\">" + basename + "</a>";
+            content += ConfigService.stringMessages.get("properties");
+        }
+        content += "</h1>";
+        
+
+        if (MIMETypesHelper.getMIMEType(fn).startsWith("image/")) {
+            content += "<a href=\"" + ru + "\" title=\"" + ConfigService.stringMessages.get("clickforfullsize") + "\">";
+            String thumbnailPath = "";
+            int imageWidth = 200;
+            if (ConfigService.ENABLE_THUMBNAIL) {
+                thumbnailPath = "?action=thumb";
+                imageWidth = ConfigService.THUMBNAIL_WIDTH;
+            }
+            content += "<img src=\"" + ru + thumbnailPath + "\" alt=\"image\" style=\"border: 0; width: " + String.valueOf(imageWidth) + "\">";
+            content += "</a>";
+        }
+        
+        content += "<table style=\"width: 100%; table-layout:fixed;\">";
+        
+/*
+ * TODO: finish when properties are implemented        
+        HashMap<String, String> namespaceElements = new HashMap<String, String>(ConfigService.NAMESPACEELEMENTS);
+        List dbprops = DBPropertiesOperations.db_getProperties(fn);
+        ArrayList<String> bgcolors = new ArrayList<String>(Arrays.asList("#ffffff", "#eeeeee"));
+        HashMap<?> visited = new HashMap<?>();
+        String bgcolor;
+        
         my $dbprops = db_getProperties($fn);
         my @bgcolors = ( '#ffffff', '#eeeeee' );
         my (%visited);
         my $bgcolor;
-        $content.=$cgi->Tr({-style=>"background-color:#dddddd;text-align:left"}, $cgi->th({-style=>'width:25%'},_tl('propertyname')), $cgi->th({-style=>'width:75%'},_tl('propertyvalue')));
+*/
+  
+        content += "<tr style=\"background-color:#dddddd;text-align:left\">";
+        content += "<th style=\"width:25%\">" + ConfigService.stringMessages.get("propertyname") + "</th>";
+        content += "<th style=\"width:75%\">" + ConfigService.stringMessages.get("propertyvalue") + "</th>";
+        content += "</tr>";
+
+/*
+ * TODO
+ *         
         foreach my $prop (sort {nonamespace(lc($a)) cmp nonamespace(lc($b)) } keys %{$dbprops},-d $fn ? @KNOWN_COLL_PROPS : @KNOWN_FILE_PROPS ) {
             my (%r200);
             next if exists $visited{$prop} || exists $visited{'{'.getNameSpaceUri($prop).'}'.$prop};
@@ -436,11 +528,18 @@ public class GetActionHandler extends AbstractActionHandler {
                 );
             
         }
-        $content.=$cgi->end_table();
-        $content.=$cgi->hr().$SIGNATURE if defined $SIGNATURE;
-        $content.=$cgi->end_html();
-        printHeaderAndContent('200 OK', 'text/html', $content, 'Cache-Control: no-cache, no-store');
-*/        
+*/
+        
+        content += "</table>";
+        if (ConfigService.SIGNATURE != null && !ConfigService.SIGNATURE.isEmpty()) {
+            content += "<hr>" + ConfigService.SIGNATURE;
+        }
+        content += RenderingService.end_html();
+        
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("Cache-Control", "no-cache, no-store");
+
+        OutputService.printHeaderAndContent(requestParams, "200 OK", "text/html", content, params);
     }
     
 

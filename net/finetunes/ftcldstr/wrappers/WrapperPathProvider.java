@@ -17,7 +17,8 @@ public class WrapperPathProvider {
     
     private void initHashtable() {
         
-        pathMap.put("READ_DIRECTORY_WRAPPER", "wrappers/readdir.sh");
+        // pathMap.put("READ_DIRECTORY_WRAPPER", "wrappers/readdir.sh");
+        pathMap.put("READ_DIRECTORY_WRAPPER", "d:\\1.bat"); // PZ: DEBUG
         pathMap.put("READ_DIRECTORY_WRAPPER_2", "wrappers/readdir.sh");
         // ...
         // here the rest of the paths

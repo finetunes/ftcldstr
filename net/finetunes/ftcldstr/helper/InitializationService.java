@@ -142,161 +142,8 @@ public class InitializationService {
         #    report: address-data
         # from RFC5842 (bind)
         #    resource-id, parent-set (unsupported yet)
+*/
 
-
-        @KNOWN_COLL_PROPS = ( 
-                    'creationdate', 'displayname','getcontentlanguage', 
-                    'getlastmodified', 'lockdiscovery', 'resourcetype', 
-                    'getetag', 'getcontenttype',
-                    'supportedlock', 'source',
-                    'quota-available-bytes', 'quota-used-bytes', 'quota', 'quotaused',
-                    'childcount', 'id', 'isfolder', 'ishidden', 'isstructureddocument',
-                    'hassubs', 'nosubs', 'objectcount', 'reserved', 'visiblecount',
-                    'iscollection', 'isFolder', 
-                    'authoritative-directory', 'resourcetag', 'repl-uid',
-                    'modifiedby', 
-                    'Win32CreationTime', 'Win32FileAttributes', 'Win32LastAccessTime', 'Win32LastModifiedTime', 
-                    'name','href', 'parentname', 'isreadonly', 'isroot', 'getcontentclass', 'lastaccessed', 'contentclass',
-                    'supported-report-set', 'supported-method-set',
-                    );
-        @KNOWN_ACL_PROPS = (
-                    'owner','group','supported-privilege-set', 'current-user-privilege-set', 'acl', 'acl-restrictions',
-                    'inherited-acl-set', 'principal-collection-set', 'current-user-principal'
-                      );
-        @KNOWN_CALDAV_COLL_PROPS = (
-                    'calendar-description', 'calendar-timezone', 'supported-calendar-component-set',
-                    'supported-calendar-data', 'max-resource-size', 'min-date-time',
-                    'max-date-time', 'max-instances', 'max-attendees-per-instance',
-                    'getctag',
-                        'principal-URL', 'calendar-home-set', 'schedule-inbox-URL', 'schedule-outbox-URL',
-                    'calendar-user-type', 'schedule-calendar-transp', 'schedule-default-calendar-URL',
-                    'schedule-tag', 'calendar-user-address-set',
-                    );
-        @KNOWN_CALDAV_FILE_PROPS = ( 'calendar-data' );
-
-        @KNOWN_CARDDAV_COLL_PROPS = ('addressbook-description', 'supported-address-data', 'addressbook-home-set', 'principal-address');
-        @KNOWN_CARDDAV_FILE_PROPS = ('address-data');
-
-        @KNOWN_COLL_LIVE_PROPS = ( );
-        @KNOWN_FILE_LIVE_PROPS = ( );
-        @KNOWN_CALDAV_COLL_LIVE_PROPS = ( 'resourcetype', 'displayname', 'calendar-description', 'calendar-timezone', 'calendar-user-address-set');
-        @KNOWN_CALDAV_FILE_LIVE_PROPS = ( );
-        @KNOWN_CARDDAV_COLL_LIVE_PROPS = ( 'addressbook-description');
-        @KNOWN_CARDDAV_FILE_LIVE_PROPS = ( );
-
-        push @KNOWN_COLL_LIVE_PROPS, @KNOWN_CALDAV_COLL_LIVE_PROPS if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE || $ENABLE_CARDDAV;
-        push @KNOWN_FILE_LIVE_PROPS, @KNOWN_CALDAV_FILE_LIVE_PROPS if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE || $ENABLE_CARDDAV;
-        push @KNOWN_COLL_LIVE_PROPS, @KNOWN_CARDDAV_COLL_LIVE_PROPS if $ENABLE_CARDDAV;
-        push @KNOWN_COLL_PROPS, @KNOWN_ACL_PROPS if $ENABLE_ACL || $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE || $ENABLE_CARDDAV;
-        push @KNOWN_COLL_PROPS, @KNOWN_CALDAV_COLL_PROPS if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE;
-        push @KNOWN_COLL_PROPS, @KNOWN_CARDDAV_COLL_PROPS if $ENABLE_CARDDAV;
-        push @KNOWN_COLL_PROPS, 'resource-id' if $ENABLE_BIND;
-
-
-        @KNOWN_FILE_PROPS = ( @KNOWN_COLL_PROPS, 'getcontentlength', 'executable' );
-        push @KNOWN_FILE_PROPS, @KNOWN_CALDAV_FILE_PROPS if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE;
-        push @KNOWN_FILE_PROPS, @KNOWN_CARDDAV_FILE_PROPS if $ENABLE_CARDDAV;
-
-        push @KNOWN_COLL_PROPS, 'component-set' if $ENABLE_GROUPDAV;
-
-        @UNSUPPORTED_PROPS = ( 'checked-in', 'checked-out', 'xmpp-uri', 'dropbox-home-URL' ,'appledoubleheader','parent-set' );
-
-        @PROTECTED_PROPS = ( @UNSUPPORTED_PROPS, 
-                    'getcontentlength', 'getcontenttype', 'getetag', 'lockdiscovery', 
-                    'source', 'supportedlock',
-                    'supported-report-set',
-                    'quota-available-bytes, quota-used-bytes', 'quota', 'quotaused',
-                    'childcount', 'id', 'isfolder', 'ishidden', 'isstructureddocument', 
-                    'hassubs', 'nosubs', 'objectcount', 'reserved', 'visiblecount',
-                    'iscollection', 'isFolder',
-                    'authoritative-directory', 'resourcetag', 'repl-uid',
-                    'modifiedby', 
-                    'name', 'href', 'parentname', 'isreadonly', 'isroot', 'getcontentclass', 'contentclass',
-                    'owner', 'group', 'supported-privilege-set', 'current-user-privilege-set', 
-                    'acl', 'acl-restrictions', 'inherited-acl-set', 'principal-collection-set',
-                    'supported-calendar-component-set','supported-calendar-data', 'max-resource-size',
-                    'min-date-time','max-date-time','max-instances','max-attendees-per-instance', 'getctag',
-                    'current-user-principal', 
-                    'calendar-user-address-set', 'schedule-inbox-URL', 'schedule-outbox-URL', 'schedule-calendar-transp',
-                    'schedule-default-calendar-URL', 'schedule-tag', 'supported-address-data', 
-                    'supported-collation-set', 'supported-method-set', 'supported-method',
-                    'supported-query-grammar'
-                );
-
-        @ALLPROP_PROPS = ( 'creationdate', 'displayname', 'getcontentlanguage', 'getlastmodified', 
-                    'lockdiscovery', 'resourcetype','supportedlock', 'getetag', 'getcontenttype', 
-                    'getcontentlength', 'executable' );
-
-
-        ### XML
-        %NAMESPACES = ( 'DAV:'=>'D', 'http://apache.org/dav/props/'=>'lp2', 'urn:schemas-microsoft-com:' => 'Z', 'urn:schemas-microsoft-com:datatypes'=>'M', 'urn:schemas-microsoft-com:office:office' => 'Office', 'http://schemas.microsoft.com/repl/' => 'Repl', 'urn:ietf:params:xml:ns:caldav'=>'C', 'http://calendarserver.org/ns/'=>'CS', 'http://www.apple.com/webdav_fs/props/'=>'Apple', 'http://www.w3.org/2000/xmlns/'=>'x', 'urn:ietf:params:xml:ns:carddav' => 'A', 'http://www.w3.org/2001/XMLSchema'=>'xs', 'http://groupdav.org/'=>'G');
-
-        %ELEMENTS = (   'calendar'=>'C','calendar-description'=>'C', 'calendar-timezone'=>'C', 'supported-calendar-component-set'=>'C',
-                'supported-calendar-data'=>'C', 'max-resource-size'=>'C', 'min-date-time'=>'C',
-                'max-date-time'=>'C','max-instances'=>'C', 'max-attendees-per-instance'=>'C',
-                'read-free-busy'=>'C', 'calendar-home-set'=>'C', 'supported-collation-set'=>'C', 'schedule-tag'=>'C',
-                'calendar-data'=>'C', 'mkcalendar-response'=>'C', getctag=>'CS',
-                'calendar-user-address-set'=>'C', 'schedule-inbox-URL'=>'C', 'schedule-outbox-URL'=>'C',
-                'calendar-user-type'=>'C', 'schedule-calendar-transp'=>'C', 'schedule-default-calendar-URL'=>'C',
-                'schedule-inbox'=>'C', 'schedule-outbox'=>'C', 'transparent'=>'C',
-                'calendar-multiget'=>'C', 'calendar-query'=>'C', 'free-busy-query'=>'C',
-                'addressbook'=>'A', 'addressbook-description'=>'A', 'supported-address-data'=>'A', 'addressbook-home-set'=>'A', 'principal-address'=>'A',
-                'address-data'=>'A',
-                'addressbook-query'=>'A', 'addressbook-multiget'=>'A',
-                'string'=>'xs', 'anyURI'=>'xs', 'nonNegativeInteger'=>'xs', 'dateTime'=>'xs',
-                'vevent-collection'=>'G', 'vtodo-collection'=>'G', 'vcard-collection'=>'G', 'component-set'=>'G',
-                'executable'=>'lp2','Win32CreationTime'=>'Z', 'Win32LastModifiedTime'=>'Z', 'Win32LastAccessTime'=>'Z', 
-                'authoritative-directory'=>'Repl', 'resourcetag'=>'Repl', 'repl-uid'=>'Repl', 'modifiedby'=>'Office', 'specialFolderType'=>'Office',
-                'Win32CreationTime'=>'Z', 'Win32FileAttributes'=>'Z', 'Win32LastAccessTime'=>'Z', 'Win32LastModifiedTime'=>'Z',default=>'D' );
-
-        %NAMESPACEABBR = ( 'D'=>'DAV:', 'lp2'=>'http://apache.org/dav/props/', 'Z'=>'urn:schemas-microsoft-com:', 'Office'=>'urn:schemas-microsoft-com:office:office','Repl'=>'http://schemas.microsoft.com/repl/', 'M'=>'urn:schemas-microsoft-com:datatypes', 'C'=>'urn:ietf:params:xml:ns:caldav', 'CS'=>'http://calendarserver.org/ns/', 'Apple'=>'http://www.apple.com/webdav_fs/props/', 'A'=> 'urn:ietf:params:xml:ns:carddav', 'xs'=>'http://www.w3.org/2001/XMLSchema', 'G'=>'http://groupdav.org/');
-
-        %DATATYPES = ( isfolder=>'M:dt="boolean"', ishidden=>'M:dt="boolean"', isstructureddocument=>'M:dt="boolean"', hassubs=>'M:dt="boolean"', nosubs=>'M:dt="boolean"', reserved=>'M:dt="boolean"', iscollection =>'M:dt="boolean"', isFolder=>'M:dt="boolean"', isreadonly=>'M:dt="boolean"', isroot=>'M:dt="boolean"', lastaccessed=>'M:dt="dateTime"', Win32CreationTime=>'M:dt="dateTime"',Win32LastAccessTime=>'M:dt="dateTime"',Win32LastModifiedTime=>'M:dt="dateTime"', description=>'xml:lang="en"');
-
-        %NAMESPACEELEMENTS = ( 'multistatus'=>1, 'prop'=>1 , 'error'=>1, 'principal-search-property-set'=>1);
-
-        %ELEMENTORDER = ( multistatus=>1, responsedescription=>4, 
-                    allprop=>1, include=>2,
-                    prop=>1, propstat=>2,status=>3, error=>4,
-                    href=>1, responsedescription=>5, location=>6,
-                    locktype=>1, lockscope=>2, depth=>3, owner=>4, timeout=>5, locktoken=>6, lockroot=>7, 
-                    getcontentlength=>1001, getlastmodified=>1002, 
-                    resourcetype=>0,
-                    getcontenttype=>1, 
-                    supportedlock=>1010, lockdiscovery=>1011, 
-                    src=>1,dst=>2,
-                    principal => 1, grant => 2,
-                    privilege => 1, abstract=> 2, description => 3, 'supported-privilege' => 4,
-                    collection=>1, calendar=>2, 'schedule-inbox'=>3, 'schedule-outbox'=>4,
-                    'calendar-data'=>101, getetag=>100,
-                    properties => 1, operators=>2,
-                    default=>1000);
-        %SEARCH_PROPTYPES = ( default=>'string',
-                      '{DAV:}getlastmodified'=> 'dateTime', '{DAV:}lastaccessed'=>'dateTime', '{DAV:}getcontentlength' => 'int', 
-                      '{DAV:}creationdate' => 'dateTime','{urn:schemas-microsoft-com:}Win32CreationTime' =>'dateTime', 
-                      '{urn:schemas-microsoft-com:}Win32LastAccessTime'=>'dateTime',  '{urn:schemas-microsoft-com:}Win32LastModifiedTime'=>'dateTime',
-                      '{DAV:}childcount'=>'int', '{DAV:}objectcount'=>'int','{DAV:}visiblecount'=>'int',
-                      '{DAV:}acl'=>'xml', '{DAV:}acl-restrictions'=>'xml','{urn:ietf:params:xml:ns:carddav}addressbook-home-set'=>'xml',
-                      '{urn:ietf:params:xml:ns:caldav}calendar-home-set'=>'xml', '{DAV:}current-user-principal}'=>'xml',
-                      '{DAV:}current-user-privilege-set'=>'xml', '{DAV:}group'=>'xml',
-                      '{DAV:}owner'=>'xml', '{urn:ietf:params:xml:ns:carddav}principal-address'=>'xml',
-                      '{DAV:}principal-collection-set'=>'xml', '{DAV:}principal-URL'=>'xml',
-                      '{DAV:}resourcetype'=>'xml', '{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp'=>'xml',
-                      '{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL'=>'xml', '{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL'=>'xml',
-                      '{DAV:}source'=>'xml', '{urn:ietf:params:xml:ns:carddav}supported-address-data'=>'xml',
-                      '{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set'=>'xml','{urn:ietf:params:xml:ns:caldav}supported-calendar-data'=>'xml',
-                      '{DAV:}supported-method-set'=>'xml','{DAV:}supported-privilege-set'=>'xml','{DAV:}supported-report-set'=>'xml',
-                      '{DAV:}supportedlock'=>'xml'
-                    );
-        %SEARCH_SPECIALCONV = ( dateTime => 'str2time', xml=>'convXML2Str' );
-        %SEARCH_SPECIALOPS = ( int => { eq => '==', gt => '>', lt =>'<', gte=>'>=', lte=>'<=', cmp=>'<=>' }, 
-                                   dateTime => { eq => '==', gt => '>', lt =>'<', gte=>'>=', lte=>'<=', cmp=>'<=>' }, 
-                                   string => { lte=>'le', gte=>'ge' } );
-
-        @IGNORE_PROPS = ( 'xmlns', 'CS');
-        
-*/      
-        
         initMessages();
         
         initialized = true;
@@ -392,7 +239,7 @@ public class InitializationService {
         strings.put("search", "Search for file/folder name:");
         strings.put("searchtooltip", "allowed are: file/folder name, regular expression");
         strings.put("searchnothingfound", "Nothing found for ");
-        strings.put("searchgoback ", " in ");
+        strings.put("searchgoback", " in ");
         strings.put("searchresultsfor", " search results for ");
         strings.put("searchresultfor", " search result for ");
         strings.put("searchresults", " results in");
@@ -447,8 +294,8 @@ public class InitializationService {
         strings.put("zipuploadconfirm", "Do you really want to upload zip, extract it and replace existing files?");
         strings.put("fileuploadtext", "File: ");
         strings.put("fileuploadbutton", "Upload");
-        strings.put("fileuploadmore ", "more");
-        strings.put("fileuploadconfirm ", "Do you really want to upload file(s) and replace existing file(s)?");
+        strings.put("fileuploadmore", "more");
+        strings.put("fileuploadconfirm", "Do you really want to upload file(s) and replace existing file(s)?");
         strings.put("confirm", "Please confirm.");
         strings.put("foldernotwriteable", "This folder is not writeable (no write permission).");
         strings.put("foldernotreadable", "This folder is not readable (no read permission).");
