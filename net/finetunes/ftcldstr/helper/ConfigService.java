@@ -84,27 +84,37 @@ public class ConfigService {
      */
     public static final int MAXSIZESIZE = 12;
 
-    // TODO: Translate paths and hash
     /*
-    ## -- ICONS
-    ## for fancy indexing (you need a server alias /icons to your Apache icons directory):
-    %ICONS = (
-        '< .. >' => '/icons/back.gif',
-        '< folder >' => '/icons/folder.gif',
-        'text/plain' => '/icons/text.gif', 'text/html' => '/icons/text.gif',
-        'application/zip'=> '/icons/compressed.gif', 'application/x-gzip'=>'/icons/compressed.gif',
-        'image/gif'=>'/icons/image2.gif', 'image/jpg'=>'/icons/image2.gif',
-        'image/png'=>'/icons/image2.gif', 
-        'application/pdf'=>'/icons/pdf.gif', 'application/ps' =>'/icons/ps.gif',
-        'application/msword' => '/icons/text.gif',
-        'application/vnd.ms-powerpoint' => '/icons/world2.gif',
-        'application/vnd.ms-excel' => '/icons/quill.gif',
-        'application/x-dvi'=>'/icons/dvi', 'text/x-chdr' =>'/icons/c.gif', 'text/x-csrc'=>'/icons/c.gif',
-        'video/x-msvideo'=>'/icons/movie.gif', 'video/x-ms-wmv'=>'/icons/movie.gif', 'video/ogg'=>'/icons/movie.gif',
-        'video/mpeg'=>'/icons/movie.gif', 'video/quicktime'=>'/icons/movie.gif',
-        default => '/icons/unknown.gif',
-    );
-    */
+     * -- ICONS
+     * for fancy indexing (you need a server alias /icons to your Apache icons directory):
+     */
+    // TODO: set proper paths
+    public static final Map<String, String> ICONS = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{
+            put("< .. >", "/icons/back.gif");
+            put("< folder >", "/icons/folder.gif");
+            put("text/plain", "/icons/text.gif"); 
+            put("text/html", "/icons/text.gif");
+            put("application/zip", "/icons/compressed.gif"); 
+            put("application/x-gzip", "/icons/compressed.gif");
+            put("image/gif", "/icons/image2.gif"); 
+            put("image/jpg", "/icons/image2.gif");
+            put("image/png", "/icons/image2.gif"); 
+            put("application/pdf", "/icons/pdf.gif"); 
+            put("application/ps", "/icons/ps.gif");
+            put("application/msword", "/icons/text.gif");
+            put("application/vnd.ms-powerpoint", "/icons/world2.gif");
+            put("application/vnd.ms-excel", "/icons/quill.gif");
+            put("application/x-dvi", "/icons/dvi"); 
+            put("text/x-chdr", "/icons/c.gif"); 
+            put("text/x-csrc", "/icons/c.gif");
+            put("video/x-msvideo", "/icons/movie.gif"); 
+            put("video/x-ms-wmv", "/icons/movie.gif"); 
+            put("video/ogg", "/icons/movie.gif");
+            put("video/mpeg", "/icons/movie.gif"); 
+            put("video/quicktime", "/icons/movie.gif");
+            put("default", "/icons/unknown.gif");               
+        }});        
 
     /*
      * -- ICON_WIDTH

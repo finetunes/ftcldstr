@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.rendering.RenderingService;
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
@@ -48,7 +49,13 @@ public class DirectoryOperationsService {
 	    
         content += "<h2 style=\"border:0; padding:0; margin:0\">";
         content += "<a href=\"" + ru + "?action=props\">";
-        // TODO: // > content += $cgi->img({-src=>$ICONS{'< folder >'} || $ICONS{default},-style=>'border:0',-title=>_tl('showproperties'), -alt=>'folder'})
+        
+        String iconPath = ConfigService.ICONS.get("< folder >");
+        if (iconPath == null || iconPath.isEmpty()) {
+            iconPath = ConfigService.ICONS.get("default");
+        }
+        
+        content += "<img src=\"" + iconPath + "\" style=\"border:0\" title=\"" + ConfigService.stringMessages.get("showproperties") + "\" alt=\"" + ConfigService.stringMessages.get("folder") + "\">";
         content += "</a>";
         // TODO: // > content += '&nbsp;'.$cgi->a({-href=>'?action=davmount',-style=>'font-size:0.8em;color:black',-title=>_tl('mounttooltip')},_tl('mount'))
         content += " ";
