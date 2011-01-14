@@ -82,6 +82,50 @@ public class FileOperationsService {
         // TODO: implement
         return true;
         
-    }         
+    }
+    
+    // determines whether the file or directory is executable with the effective uid/gid
+    public static boolean is_file_executable(String filename) {
+        
+        // TODO: implement
+        return true;
+        
+    }
+    
+    public static String[] splitFilename(String filename) {
+        
+        String fullparent = "";
+        String basename = "";
+        String fn = filename;
+        if (fn != null && !fn.isEmpty()) {
+            int index = fn.lastIndexOf("/");
+            if (index > 0) {
+                fullparent = fn.substring(0, index);
+            }
+            else {
+                fullparent = "/";
+            }
+            
+            if (index + 1 < fn.length()) {
+                basename = fn.substring(index + 1);
+            }
+        }
+        
+        return new String[] {fullparent, basename};
+        
+    }
+    
+    // returns the result of stat unix funtion
+    public static Object[] stat(String filename) {
+        
+        // ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, 
+        // $atime,$mtime,$ctime,$blksize,$blocks) = stat($filename);
+        
+        // TODO: implement
+        // return true;
+        
+        return new Object[] {0, 0, "0888", 0, 0, 0, 0, 0, 0, "", 0, 0, 0};
+        
+    }    
     
 }

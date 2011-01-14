@@ -1,5 +1,8 @@
 package net.finetunes.ftcldstr.routines.xml;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 import org.w3c.dom.Element;
 
 public class XMLService {
@@ -13,7 +16,7 @@ public class XMLService {
 	
 	
 	// TODO: first parameter should represent an xml tree as an array structure
-	public static String createXML(Element dataRef, boolean withoutp) {
+	public static String createXML(Hashtable<String, Object> dataRef, boolean withoutp) {
 		
 		// TODO: implement
 		return "";

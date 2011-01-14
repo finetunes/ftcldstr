@@ -74,10 +74,10 @@ public class GetActionHandler extends AbstractActionHandler {
         }
         else if (FileOperationsService.file_exits(fn) &&
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("props")) {
-            doFilePropertiesRequest(fn, requestParams);
+            doFilePropertiesRequest(requestParams, fn);
         }
         else if (FileOperationsService.is_directory(fn)) {
-            doFileIsDirectory(fn, requestParams);
+            doFileIsDirectory(requestParams, fn);
         }
         else if (FileOperationsService.file_exits(fn) &&
                 !FileOperationsService.is_file_readable(fn)) {
@@ -151,7 +151,7 @@ public class GetActionHandler extends AbstractActionHandler {
     }
     
     // TODO
-    private void doFileIsDirectory(String fn, RequestParams requestParams) {
+    private void doFileIsDirectory(RequestParams requestParams, String fn) {
         
         String ru = requestParams.getRequestURI();
         String content = "";
@@ -247,7 +247,7 @@ public class GetActionHandler extends AbstractActionHandler {
             String list = "";
             int count = 0;
             
-            Object[] folderList = DirectoryOperationsService.getFolderList(fn, ru);
+            Object[] folderList = DirectoryOperationsService.getFolderList(requestParams, fn, ru);
             
             if (folderList.length >= 2) {
                 list = (String)folderList[0];
@@ -422,7 +422,7 @@ public class GetActionHandler extends AbstractActionHandler {
     }
   
     // TODO
-    private void doFilePropertiesRequest(String fn, RequestParams requestParams) {
+    private void doFilePropertiesRequest(RequestParams requestParams, String fn) {
         
         String content = "";
         content += RenderingService.start_html(requestParams.getRequestURI() + " properties");
@@ -434,22 +434,11 @@ public class GetActionHandler extends AbstractActionHandler {
         // my $fullparent = dirname($REQUEST_URI) .'/';
         // PZ: a strange trick, since dirname() may work wrong for some names
         
-        String fullparent = "";
-        String basename = "";
         String ru = requestParams.getRequestURI();
-        if (ru != null && !ru.isEmpty()) {
-            int index = ru.lastIndexOf("/");
-            if (index > 0) {
-                fullparent = ru.substring(0, index);
-            }
-            else {
-                fullparent = "/";
-            }
-            
-            if (index + 1 < ru.length()) {
-                basename = ru.substring(index + 1);
-            }
-        }
+        String[] sf = FileOperationsService.splitFilename(ru);
+        
+        String fullparent = sf[0];
+        String basename = sf[1];
         
         if (fullparent == null || fullparent.isEmpty() || fullparent == "//") {
             fullparent = "/";

@@ -274,7 +274,11 @@ public class InitializationService {
         strings.put("lastmodified", "Last Modified");
         strings.put("size", "Size");
         strings.put("mimetype", "MIME Type");
-        strings.put("lastmodifiedformat", "%d-%b-%Y %H:%M");
+        
+        // TODO: set java time format here
+        // strings.put("lastmodifiedformat", "%d-%b-%Y %H:%M");
+        strings.put("lastmodifiedformat", "dd-MM-yyyy HH:mm");
+        
         strings.put("statfiles", "files:");
         strings.put("statfolders", "folders:");
         strings.put("statsum", "sum:");

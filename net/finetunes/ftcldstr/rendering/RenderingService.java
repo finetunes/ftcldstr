@@ -30,7 +30,9 @@ public class RenderingService {
 	public static String getQuickNavPath(String ru, String query) {
 		
 		// TODO: implement
-		return null;
+		// return null;
+	    
+	    return "[quick nav path stub // todo]";
 		
 	}
 	

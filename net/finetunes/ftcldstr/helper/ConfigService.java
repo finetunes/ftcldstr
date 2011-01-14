@@ -21,12 +21,17 @@ public class ConfigService {
     ## regular expressions are allowed
     ## DEFAULT: $VIRTUAL_BASE = "";
     $VIRTUAL_BASE = '(/webdav|)';
+*/
+    
+    /*
+     * -- DOCUMENT_ROOT
+     * by default the server document root
+     * (don't forget a trailing slash '/'):
+     */
+    // $DOCUMENT_ROOT = $ENV{DOCUMENT_ROOT};
+    public static final String DOCUMENT_ROOT = ""; // TODO: PZ: fill with an appropriate value
 
-    ## -- DOCUMENT_ROOT
-    ## by default the server document root
-    ## (don't forget a trailing slash '/'):
-    $DOCUMENT_ROOT = $ENV{DOCUMENT_ROOT};
-
+/*    
     ## -- UMASK
     ## mask for file/folder creation 
     ## (it does not change permission of existing files/folders):

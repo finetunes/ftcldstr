@@ -27,11 +27,11 @@ public class ReadDirectoryContentWrapper extends AbstractWrapper {
             
             ArrayList<String> directoryContent = new ArrayList<String>(Arrays.asList(content));
             
-            for (int i = directoryContent.size() - 1; i >= 0; i--) {
-                if (directoryContent.get(i).equals(".") || directoryContent.get(i).equals("..")) {
-                    directoryContent.remove(i);
-                }
-            }
+//            for (int i = directoryContent.size() - 1; i >= 0; i--) {
+//                if (directoryContent.get(i).equals(".") || directoryContent.get(i).equals("..")) {
+//                    directoryContent.remove(i);
+//                }
+//            }
             
             result.setContent(directoryContent);
         }
