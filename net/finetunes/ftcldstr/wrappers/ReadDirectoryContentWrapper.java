@@ -25,7 +25,9 @@ public class ReadDirectoryContentWrapper extends AbstractWrapper {
             String externalCallOutput = externalCallResult.getStdOutput();
             String[] content = externalCallOutput.split("\n");
             
-            ArrayList<String> directoryContent = new ArrayList<String>(Arrays.asList(content));
+            // ArrayList<String> directoryContent = new ArrayList<String>(Arrays.asList(content));
+            // TODO: returning sublist for windows; check for ubuntu
+            ArrayList<String> directoryContent = new ArrayList<String>(Arrays.asList(content).subList(2, content.length));
             
 //            for (int i = directoryContent.size() - 1; i >= 0; i--) {
 //                if (directoryContent.get(i).equals(".") || directoryContent.get(i).equals("..")) {

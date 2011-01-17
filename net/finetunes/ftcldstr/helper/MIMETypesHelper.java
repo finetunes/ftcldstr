@@ -1,36 +1,32 @@
 package net.finetunes.ftcldstr.helper;
 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 public class MIMETypesHelper {
-	
-//	public static void readMIMETypes() {
-//		
-//	}
 	
 	public static String getMIMEType(String filename) {
 	    
-	    // TODO
-	    // check filename is null
-	    // filename!=null
-
-	    String extension = "default";
-	    String ext = filename.replaceFirst("^.*\\.([^\\.]+)$", "$1");
-	    
-	    if (ext != null && !ext.isEmpty()) {
-	        extension = ext;
+	    if (filename != null) {
+    	    String extension = "default";
+    	    String ext = filename.replaceFirst("^.*\\.([^\\.]+)$", "$1");
+    	    
+    	    if (ext != null && !ext.isEmpty()) {
+    	        extension = ext;
+    	    }
+    	    
+    	    Set<String> keys = ConfigService.MIMETYPES.keySet();
+    	    Iterator<String> it = keys.iterator();
+    	    while (it.hasNext()) {
+    	        String k = it.next();
+                if (k.matches("(?i).*\\b" + Pattern.quote(extension) + "\\b.*")) {
+    	            return ConfigService.MIMETYPES.get(k);
+    	        }
+    	    }
 	    }
 	    
-/*	    
-	    my ($filename) = @_;
-	    my $extension= "default";
-	    if ($filename=~/\.([^\.]+)$/) {
-	        $extension=$1;
-	    }
-	    my @t = grep /\b\Q$extension\E\b/i, keys %MIMETYPES;
-	    return $#t>-1 ? $MIMETYPES{$t[0]} : $MIMETYPES{default};	    
-*/	    
-		// TODO: implement
-        return null;
-		
+        return ConfigService.MIMETYPES.get("default");
 	}
 
 }

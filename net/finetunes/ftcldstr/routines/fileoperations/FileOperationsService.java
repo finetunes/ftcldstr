@@ -97,17 +97,42 @@ public class FileOperationsService {
         String fullparent = "";
         String basename = "";
         String fn = filename;
+        
         if (fn != null && !fn.isEmpty()) {
-            int index = fn.lastIndexOf("/");
-            if (index > 0) {
-                fullparent = fn.substring(0, index);
+            
+            File f = new File(filename);
+            if (f.isFile() || f.isDirectory()) {
+                if (f.isFile()) {
+                    fullparent = f.getParent();
+                    basename = f.getName();
+                }
+                else {
+                    fullparent = f.getPath();
+                    basename = "";
+                }
+                
             }
             else {
-                fullparent = "/";
-            }
-            
-            if (index + 1 < fn.length()) {
-                basename = fn.substring(index + 1);
+                if (fn.equals("/") || fn.equals("//")) {
+                    fullparent = "";
+                    basename = "";
+                }
+                else {
+                    int index = fn.lastIndexOf("/");
+                    if (fn.length() == index + 1) {
+                        fn = fn.substring(0, index);
+                        index = fn.lastIndexOf("/");
+                    }
+                    
+                    if (index > 0) {
+                        fullparent = fn.substring(0, index);
+                    }
+                    
+                    if (index + 1 < fn.length()) {
+                        basename = fn.substring(index + 1);
+                    }
+                }
+                
             }
         }
         

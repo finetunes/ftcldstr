@@ -14,8 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.base.NotSupportedMethodActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.GetActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.GetlibActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.HeadActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.OptionsActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.PostActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.TraceActionHandler;
 import net.finetunes.ftcldstr.helper.InitializationService;
 
 
@@ -47,6 +50,7 @@ public class ActionServlet extends MServlet {
         RequestParams requestParams = InitializationService.initRequestParams(request, response,
                 getServletContext());
         
+
 //        > System.out.println(getServletContext().getRealPath(""));
 //        > System.out.println(request.getQueryString());
 //        > System.out.println(request.getServletPath());
@@ -125,6 +129,9 @@ public class ActionServlet extends MServlet {
         addMethodHandler("GET", new GetActionHandler());
         addMethodHandler("HEAD", new HeadActionHandler());
         addMethodHandler("POST", new PostActionHandler());
+        addMethodHandler("OPTIONS", new OptionsActionHandler());
+        addMethodHandler("TRACE", new TraceActionHandler());
+        addMethodHandler("GETLIB", new GetlibActionHandler());
         
         // TODO: add the rest of the method handlers
         

@@ -6,6 +6,7 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.MissingFormatArgumentException;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,7 +66,7 @@ public class GetActionHandler extends AbstractActionHandler {
         }
         else if (FileOperationsService.file_exits(fn) && 
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("davmount")) {
-            doDavmountRequest(fn);
+            doDavmountRequest(requestParams, fn);
         }
         else if (ConfigService.ENABLE_THUMBNAIL && FileOperationsService.is_plain_file(fn) &&
                 FileOperationsService.is_file_readable(fn) &&
@@ -92,15 +93,20 @@ public class GetActionHandler extends AbstractActionHandler {
         }
     }
     
-    // TODO
-    private void doDavmountRequest(String fn) {
-//      my $su = $ENV{REDIRECT_SCRIPT_URI} || $ENV{SCRIPT_URI};
-//      my $bn = basename($fn);
-//      $su =~ s/\Q$bn\E\/?//;
-//      $bn.='/' if -d $fn && $bn!~/\/$/;
-//      printHeaderAndContent('200 OK','application/davmount+xml',
-//             qq@<dm:mount xmlns:dm="http://purl.org/NET/webdav/mount"><dm:url>$su</dm:url><dm:open>$bn</dm:open></dm:mount>@);            
+    // TODO: check
+    private void doDavmountRequest(RequestParams requestParams, String fn) {
         
+        // my $su = $ENV{REDIRECT_SCRIPT_URI} || $ENV{SCRIPT_URI};
+        String su = requestParams.getScriptURI();
+        String bn = FileOperationsService.splitFilename(fn)[1];
+        
+        su = su.replaceFirst(Pattern.quote(bn) + "/?", ""); // $su =~ s/\Q$bn\E\/?//;
+        if (FileOperationsService.is_directory(fn) && !bn.endsWith("/")) {
+            bn += "/";
+        }
+        
+        OutputService.printHeaderAndContent(requestParams, "200 OK", "application/davmount+xml", 
+                "<dm:mount xmlns:dm=\"http://purl.org/NET/webdav/mount\"><dm:url>" + su +  "</dm:url><dm:open>" + bn + "</dm:open></dm:mount>");
     }
     
     // TODO
@@ -118,7 +124,7 @@ public class GetActionHandler extends AbstractActionHandler {
         
         if (ConfigService.ENABLE_THUMBNAIL_CACHE) {
             String uniqname = fn;
-//          $uniqname=~s/\//_/g; // TODO
+            uniqname = uniqname.replaceAll("/", "_");
             
             String cachefile = ConfigService.THUMBNAIL_CACHEDIR + "/" + uniqname + ".thumb";
             if (!FileOperationsService.file_exits(ConfigService.THUMBNAIL_CACHEDIR)) {
@@ -150,7 +156,6 @@ public class GetActionHandler extends AbstractActionHandler {
         
     }
     
-    // TODO
     private void doFileIsDirectory(RequestParams requestParams, String fn) {
         
         String ru = requestParams.getRequestURI();

@@ -74,6 +74,32 @@ public class OutputService {
         }
 	}
 	
+	
+    /**
+     * Sends the header and the content directly to the out
+     */
+    public static void printHeader(RequestParams requestParams, String status, String type, 
+            HashMap<String, String> headers) {
+        
+        // print header
+        
+        if (status != null && !status.isEmpty()) {
+            requestParams.getResponse().setStatus(extractStatusCode(status));
+        }
+        
+        requestParams.getResponse().addHeader("Content-Type", type + "; charset=" + ConfigService.CHARSET);
+
+        // adding extra headers
+        if (headers != null) {
+            Set<String> headerKeys = headers.keySet();
+            Iterator<String> it = headerKeys.iterator();
+            while (it.hasNext()) {
+                String key = it.next();
+                requestParams.getResponse().addHeader(key, headers.get(key));
+            }
+        }
+    }	
+	
     public static void printHeaderAndContent(
             RequestParams requestParams,
             String status, String type, String content) {

@@ -1,5 +1,11 @@
 package net.finetunes.ftcldstr.rendering;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
+import net.finetunes.ftcldstr.helper.ConfigService;
+
 public class RenderingHelper {
 	
 	public static String getmodecolors(String filename, String mode) {
@@ -33,6 +39,32 @@ public class RenderingHelper {
         }
 
         return raus.toString();
+    }
+    
+    public static String uri_unescape(String s) {
+        String r;
+        
+        try {
+            r = URLDecoder.decode(s, ConfigService.CHARSET);
+        }
+        catch (UnsupportedEncodingException e) {
+            r = URLDecoder.decode(s);
+        }
+        
+        return r;
+    }
+    
+    public static String uri_escape(String s) {
+        String r;
+        
+        try {
+            r = URLEncoder.encode(s, ConfigService.CHARSET);
+        }
+        catch (UnsupportedEncodingException e) {
+            r = URLEncoder.encode(s);
+        }
+        
+        return r;
     }
 	
 

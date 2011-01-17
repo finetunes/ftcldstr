@@ -52,7 +52,7 @@ public class AbstractWrapper {
         // PZ: TODO: params passing
         
         try {
-            Process p = Runtime.getRuntime().exec(command[0] + " /A /B"); // PZ: test params
+            Process p = Runtime.getRuntime().exec(command[0] + " " + command[5]); // PZ: TODO: test params
             
             outputStream = new ProcessStreamReader(p.getInputStream()); // output stream of a process          
             errorStream = new ProcessStreamReader(p.getErrorStream()); // error stream of a process

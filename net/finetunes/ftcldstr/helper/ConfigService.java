@@ -37,31 +37,46 @@ public class ConfigService {
     ## (it does not change permission of existing files/folders):
     ## DEFAULT: $UMASK = 0002; # read/write/execute for users and groups, others get read/execute permissions
     $UMASK = 0022;
-
-    ## -- MIMETYPES
-    ## some MIME types for Web browser access and GET access
-    ## you can add some missing types ('extension list' => 'mime-type'):
-    %MIMETYPES = (
-        'html htm shtm shtml' => 'text/html',
-        'css' => 'text/css', 'xml xsl'=>'text/xml',
-        'js' => 'application/x-javascript',
-        'txt asc pl cgi php php3 php4 php5 php6 csv log out java jsp tld tag' => 'text/plain',
-        'c'=> 'text/x-csrc', 'h'=>'text/x-chdr',
-        'gif'=>'image/gif', 'jpeg jpg jpe'=>'image/jpg', 
-        'png'=>'image/png', 'bmp'=>'image/bmp', 'tiff'=>'image/tiff',
-        'pdf'=>'application/pdf', 'ps'=>'application/ps',
-        'dvi'=>'application/x-dvi','tex'=>'application/x-tex',
-        'zip'=>'application/zip', 'tar'=>'application/x-tar','gz'=>'application/x-gzip',
-        'doc dot' => 'application/msword',
-        'xls xlm xla xlc xlt xlw' => 'application/vnd.ms-excel',
-        'ppt pps pot'=>'application/vnd.ms-powerpoint',
-        'pptx'=>'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'ics' => 'text/calendar',
-        'avi' => 'video/x-msvideo', 'wmv' => 'video/x-ms-wmv', 'ogv'=>'video/ogg',
-        'mpeg mpg mpe' => 'video/mpeg', 'qt mov'=>'video/quicktime',
-        default => 'application/octet-stream',
-        ); 
-*/        
+*/
+    
+    /*
+     * -- MIMETYPES
+     * some MIME types for Web browser access and GET access
+     * you can add some missing types ('extension list' => 'mime-type'):
+     */
+    public static final Map<String, String> MIMETYPES = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{ 
+            put("html htm shtm shtml", "text/html");
+            put("css", "text/css");
+            put("xml xsl", "text/xml");
+            put("js", "application/x-javascript");
+            put("txt asc pl cgi php php3 php4 php5 php6 csv log out java jsp tld tag", "text/plain");
+            put("c", "text/x-csrc");
+            put("h", "text/x-chdr");
+            put("gif", "image/gif");
+            put("jpeg jpg jpe", "image/jpg");
+            put("png", "image/png");
+            put("bmp", "image/bmp");
+            put("tiff", "image/tiff");
+            put("pdf", "application/pdf");
+            put("ps", "application/ps");
+            put("dvi", "application/x-dvi");
+            put("tex", "application/x-tex");
+            put("zip", "application/zip");
+            put("tar", "application/x-tar");
+            put("gz", "application/x-gzip");
+            put("doc dot", "application/msword");
+            put("xls xlm xla xlc xlt xlw", "application/vnd.ms-excel");
+            put("ppt pps pot", "application/vnd.ms-powerpoint");
+            put("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+            put("ics", "text/calendar");
+            put("avi", "video/x-msvideo");
+            put("wmv", "video/x-ms-wmv");
+            put("ogv", "video/ogg");
+            put("mpeg mpg mpe", "video/mpeg");
+            put("qt mov", "video/quicktime");
+            put("default", "application/octet-stream");
+        }});        
         
     /*
      * -- FANCYINDEXING
@@ -674,6 +689,8 @@ public class ConfigService {
     
     // phrases
     public static HashMap<String, String> stringMessages = null;
+    
+    public static final String URL_PARAM_SEPARATOR = "&"; // was ";" in perl
     
 
 }

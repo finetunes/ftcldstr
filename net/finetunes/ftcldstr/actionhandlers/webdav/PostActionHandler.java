@@ -1,6 +1,10 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
 /**
  * The POST method is used to request that the origin server accept the
@@ -23,20 +27,35 @@ import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 
 public class PostActionHandler extends AbstractActionHandler {
 
-    
-/*    
-    debug("_POST: $PATH_TRANSLATED");
+    public void handle(final RequestParams requestParams) {
 
-    if (!$cgi->param('file_upload') && $cgi->cgi_error) {
-        printHeaderAndContent($cgi->cgi_error,undef,$cgi->cgi_error);   
-        exit 0;
-    }
+        String fn = requestParams.getPathTranslated();
+        Logger.debug("POST: " + fn);
 
-    my($msg,$msgparam,$errmsg);
-    my $redirtarget = $REQUEST_URI;
-    $redirtarget =~s/\?.*$//; # remove query
-    
-    if ($ALLOW_FILE_MANAGEMENT && ($cgi->param('delete')||$cgi->param('rename')||$cgi->param('mkcol')||$cgi->param('changeperm'))) {
+        /*
+        if (!$cgi->param('file_upload') && $cgi->cgi_error) {
+            printHeaderAndContent($cgi->cgi_error,undef,$cgi->cgi_error);   
+            exit 0;
+        }
+        */
+        
+        String msg;
+        String msgparam;
+        String errmsg;
+        
+        String redirtarget = requestParams.getRequestURI();
+        int index = redirtarget.indexOf("?");
+        if (index >= 0) {
+            redirtarget = redirtarget.substring(0, index);
+        }
+        
+        if (ConfigService.ALLOW_FILE_MANAGEMENT && (
+                requestParams.requestParamExists("delete") || 
+                requestParams.requestParamExists("rename") || 
+                requestParams.requestParamExists("mkcol") || 
+                requestParams.requestParamExists("changeperm"))) {
+/*
+
         debug("_POST: file management ".join(",",$cgi->param('file')));
         if ($cgi->param('delete')) {
             if ($cgi->param('file')) {
@@ -128,8 +147,13 @@ public class PostActionHandler extends AbstractActionHandler {
                 $errmsg='chpermnothingerr';
             }
         }
-        print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam, $errmsg, $msgparam));
-    } elsif ($ALLOW_POST_UPLOADS && -d $PATH_TRANSLATED && defined $cgi->param('file_upload')) {
+        print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam, $errmsg, $msgparam));            
+            
+*/            
+        }
+        else if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_directory(fn) && requestParams.requestParamExists("file_upload")) {
+/*            
+  
         my @filelist;
         foreach my $filename ($cgi->param('file_upload')) {
             next if $filename eq "";
@@ -154,21 +178,29 @@ public class PostActionHandler extends AbstractActionHandler {
         } else {
             $errmsg='uploadnothingerr';
         }
-        print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam,$errmsg,$msgparam));
-    } elsif ($ALLOW_ZIP_DOWNLOAD && defined $cgi->param('zip')) {
-        my $zip =  Archive::Zip->new();     
-        foreach my $file ($cgi->param('file')) {
-            if (-d $PATH_TRANSLATED.$file) {
-                $zip->addTree($PATH_TRANSLATED.$file, $file);
-            } else {
-                $zip->addFile($PATH_TRANSLATED.$file, $file);
-            }
+        print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam,$errmsg,$msgparam));  
+  
+*/            
         }
-        my $zfn = basename($PATH_TRANSLATED).'.zip';
-        $zfn=~s/ /_/;
-        print $cgi->header(-status=>'200 OK', -type=>'application/zip',-Content_disposition=>'attachment; filename='.$zfn);
-        $zip->writeToFileHandle(\*STDOUT,0);
-    } elsif ($ALLOW_ZIP_UPLOAD && defined $cgi->param('uncompress')) {
+        else if (ConfigService.ALLOW_ZIP_DOWNLOAD && requestParams.requestParamExists("zip")) {
+/*            
+            my $zip =  Archive::Zip->new();     
+            foreach my $file ($cgi->param('file')) {
+                if (-d $PATH_TRANSLATED.$file) {
+                    $zip->addTree($PATH_TRANSLATED.$file, $file);
+                } else {
+                    $zip->addFile($PATH_TRANSLATED.$file, $file);
+                }
+            }
+            my $zfn = basename($PATH_TRANSLATED).'.zip';
+            $zfn=~s/ /_/;
+            print $cgi->header(-status=>'200 OK', -type=>'application/zip',-Content_disposition=>'attachment; filename='.$zfn);
+            $zip->writeToFileHandle(\*STDOUT,0);
+*/            
+        }
+        else if (ConfigService.ALLOW_ZIP_UPLOAD && requestParams.requestParamExists("uncompress")) {
+/*
+
         my @zipfiles;
         foreach my $fh ($cgi->param('zipfile_upload')) {
             my $rfn= $fh;
@@ -192,14 +224,18 @@ public class PostActionHandler extends AbstractActionHandler {
         } else {
             $errmsg='zipuploadnothingerr';
         }
-        print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam,$errmsg,$msgparam));
-        
-    } elsif ($ENABLE_CALDAV_SCHEDULE && -d $PATH_TRANSLATED) {
-        ## NOT IMPLEMENTED YET
-    } else {
-        debug("_POST: forbidden POST to $PATH_TRANSLATED");
-        printHeaderAndContent('403 Forbidden','text/plain','403 Forbidden');
+        print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam,$errmsg,$msgparam)); 
+*/
+        }
+        else if (ConfigService.ENABLE_CALDAV_SCHEDULE && FileOperationsService.is_directory(fn)) {
+            // ## NOT IMPLEMENTED YET // PZ: that was original perl code; TODO?
+        }
+        else {
+/*            
+            debug("_POST: forbidden POST to $PATH_TRANSLATED");
+            printHeaderAndContent('403 Forbidden','text/plain','403 Forbidden');
+*/            
+        }
     }
-*/    
     
 }

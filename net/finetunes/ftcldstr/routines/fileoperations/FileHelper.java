@@ -62,8 +62,14 @@ public class FileHelper {
 	    // $full=~/([^\.]+)$/;
 	    // my $suffix = $1 || $m;
 	    
-	    String suffix = full.replaceFirst("^.*\\.([^\\.]+)$", "$1");
-	    if (suffix == null || suffix.isEmpty()) {
+	    String suffix = null;
+	    int li = full.lastIndexOf(".");
+	    if (li >= 0) {
+	        suffix = full.substring(li + 1);
+	    }
+	    
+	    // String suffix = full.replaceFirst("^.*(\\.)?([^\\.]*)$", "$1");
+	    if (suffix == null || suffix.isEmpty() || suffix.equals("/")) {
 	        suffix = m;
 	    }
 	    
@@ -91,10 +97,11 @@ public class FileHelper {
             // Original code: $icon=$full.($full=~/\?.*/?';':'?').'action=thumb';
 	        icon = "?";
 	        if (full.matches(".*\\?.*")) {
-	            icon = ";";
+	            icon = ConfigService.URL_PARAM_SEPARATOR;
 	        }
 	        
 	        icon += "action=thumb";
+	        icon = full + icon;
 	        
 	        if (ConfigService.THUMBNAIL_WIDTH > 0 && ConfigService.ICON_WIDTH < ConfigService.THUMBNAIL_WIDTH) {
 	            align = "vertical-align:top;padding: 1px 0px 1px 0px;";
@@ -106,7 +113,7 @@ public class FileHelper {
 	    }
 	    
 	    if (q.matches(".*\\?.*")) {
-	        full += ";action=props";
+	        full += ConfigService.URL_PARAM_SEPARATOR + "action=props";
 	    }
 	    else {
 	        full += "?action=props";

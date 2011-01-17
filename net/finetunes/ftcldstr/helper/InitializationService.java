@@ -169,7 +169,7 @@ public class InitializationService {
         String requestURI = request.getServletPath();
         
         if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
-            requestURI += "?" + request.getQueryString();
+            // requestURI += "?" + request.getQueryString(); // PZ: seems no param should be here
         }
         
 /*        
@@ -224,8 +224,11 @@ public class InitializationService {
             }
 */            
         
+        String scriptURI = servletContext.getRealPath("");
+        
         params.setPathTranslated(pathTranslated);
         params.setRequestURI(requestURI);
+        params.setScriptURI(scriptURI);
         
         return params;
     }
