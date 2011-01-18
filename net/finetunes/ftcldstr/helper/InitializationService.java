@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 
 public class InitializationService {
     
@@ -145,6 +146,23 @@ public class InitializationService {
 */
 
         initMessages();
+        
+        
+        // properties
+        
+//        Properties p = new Properties();
+//        p.setProperty("c:\\1.txt", "prop1", "v1");
+//        p.setProperty("c:\\1.txt", "prop2", "v2");
+//        p.setProperty("c:\\1.txt", "prop3", "v3");
+//        p.setProperty("c:\\2.txt", "prop1", "v22");
+//        
+//        Properties.serialize("c:\\p.txt", p);
+        
+        Properties p = Properties.deserialize(ConfigService.PROPERTIES_FILE_PATH);
+        ConfigService.properties = p;
+        
+        // end properties
+        
         
         initialized = true;
     }

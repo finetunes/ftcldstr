@@ -9,8 +9,10 @@ public class PropertiesActions {
 	}
 	
 	// TODO: params and return type
-	public static void handlePropFindElement() {
+	public static Object[] handlePropFindElement(Object xmldata) {
 		
+	    return new Object[]{"", "", ""};
+	    
 	}
 	
 	// TODO: params and return type

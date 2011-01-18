@@ -4,6 +4,7 @@ import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
 /**
@@ -54,11 +55,15 @@ public class PostActionHandler extends AbstractActionHandler {
                 requestParams.requestParamExists("rename") || 
                 requestParams.requestParamExists("mkcol") || 
                 requestParams.requestParamExists("changeperm"))) {
+            
+            
+            String[] files = requestParams.getRequest().getParameterValues("file");
+            String fileList = RenderingHelper.joinArray(files, ",");
+            Logger.debug("POST: file management " + fileList);
+            
+            if (requestParams.requestParamExists("delete")) {
+                if (files.length > 0) {
 /*
-
-        debug("_POST: file management ".join(",",$cgi->param('file')));
-        if ($cgi->param('delete')) {
-            if ($cgi->param('file')) {
                 my $count = 0;
                 foreach my $file ($cgi->param('file')) {
                     debug("_POST: delete $PATH_TRANSLATED.$file");
@@ -74,13 +79,17 @@ public class PostActionHandler extends AbstractActionHandler {
                     $msgparam="p1=$count";
                 } else {
                     $errmsg='deleteerr'; 
+                }                    
+ */
                 }
-            } else {
-                $errmsg='deletenothingerr';
+                else {
+                    errmsg = "deletenothingerr";
+                }
             }
-        } elsif ($cgi->param('rename')) {
-            if ($cgi->param('file')) {
-                if ($cgi->param('newname')) {
+            else if (requestParams.requestParamExists("rename")) {
+                if (files.length > 0) {
+                    if (requestParams.requestParamExists("newname")) {
+/*                        
                     my @files = $cgi->param('file');
                     if (($#files > 0)&&(! -d $PATH_TRANSLATED.$cgi->param('newname'))) {
                         printHeaderAndContent('403 Forbidden','text/plain','403 Forbidden');
@@ -97,14 +106,19 @@ public class PostActionHandler extends AbstractActionHandler {
                             }
                         }
                     }
-                } else {
-                    $errmsg='renamenotargeterr';
+*/                        
+                    }
+                    else {
+                        errmsg = "renamenotargeterr";
+                    }
                 }
-            } else {
-                $errmsg='renamenothingerr';
+                else {
+                    errmsg = "renamenothingerr";
+                }
             }
-        } elsif ($cgi->param('mkcol'))  {
-            if ($cgi->param('colname')) {
+            else if (requestParams.requestParamExists("mkcol")) {
+                if (requestParams.requestParamExists("colname")) {
+/*                    
                 $msgparam="p1=".$cgi->escape($cgi->param('colname'));
                 if (mkdir($PATH_TRANSLATED.$cgi->param('colname'))) {
                     logger("MKCOL($PATH_TRANSLATED".$cgi->param('colname').") via POST");
@@ -113,11 +127,15 @@ public class PostActionHandler extends AbstractActionHandler {
                     $errmsg='foldererr'; 
                     $msgparam.=';p2='.$cgi->escape(_tl($!));
                 }
-            } else {
-                $errmsg='foldernothingerr';
+*/                    
+                }
+                else {
+                    errmsg = "foldernothingerr";
+                }
             }
-        } elsif ($cgi->param('changeperm')) {
-            if ($cgi->param('file')) {
+            else if (requestParams.requestParamExists("changeperm")) {
+                if (files.length > 0) {
+/*                    
                 my $mode = 0000;
                 foreach my $userperm ($cgi->param('fp_user')) {
                     $mode = $mode | 0400 if $userperm eq 'r' && grep(/^r$/,@{$PERM_USER}) == 1;
@@ -142,13 +160,16 @@ public class PostActionHandler extends AbstractActionHandler {
                 $msgparam=sprintf("p1=%04o",$mode);
                 foreach my $file ($cgi->param('file')) {
                     changeFilePermissions($PATH_TRANSLATED.$file, $mode, $cgi->param('fp_type'), $ALLOW_CHANGEPERMRECURSIVE && $cgi->param('fp_recursive'));
+                }  
+*/                    
                 }
-            } else {
-                $errmsg='chpermnothingerr';
+                else {
+                    errmsg = "chpermnothingerr";
+                }
             }
-        }
-        print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam, $errmsg, $msgparam));            
             
+/*
+            print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam, $errmsg, $msgparam));            
 */            
         }
         else if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_directory(fn) && requestParams.requestParamExists("file_upload")) {

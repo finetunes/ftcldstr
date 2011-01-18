@@ -8,6 +8,8 @@ import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.rendering.OutputService;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.rendering.RenderingService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.handlers.SupportedMethodsHandler;
 
@@ -44,18 +46,7 @@ public class OptionsActionHandler extends AbstractActionHandler {
             }
             
             Object[] supportedMethods = SupportedMethodsHandler.getSupportedMethods(fn);
-            
-            if (supportedMethods.length > 0) {
-                StringBuilder sb = new StringBuilder();
-                sb.append((String)(supportedMethods[0]));
-                 
-                for (int i = 1; i < supportedMethods.length; i++) {
-                    sb.append(", ");
-                    sb.append((String)(supportedMethods[i]));
-                }
-                 
-                methods = sb.toString();
-            }
+            methods = RenderingHelper.joinArray(supportedMethods, ", ");
         }
         else {
             status = "404 Not Found";

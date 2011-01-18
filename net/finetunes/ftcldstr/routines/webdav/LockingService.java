@@ -53,6 +53,11 @@ public class LockingService {
 		
 	}
 	
+    public static boolean isAllowed(String filename) {
+        
+        return isAllowed(filename, false);
+    }	
+	
 	public static boolean inheritLock(String fileaname, boolean checkContent, HashMap visited) {
 		
 		// TODO: implement

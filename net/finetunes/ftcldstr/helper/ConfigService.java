@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
+
 /**
  * Config class to store global configuration values
  *
@@ -391,12 +393,17 @@ public class ConfigService {
     ## a virtual URI for ACL principals
     ## for Apple's iCal &  Addressbook
     $CURRENT_USER_PRINCIPAL = "/principals/".($ENV{REDIRECT_REMOTE_USER} || $ENV{REMOTE_USER}) .'/';
-
-    ## -- PRINCIPAL_COLLECTION_SET 
-    ## don't change it for MacOS X Addressbook support
-    ## DEFAULT: $PRINCIPAL_COLLECTION_SET = '/directory/';
-    $PRINCIPAL_COLLECTION_SET = '/directory/';
 */
+    // TODO: set proper value with username
+    public static final String CURRENT_USER_PRINCIPAL = "/principals/" + "user" + "/";
+    
+    /*
+     * -- PRINCIPAL_COLLECTION_SET
+     * don't change it for MacOS X Addressbook support
+     * DEFAULT: $PRINCIPAL_COLLECTION_SET = '/directory/';
+     */
+    public static final String PRINCIPAL_COLLECTION_SET = "/directory/";
+
     
     /*
      * -- ENABLE_CALDAV
@@ -686,11 +693,14 @@ public class ConfigService {
 //	}
     
     public static String DAV = null;
+    public static Properties properties = null;
     
     // phrases
     public static HashMap<String, String> stringMessages = null;
     
     public static final String URL_PARAM_SEPARATOR = "&"; // was ";" in perl
+    
+    public static final String PROPERTIES_FILE_PATH = "c:\\p.txt";
     
 
 }

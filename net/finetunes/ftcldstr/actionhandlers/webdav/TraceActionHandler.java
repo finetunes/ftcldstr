@@ -35,7 +35,7 @@ public class TraceActionHandler extends AbstractActionHandler {
         String status = "200 OK";
         
         // original perl code: my $content = join("",<>);
-        String content = getRequestBody(requestParams.getRequest());
+        String content = requestParams.getRequestBody();
         String type = "message/http";
         
         String viaHeader = "Via: " + requestParams.getRequest().getServerName() + ":" + requestParams.getRequest().getServerPort();
@@ -49,36 +49,4 @@ public class TraceActionHandler extends AbstractActionHandler {
         
         OutputService.printHeaderAndContent(requestParams, status, type, content, params);
     }   
-
-    private String getRequestBody(HttpServletRequest request) {
-        
-        StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader bufferedReader = null;
-        try {
-            InputStream inputStream = request.getInputStream();
-            if (inputStream != null) {
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                char[] charBuffer = new char[256];
-                int bytesRead = -1;
-                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                    stringBuilder.append(charBuffer, 0, bytesRead);
-                }
-            } 
-            else {
-                stringBuilder.append("");
-            }
-        } catch (IOException ex) {
-            // do nothing
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException ex) {
-                    // do nothing
-                }
-            }
-        }
-        String body = stringBuilder.toString();
-        return body;
-    }
 }

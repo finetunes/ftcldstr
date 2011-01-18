@@ -184,11 +184,14 @@ public class DirectoryOperationsService {
 	    // original perl code:
 	    // eval qq@/$filter/;@;
 	    // $filter="\Q$filter\E" if ($@);
-	    try {
-	        Pattern pattern = Pattern.compile(filter);
-	    }
-	    catch (PatternSyntaxException e) {
-	        filter = Pattern.quote(filter);
+	    
+	    if (filter != null && !filter.isEmpty()) {
+    	    try {
+    	        Pattern pattern = Pattern.compile(filter);
+    	    }
+    	    catch (PatternSyntaxException e) {
+    	        filter = Pattern.quote(filter);
+    	    }
 	    }
 	    
         Iterator<String> it = files.iterator();

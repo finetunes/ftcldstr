@@ -19,7 +19,9 @@ import net.finetunes.ftcldstr.actionhandlers.webdav.HeadActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.OptionsActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.PostActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.TraceActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.InitializationService;
+import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 
 
 public class ActionServlet extends MServlet {
@@ -32,6 +34,10 @@ public class ActionServlet extends MServlet {
         InitializationService.init();
         initMethods();
     }
+    
+    public void destroy() {
+        Properties.serialize(ConfigService.PROPERTIES_FILE_PATH, ConfigService.properties);
+    }    
     
     
 	public void bla() {

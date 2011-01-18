@@ -66,6 +66,27 @@ public class RenderingHelper {
         
         return r;
     }
-	
+    
+    // additional routines
+    
+    public static String joinArray(Object[] strings, String glue) {
+        
+        String result = "";
+        
+        if (strings != null && strings.length > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append((String)(strings[0]));
+             
+            for (int i = 1; i < strings.length; i++) {
+                sb.append(glue);
+                sb.append((String)(strings[i]));
+            }
+             
+            result = sb.toString();
+        }    
+        
+        return result;
+    }       
+    
 
 }
