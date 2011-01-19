@@ -1,10 +1,19 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.annotation.processing.RoundEnvironment;
+
+import com.oreilly.servlet.MultipartRequest;
+
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.routines.fileoperations.FileHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
 /**
@@ -32,8 +41,9 @@ public class PostActionHandler extends AbstractActionHandler {
 
         String fn = requestParams.getPathTranslated();
         Logger.debug("POST: " + fn);
-
+        
         /*
+        TODO
         if (!$cgi->param('file_upload') && $cgi->cgi_error) {
             printHeaderAndContent($cgi->cgi_error,undef,$cgi->cgi_error);   
             exit 0;
@@ -43,7 +53,8 @@ public class PostActionHandler extends AbstractActionHandler {
         String msg;
         String msgparam;
         String errmsg;
-        
+        ArrayList<String> err = new ArrayList<String>();
+
         String redirtarget = requestParams.getRequestURI();
         int index = redirtarget.indexOf("?");
         if (index >= 0) {
@@ -51,62 +62,81 @@ public class PostActionHandler extends AbstractActionHandler {
         }
         
         if (ConfigService.ALLOW_FILE_MANAGEMENT && (
-                requestParams.requestParamExists("delete") || 
-                requestParams.requestParamExists("rename") || 
-                requestParams.requestParamExists("mkcol") || 
-                requestParams.requestParamExists("changeperm"))) {
+                requestParams.multipartRequestParamExists("delete") || 
+                requestParams.multipartRequestParamExists("rename") || 
+                requestParams.multipartRequestParamExists("mkcol") || 
+                requestParams.multipartRequestParamExists("changeperm"))) {
             
             
-            String[] files = requestParams.getRequest().getParameterValues("file");
+            String[] files = requestParams.getMultipartRequestParamValues("file");
             String fileList = RenderingHelper.joinArray(files, ",");
             Logger.debug("POST: file management " + fileList);
             
             if (requestParams.requestParamExists("delete")) {
                 if (files.length > 0) {
-/*
-                my $count = 0;
-                foreach my $file ($cgi->param('file')) {
-                    debug("_POST: delete $PATH_TRANSLATED.$file");
-                    if ($ENABLE_TRASH) {
-                        moveToTrash($PATH_TRANSLATED.$file);
-                    } else {
-                        $count += deltree($PATH_TRANSLATED.$file, \my @err);
+                    
+                    int count = 0;
+                    for (int i = 0; i < files.length; i++) {
+                        String file = files[i];
+                        Logger.debug("POST: delete " + fn + file);
+                        
+                        if (ConfigService.ENABLE_TRASH) {
+                            FileHelper.moveToTrash(fn + file); // TODO: implement
+                        }
+                        else {
+                            // $count += deltree($PATH_TRANSLATED.$file, \my @err);
+                            // TODO: count += FileHelper.deltree(fn + file, err); // param?
+                        }
+                        
+                        Logger.log("DELETE(" + fn + ") via POST");
                     }
-                    logger("DELETE($PATH_TRANSLATED) via POST");
-                }
-                if ($count>0) {
-                    $msg= ($count>1)?'deletedmulti':'deletedsingle';
-                    $msgparam="p1=$count";
-                } else {
-                    $errmsg='deleteerr'; 
-                }                    
- */
+                    
+                    if (count > 0) {
+                        if (count > 1) {
+                            msg = "deletedmulti"; 
+                        }
+                        else {
+                            msg = "deletedsingle";
+                        }
+                        
+                        msgparam = "p1=" + count;
+                    }
+                    else {
+                        errmsg = "deleteerr";
+                    }
                 }
                 else {
                     errmsg = "deletenothingerr";
                 }
             }
-            else if (requestParams.requestParamExists("rename")) {
+            else if (requestParams.multipartRequestParamExists("rename")) {
                 if (files.length > 0) {
-                    if (requestParams.requestParamExists("newname")) {
-/*                        
-                    my @files = $cgi->param('file');
-                    if (($#files > 0)&&(! -d $PATH_TRANSLATED.$cgi->param('newname'))) {
-                        printHeaderAndContent('403 Forbidden','text/plain','403 Forbidden');
-                        exit;
-                    } else {
-                        $msg='rename';
-                        $msgparam = 'p1='.$cgi->escape(join(', ',@files))
-                                  . ';p2='.$cgi->escape($cgi->param('newname'));
-                        foreach my $file (@files) {
-                            if (rmove($PATH_TRANSLATED.$file, $PATH_TRANSLATED.$cgi->param('newname'))) {
-                                logger("MOVE($PATH_TRANSLATED,$PATH_TRANSLATED".$cgi->param('newname').") via POST");
-                            } else {
-                                $errmsg='renameerr';
+                    if (requestParams.multipartRequestParamExists("newname")) {
+                        
+                        
+                        String newname = requestParams.getMultipartRequestParam("newname");
+                        
+                        if (files.length > 1 && !FileOperationsService.is_directory(fn + newname)) {
+                            OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
+                            return;
+                        }
+                        else {
+                            msg = "rename";
+                            String fileList2 = RenderingHelper.joinArray(files, ", ");
+                            msgparam = "p1=" + RenderingHelper.uri_escape(fileList2) + 
+                                ConfigService.URL_PARAM_SEPARATOR + "p2=" + RenderingHelper.uri_escape(newname);
+                            
+                            for (int i = 0; i < files.length; i++) {
+                                String file = files[i];
+                                
+                                if (FileOperationsService.rmove(fn + file, fn + newname)) { // TODO: implement
+                                    Logger.log("MOVE(" + fn + "," + fn + "" + newname + ") via POST");
+                                }
+                                else {
+                                    errmsg = "renameerr";
+                                }
                             }
                         }
-                    }
-*/                        
                     }
                     else {
                         errmsg = "renamenotargeterr";
@@ -116,52 +146,72 @@ public class PostActionHandler extends AbstractActionHandler {
                     errmsg = "renamenothingerr";
                 }
             }
-            else if (requestParams.requestParamExists("mkcol")) {
-                if (requestParams.requestParamExists("colname")) {
-/*                    
-                $msgparam="p1=".$cgi->escape($cgi->param('colname'));
-                if (mkdir($PATH_TRANSLATED.$cgi->param('colname'))) {
-                    logger("MKCOL($PATH_TRANSLATED".$cgi->param('colname').") via POST");
-                    $msg='foldercreated';
-                } else {
-                    $errmsg='foldererr'; 
-                    $msgparam.=';p2='.$cgi->escape(_tl($!));
-                }
-*/                    
+            else if (requestParams.multipartRequestParamExists("mkcol")) {
+                if (requestParams.multipartRequestParamExists("colname")) {
+                    
+                    String mkcol = requestParams.getMultipartRequestParam("mkcol");
+                    String colname = requestParams.getMultipartRequestParam("colname");
+                    
+                    msgparam = "p1=" + RenderingHelper.uri_escape(colname);
+                    ArrayList<String> mkdirErrors = new ArrayList<String>();
+                    if (FileOperationsService.mkdir(fn + colname, mkdirErrors)) { // TODO: implement
+                        Logger.log("MKCOL(" + fn + colname + ") via POST");
+                        msg = "foldercreated";
+                    }
+                    else {
+                        errmsg = "foldererr";
+                        String em = "";
+                        if (mkdirErrors.size() > 0) {
+                            em = mkdirErrors.get(0);
+                        }
+                        msgparam += ConfigService.URL_PARAM_SEPARATOR + "p2=" + RenderingHelper.uri_escape(em); 
+                    }
                 }
                 else {
                     errmsg = "foldernothingerr";
                 }
             }
-            else if (requestParams.requestParamExists("changeperm")) {
+            else if (requestParams.multipartRequestParamExists("changeperm")) {
                 if (files.length > 0) {
-/*                    
-                my $mode = 0000;
-                foreach my $userperm ($cgi->param('fp_user')) {
-                    $mode = $mode | 0400 if $userperm eq 'r' && grep(/^r$/,@{$PERM_USER}) == 1;
-                    $mode = $mode | 0200 if $userperm eq 'w' && grep(/^w$/,@{$PERM_USER}) == 1;
-                    $mode = $mode | 0100 if $userperm eq 'x' && grep(/^x$/,@{$PERM_USER}) == 1;
-                    $mode = $mode | 04000 if $userperm eq 's' && grep(/^s$/,@{$PERM_USER}) == 1;
-                }
-                foreach my $grpperm ($cgi->param('fp_group')) {
-                    $mode = $mode | 0040 if $grpperm eq 'r' && grep(/^r$/,@{$PERM_GROUP}) == 1;
-                    $mode = $mode | 0020 if $grpperm eq 'w' && grep(/^w$/,@{$PERM_GROUP}) == 1;
-                    $mode = $mode | 0010 if $grpperm eq 'x' && grep(/^x$/,@{$PERM_GROUP}) == 1;
-                    $mode = $mode | 02000 if $grpperm eq 's' && grep(/^s$/,@{$PERM_GROUP}) == 1;
-                }
-                foreach my $operm ($cgi->param('fp_others')) {
-                    $mode = $mode | 0004 if $operm eq 'r' && grep(/^r$/,@{$PERM_OTHERS}) == 1;
-                    $mode = $mode | 0002 if $operm eq 'w' && grep(/^w$/,@{$PERM_OTHERS}) == 1;
-                    $mode = $mode | 0001 if $operm eq 'x' && grep(/^x$/,@{$PERM_OTHERS}) == 1;
-                    $mode = $mode | 01000 if $operm eq 't' && grep(/^t$/,@{$PERM_OTHERS}) == 1;
-                }
-
-                $msg='changeperm';
-                $msgparam=sprintf("p1=%04o",$mode);
-                foreach my $file ($cgi->param('file')) {
-                    changeFilePermissions($PATH_TRANSLATED.$file, $mode, $cgi->param('fp_type'), $ALLOW_CHANGEPERMRECURSIVE && $cgi->param('fp_recursive'));
-                }  
-*/                    
+                    
+                    int mode = 0000;
+                    String[] fp_user = requestParams.getMultipartRequestParamValues("fp_user");
+                    for (int i = 0; i < fp_user.length; i++) {
+                        String userperm = fp_user[i];
+                        if (userperm.equals("r") && ConfigService.PERM_USER.contains("r")) { mode = mode | 0400; }
+                        if (userperm.equals("w") && ConfigService.PERM_USER.contains("w")) { mode = mode | 0200; }
+                        if (userperm.equals("x") && ConfigService.PERM_USER.contains("x")) { mode = mode | 0100; }
+                        if (userperm.equals("s") && ConfigService.PERM_USER.contains("s")) { mode = mode | 04000; }
+                    }
+                    
+                    String[] fp_group = requestParams.getMultipartRequestParamValues("fp_group");
+                    for (int i = 0; i < fp_group.length; i++) {
+                        String userperm = fp_group[i];
+                        if (userperm.equals("r") && ConfigService.PERM_GROUP.contains("r")) { mode = mode | 0040; }
+                        if (userperm.equals("w") && ConfigService.PERM_GROUP.contains("w")) { mode = mode | 0020; }
+                        if (userperm.equals("x") && ConfigService.PERM_GROUP.contains("x")) { mode = mode | 0010; }
+                        if (userperm.equals("s") && ConfigService.PERM_GROUP.contains("s")) { mode = mode | 02000; }
+                    }
+                    
+                    String[] fp_others = requestParams.getMultipartRequestParamValues("fp_others");
+                    for (int i = 0; i < fp_others.length; i++) {
+                        String userperm = fp_others[i];
+                        if (userperm.equals("r") && ConfigService.PERM_USER.contains("r")) { mode = mode | 0004; }
+                        if (userperm.equals("w") && ConfigService.PERM_USER.contains("w")) { mode = mode | 0002; }
+                        if (userperm.equals("x") && ConfigService.PERM_USER.contains("x")) { mode = mode | 0001; }
+                        if (userperm.equals("t") && ConfigService.PERM_USER.contains("t")) { mode = mode | 01000; }
+                    }
+                    
+                    msg = "changeperm";
+                    msgparam = String.format("p1=%04o", mode);
+                    String fp_type = requestParams.getMultipartRequestParam("fp_type");
+                    String fp_recursive = requestParams.getMultipartRequestParam("fp_recursive");
+                    
+                    for (int i = 0; i < files.length; i++) {
+                        String file = files[i];
+                        FileOperationsService.changeFilePermissions(fn + file, mode, 
+                                fp_type, ConfigService.ALLOW_CHANGEPERMRECURSIVE && (fp_recursive != null && !fp_recursive.isEmpty()));
+                    }
                 }
                 else {
                     errmsg = "chpermnothingerr";
@@ -169,6 +219,7 @@ public class PostActionHandler extends AbstractActionHandler {
             }
             
 /*
+  TODO: redirects
             print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam, $errmsg, $msgparam));            
 */            
         }

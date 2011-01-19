@@ -58,8 +58,6 @@ public class PropfindActionHandler extends AbstractActionHandler {
             depth = "0";
         }
         
-        // perl code: my $xml = join("",<>); 
-        // TODO: check whether the value is passed in body
         String xml = requestParams.getRequestBody();
         
         if (xml == null || xml.isEmpty() || xml.matches("\\s*")) {

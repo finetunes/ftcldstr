@@ -1,7 +1,13 @@
 package net.finetunes.ftcldstr.routines.fileoperations;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
+import net.finetunes.ftcldstr.wrappers.ReadDirectoryResult;
 
 public class FileOperationsService {
 	
@@ -20,14 +26,74 @@ public class FileOperationsService {
 		
 	}
 	
-	public static boolean changeFilePermissions(String filename, 
-			String mode, String type, boolean recurse, 
-			HashMap visited) {
-
-		// TODO: implement
-		return false;
-		
+	public static void changeFilePermissions(String fn, 
+			int mode, String type, boolean recurse, 
+			ArrayList<String> visited) {
+	    
+	    if (type == null) {
+	        type = "";
+	    }
+	    
+	    if (type.equals("s")) {
+	        FileOperationsService.chmod(mode, fn);
+	    }
+	    else {
+	        Object[] stat = FileOperationsService.stat(fn);
+	        int newmode = 0;
+	        if (type.equals("a")) {
+	            newmode = ((Integer)stat[2]).intValue() | mode;
+	        }
+	        
+            if (type.equals("r")) {
+                newmode = ((Integer)stat[2]).intValue() ^ (((Integer)stat[2]).intValue() & mode);
+            }
+            
+            FileOperationsService.chmod(newmode, fn);
+	    }
+	    
+	    String nfn = FileOperationsService.full_resolve(fn);
+	    
+	    if (visited == null) {
+	        visited = new ArrayList<String>();
+	    }
+	    
+	    if (visited.contains(nfn)) {
+	        return;
+	    }
+	    
+	    visited.add(nfn);
+	    
+	    if (recurse && FileOperationsService.is_directory(fn)) {
+	        
+	    }
+	    
+        List<String> files = new ArrayList<String>();
+        ReadDirectoryContentWrapper rdw = new ReadDirectoryContentWrapper();
+        ReadDirectoryResult d = rdw.readDirectory(fn);
+        if (d.getExitCode() != 0) {
+            Logger.log("Error reading directory content. Dir: " + fn + "; Error: " + d.getErrorMessage());
+        }
+        else {
+            files = d.getContent();
+        }
+        
+        Iterator<String> it = files.iterator();
+        while (it.hasNext()) {
+            String f = it.next();
+            
+            if (FileOperationsService.is_directory(fn + f) && !f.endsWith("/")) {
+                f += "/";
+            }
+            
+            changeFilePermissions(fn + f, mode, type, recurse, visited);
+        }
 	}
+	
+    public static void changeFilePermissions(String filename, 
+            int mode, String type, boolean recurse) {
+
+        changeFilePermissions(filename, mode, type, recurse, null);
+    }	
 
 	public static boolean is_hidden(String filename) {
 		
@@ -55,7 +121,7 @@ public class FileOperationsService {
         
         File file = new File(filename);
         return file.exists();
-    }       
+    }
 
     // determines whether the file is a plain file (not a link, directory, pipe, etc.)
     public static boolean is_plain_file(String filename) {
@@ -90,6 +156,10 @@ public class FileOperationsService {
         // TODO: implement
         return true;
         
+    }
+    
+    public static String dirname(String filename) {
+        return splitFilename(filename)[0];
     }
     
     public static String[] splitFilename(String filename) {
@@ -151,6 +221,72 @@ public class FileOperationsService {
         
         return new Object[] {0, 0, "0888", 0, 0, 0, 0, 0, 0, "", 0, 0, 0};
         
-    }    
+    }   
+    
+    public static boolean mkdir(String dirname, ArrayList<String> err) {
+        
+        // push into err any system errors
+        // create it first if empty
+        
+        // TODO: implement
+        return false;
+        
+    }
+    
+    public static boolean chmod(int mode, String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }
+    
+    public static String full_resolve(String filename) {
+        
+        // Returns the filename of $file with all links in the path resolved.
+        // This sub tries to use Cwd::abs_path via ->resolve_path.
+        
+        // resolve_path($file) Returns the filename of $file with all links in the path resolved.
+        // This sub uses Cwd::abs_path and is independent of the rest of File::Spec::Link.
+        
+        // TODO implement
+        return "";
+    }
+    
+    public static boolean write_file(String fn, String content) {
+
+        // method creates a new file and writets content to it
+        // returns false if file can't be created or written
+        // otherwise returns true
+
+/*            
+        if (open(my $f,">$PATH_TRANSLATED")) {
+            binmode STDIN;
+            binmode $f;
+            my $maxread = 0;
+            while (my $read = read(STDIN, $buffer, $BUFSIZE)>0) {
+                print $f $buffer;
+                $maxread+=$read;
+            }
+            close($f);
+            inheritLock();
+            if (exists $ENV{CONTENT_LENGTH} && $maxread != $ENV{CONTENT_LENGTH}) {
+                debug("_PUT: ERROR: maxread=$maxread, content-length: $ENV{CONTENT_LENGTH}");
+                #$status='400';
+            }
+
+
+            logger("PUT($PATH_TRANSLATED)");
+        } else {
+            $status='403 Forbidden';
+            $content="";
+            $type='text/plain';
+        }
+            
+*/
+        
+        // TODO: implement
+        return false;
+        
+    }
     
 }
