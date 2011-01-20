@@ -60,7 +60,7 @@ public class OptionsActionHandler extends AbstractActionHandler {
             params.put("DASL", "<DAV:basicsearch>");
         }
         
-        if (methods != null && !methods.isEmpty()) {
+        if (methods != null) {
             params.put("MS-Author-Via", "DAV");
             params.put("DAV", ConfigService.DAV);
             params.put("Allow", methods);

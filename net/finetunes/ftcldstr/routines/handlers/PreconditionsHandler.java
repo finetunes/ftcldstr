@@ -47,7 +47,7 @@ public class PreconditionsHandler {
 	                t = true;
 	            }
 	            
-	            if (ieetag != null && !ieetag.isEmpty()) {
+	            if (ieetag != null) {
 	                e = !ieetag.equals(etag);
 	            }
 	        }

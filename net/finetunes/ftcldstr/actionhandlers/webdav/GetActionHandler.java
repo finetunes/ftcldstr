@@ -413,7 +413,7 @@ public class GetActionHandler extends AbstractActionHandler {
             }
         }
         
-        if (ConfigService.SIGNATURE != null && !ConfigService.SIGNATURE.isEmpty()) {
+        if (ConfigService.SIGNATURE != null) {
             content += "<hr>" + ConfigService.SIGNATURE;
         }
         
@@ -431,7 +431,7 @@ public class GetActionHandler extends AbstractActionHandler {
         
         String content = "";
         content += RenderingService.start_html(requestParams.getRequestURI() + " properties");
-        if (ConfigService.HEADER != null && !ConfigService.HEADER.isEmpty()) {
+        if (ConfigService.HEADER != null) {
             content += ConfigService.HEADER;
         }
 
@@ -525,7 +525,7 @@ public class GetActionHandler extends AbstractActionHandler {
 */
         
         content += "</table>";
-        if (ConfigService.SIGNATURE != null && !ConfigService.SIGNATURE.isEmpty()) {
+        if (ConfigService.SIGNATURE != null) {
             content += "<hr>" + ConfigService.SIGNATURE;
         }
         content += RenderingService.end_html();

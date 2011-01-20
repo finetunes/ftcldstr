@@ -41,7 +41,7 @@ public class PropfindActionHandler extends AbstractActionHandler {
         int noroot = 0;
         
         String depth = requestParams.getRequest().getHeader("Depth");
-        if (depth != null && !depth.isEmpty()) {
+        if (depth == null) {
             depth = "-1";
         }
         
@@ -60,7 +60,7 @@ public class PropfindActionHandler extends AbstractActionHandler {
         
         String xml = requestParams.getRequestBody();
         
-        if (xml == null || xml.isEmpty() || xml.matches("\\s*")) {
+        if (xml == null || xml.matches("\\s*")) {
             xml = "<?xml version=\"1.0\" encoding=\"" + ConfigService.CHARSET + "\" ?>\n<D:propfind xmlns:D=\"DAV:\"><D:allprop/></D:propfind>";
         }
 
@@ -107,7 +107,7 @@ public class PropfindActionHandler extends AbstractActionHandler {
             String all = (String)propFindElement[1];
             String noval = (String)propFindElement[2];
             
-            if (props != null && !props.isEmpty()) {
+            if (props != null) {
                 DirectoryOperationsService.readDirRecursive(/* $fn, $ru, \@resps, $props, $all, $noval, $depth, $noroot */); // TODO: implement
             }
             else {

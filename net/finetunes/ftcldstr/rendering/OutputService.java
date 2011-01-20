@@ -26,8 +26,20 @@ public class OutputService {
 	        String status, String type, String content, HashMap<String, String> headers) {
 	    
 	    // print header
+
+	    if (status == null) {
+	        status = "403 Forbidden";
+	    }
 	    
-	    if (status != null && !status.isEmpty()) {
+	    if (type == null) {
+	        type = "text/plain";
+	    }
+	    
+	    if (content == null) {
+	        content = "";
+	    }
+	    
+	    if (status != null) {
 	        requestParams.getResponse().setStatus(extractStatusCode(status));
 	    }
 	    
@@ -35,8 +47,7 @@ public class OutputService {
 	    requestParams.getResponse().addHeader("Content-Length", String.valueOf(getContentLength(content)));
 	    requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams.getPathTranslated()));
 
-        if (requestParams.getRequest().getHeader("Translate") != null &&
-                !requestParams.getRequest().getHeader("Translate").isEmpty()) {
+        if (requestParams.getRequest().getHeader("Translate") != null) {
             requestParams.getResponse().addHeader("Translate", "f");
         }
         

@@ -40,7 +40,7 @@ public class TraceActionHandler extends AbstractActionHandler {
         
         String viaHeader = "Via: " + requestParams.getRequest().getServerName() + ":" + requestParams.getRequest().getServerPort();
         String via = requestParams.getRequest().getHeader("Via");
-        if (via != null && !via.isEmpty()) {
+        if (via != null) {
             viaHeader += ", " + via;
         }
         
