@@ -1,6 +1,17 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.rendering.OutputService;
+import net.finetunes.ftcldstr.routines.fileoperations.FileHelper;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.webdav.LockingService;
 
 /**
  * The DELETE method requests that the origin server delete the resource
@@ -31,4 +42,72 @@ import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 
 public class DeleteActionHandler extends AbstractActionHandler {
 
+    public void handle(final RequestParams requestParams) {
+        
+        String fn = requestParams.getPathTranslated();
+        String status = "204 No Content";
+        // check all files are writeable and than remove it
+        
+        Logger.debug("_DELETE: " + fn);
+        
+        ArrayList<HashMap<String, String>> resps = new ArrayList<HashMap<String,String>>(); 
+        
+        if (!FileOperationsService.file_exits(fn)) {
+            status = "404 Not Found";
+        }
+        else if (requestParams.getRequestURI().matches(".*\\#.*") && !fn.matches(".*\\#.*") || 
+                (requestParams.getRequest().getQueryString() != null && !requestParams.getRequest().getQueryString().isEmpty())) {
+            status = "400 Bad Request";
+        }
+        else if (LockingService.isAllowed(requestParams, fn)) {
+            status = "423 Locked";
+        }
+        else {
+            if (ConfigService.ENABLE_TRASH) {
+                if (!FileHelper.moveToTrash(fn)) {
+                    status = "403 Forbidden";
+                    
+                    // PZ: original message was 404 Forbidden
+                    // suppose 403, not 404 should be here
+                }
+            }
+            else {
+                
+                ArrayList<String[]> err = new ArrayList<String[]>();
+                FileHelper.deltree(fn, err);
+                Logger.log("DELETE(" + fn + ")");
+                
+                Iterator<String[]> it = err.iterator();
+                while (it.hasNext()) {
+                    String[] e = it.next();
+                    String file = e[0];
+                    String message = e[1];
+                    HashMap<String, String> r = new HashMap<String, String>();
+                    r.put("href", file);
+                    r.put("status", "403 Forbidden - $message");
+                    resps.add(r);
+                }
+                
+                if (resps.size() > 0) {
+                    status = "207 Multi-Status";
+                }
+            }
+        }
+        
+        
+        String content = "";
+        if (resps.size() > 0) {
+            content = ""; // TODO! /* content = createXML({ 'multistatus' => { 'response'=>\@resps} }); */
+        }
+        
+        String type = null;
+        if (resps.size() > 0) {
+            type = "text/xml";
+        }
+        OutputService.printHeaderAndContent(requestParams, status, type, content);
+        
+        Logger.debug("DELETE RESPONSE (status=" + status + "): " + content);
+      
+    }    
+    
 }

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 
 /**
@@ -15,15 +16,15 @@ import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 public class ConfigService {
     
     // TODO: add all the config values here
-    
-/*    
-    ## -- VIRTUAL_BASE
-    ## only neccassary if you use redirects or rewrites 
-    ## from a VIRTUAL_BASE to the DOCUMENT_ROOT
-    ## regular expressions are allowed
-    ## DEFAULT: $VIRTUAL_BASE = "";
-    $VIRTUAL_BASE = '(/webdav|)';
-*/
+
+    /*
+     * -- VIRTUAL_BASE
+     * only neccassary if you use redirects or rewrites
+     * from a VIRTUAL_BASE to the DOCUMENT_ROOT
+     * regular expressions are allowed
+     * DEFAULT: $VIRTUAL_BASE = "";
+     */
+    public static final String VIRTUAL_BASE = "(/webdav|)";
     
     /*
      * -- DOCUMENT_ROOT
@@ -694,6 +695,7 @@ public class ConfigService {
     
     public static String DAV = null;
     public static Properties properties = null;
+    public static WebDAVLocks locks = null;
     
     // phrases
     public static HashMap<String, String> stringMessages = null;
@@ -701,6 +703,7 @@ public class ConfigService {
     public static final String URL_PARAM_SEPARATOR = "&"; // was ";" in perl
     
     public static final String PROPERTIES_FILE_PATH = "c:\\p.txt";
+    public static final String LOCKS_FILE_PATH = "c:\\p2.txt";
     
 
 }

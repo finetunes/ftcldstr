@@ -1,7 +1,17 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.util.ArrayList;
+
+import javax.xml.soap.Detail;
+
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.rendering.OutputService;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.webdav.LockingService;
 
 /**
  * The COPY method creates a duplicate of the source resource identified
@@ -21,54 +31,71 @@ public class CopyActionHandler extends AbstractActionHandler {
         
         String fn = requestParams.getPathTranslated();
         String status = "201 Created";
-        String depth = requestParams.getHeader("Depth");
+        String depthHeader = requestParams.getHeader("Depth");
+        int depth = 0;
+        try {
+            depth = Integer.valueOf(depthHeader).intValue();
+        }
+        catch (NumberFormatException e) {
+            // do nothing
+        }
+        
         String host = requestParams.getHeader("Host");
         String destination = requestParams.getHeader("Destination");
         
-/*
-TODO
-  
-    my $overwrite = defined $cgi->http('Overwrite')?$cgi->http('Overwrite') : "T";
-    $destination=~s@^https?://([^\@]+\@)?\Q$host\E$VIRTUAL_BASE@@;
-    $destination=uri_unescape($destination);
-    $destination=uri_unescape($destination);
-    $destination=$DOCUMENT_ROOT.$destination;
-
-    debug("_COPY: $PATH_TRANSLATED => $destination");
-
-    if ( (!defined $destination) || ($destination eq "") || ($PATH_TRANSLATED eq $destination) ) {
-        $status = '403 Forbidden';
-    } elsif ( -e $destination && $overwrite eq "F") {
-        $status = '412 Precondition Failed';
-    } elsif ( ! -d dirname($destination)) {
-        $status = "409 Conflict - $destination";
-    } elsif ( !isAllowed($destination,-d $PATH_TRANSLATED) ) {
-        $status = '423 Locked';
-    } elsif ( -d $PATH_TRANSLATED && $depth == 0 ) {
-        if (-e $destination) {
-            $status = '204 No Content' ;
-        } else {
-            if (mkdir $destination) {
-                inheritLock($destination);
-            } else {
-                $status = '403 Forbidden';
+        String overwrite = "T";
+        if (requestParams.headerExists("Overwrite")) {
+            overwrite = requestParams.getHeader("Overwrite");
+        }
+        
+        destination = destination.replaceFirst("^https?://([^@]+@)?\\Q" + host + "\\E" + ConfigService.VIRTUAL_BASE, "");
+        destination = RenderingHelper.uri_unescape(destination);
+        destination = RenderingHelper.uri_unescape(destination); // PZ: yes, it was unescaped twice in the perl code
+        destination = ConfigService.DOCUMENT_ROOT + destination;
+        
+        Logger.debug("COPY: " + fn + " => " + destination);
+        
+        if (destination == null || destination.isEmpty() || (fn.equals(destination))) {
+            status = "403 Forbidden";
+        }
+        else if (FileOperationsService.file_exits(destination) && overwrite.equals("F")) {
+            status = "412 Precondition Failed";
+        }
+        else if (!FileOperationsService.is_directory(destination)) {
+            status = "409 Conflict - " + destination;
+        }
+        else if (!LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(fn))) {
+            status = "423 Locked";
+        }
+        else if (FileOperationsService.is_directory(fn) && depth == 0) {
+            if (FileOperationsService.file_exits(destination)) {
+                status = "204 No Content";
+            }
+            else {
+                ArrayList<String> err = new ArrayList<String>();
+                if (FileOperationsService.mkdir(destination, err)) {
+                    LockingService.inheritLock(requestParams, destination);
+                }
+                else {
+                    status = "403 Forbidden";
+                }
             }
         }
-    } else {
-        $status = '204 No Content' if -e $destination;
-        if (rcopy($PATH_TRANSLATED, $destination)) {
-            inheritLock($destination,1);
-            logger("COPY($PATH_TRANSLATED, $destination)");
-        } else {
-            $status = '403 Forbidden - copy failed';
+        else {
+            if (FileOperationsService.file_exits(destination)) {
+                status = "204 No Content";
+            }
+            
+            if (FileOperationsService.rcopy(fn, destination)) {
+                LockingService.inheritLock(requestParams, destination, true);
+                Logger.log("COPY(" + fn + ", " + destination + ")");
+            }
+            else {
+                status = "403 Forbidden - copy failed";
+            }
         }
-    }
-
-    printHeaderAndContent($status);
         
-        
-        
-*/        
+        OutputService.printHeaderAndContent(requestParams, status);
     }
     
 }

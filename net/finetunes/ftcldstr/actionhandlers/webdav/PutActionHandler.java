@@ -46,7 +46,7 @@ public class PutActionHandler extends AbstractActionHandler {
         else if (PreconditionsHandler.preConditionFailed(requestParams, fn)) {
             status = "412 Precondition Failed";
         }
-        else if (!LockingService.isAllowed(fn)) {
+        else if (!LockingService.isAllowed(requestParams, fn)) {
             status = "423 Locked";
         }
         // #} elsif (defined $ENV{HTTP_EXPECT} && $ENV{HTTP_EXPECT} =~ /100-continue/) {

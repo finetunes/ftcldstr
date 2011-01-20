@@ -139,8 +139,8 @@ public class FileHelper {
 		
 	}
 	
-	// TODO: parameters
-	public static int deltree() {
+	// TODO: parameters (seems ok)
+	public static int deltree(String f, ArrayList<String[]> err) {
 		
 		// TODO: implement
 		return -1;

@@ -2,6 +2,14 @@ package net.finetunes.ftcldstr.actionhandlers.webdav;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.rendering.OutputService;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.webdav.LockingService;
+import net.finetunes.ftcldstr.serialization.BasicRoutines;
+import net.finetunes.ftcldstr.serialization.DBPropertiesOperations;
 
 /**
  * The MOVE operation on a non-collection resource is the logical
@@ -22,47 +30,58 @@ public class MoveActionHandler extends AbstractActionHandler {
 
     public void handle(final RequestParams requestParams) {
   
+        String fn = requestParams.getPathTranslated();
         String status = "201 Created";
         String host = requestParams.getHeader("Host");
         String destination = requestParams.getHeader("Destination");
-        // TODO
+        String overwrite = "T";
+        if (requestParams.headerExists("Overwrite")) {
+            overwrite = requestParams.getHeader("Overwrite");
+        }
         
-/*        
-        my $status = '201 Created';
-        my $host = $cgi->http('Host');
-        my $destination = $cgi->http('Destination');
-        my $overwrite = defined $cgi->http('Overwrite')?$cgi->http('Overwrite') : "T";
-        debug("_MOVE: $PATH_TRANSLATED => $destination");
-        $destination=~s@^https?://([^\@]+\@)?\Q$host\E$VIRTUAL_BASE@@;
-        $destination=uri_unescape($destination);
-        $destination=uri_unescape($destination);
-        $destination=$DOCUMENT_ROOT.$destination;
+        Logger.debug("MOVE: " + fn + " => " + destination);
+        
+        destination = destination.replaceFirst("^https?://([^@]+@)?\\Q" + host + "\\E" + ConfigService.VIRTUAL_BASE, "");
+        destination = RenderingHelper.uri_unescape(destination);
+        destination = RenderingHelper.uri_unescape(destination); // PZ: yes, it was unescaped twice in the perl code
+        destination = ConfigService.DOCUMENT_ROOT + destination;
 
-        if ( (!defined $destination) || ($destination eq "") || ($PATH_TRANSLATED eq $destination) ) {
-            $status = '403 Forbidden';
-        } elsif ( -e $destination && $overwrite eq "F") {
-            $status = '412 Precondition Failed';
-        } elsif ( ! -d dirname($destination)) {
-            $status = "409 Conflict - ".dirname($destination);
-        } elsif (!isAllowed($PATH_TRANSLATED,-d $PATH_TRANSLATED) || !isAllowed($destination, -d $destination)) {
-            $status = '423 Locked';
-        } else {
-            unlink($destination) if -f $destination;
-            $status = '204 No Content' if -e $destination;
-            if (rmove($PATH_TRANSLATED, $destination)) {
-                db_moveProperties($PATH_TRANSLATED, $destination);
-                db_delete($PATH_TRANSLATED);
-                inheritLock($destination,1);
-                logger("MOVE($PATH_TRANSLATED, $destination)");
-            } else {
-                $status = '403 Forbidden';
+        if (destination == null || destination.isEmpty() || (fn.equals(destination))) {
+            status = "403 Forbidden";
+        }
+        else if (FileOperationsService.file_exits(destination) && overwrite.equals("F")) {
+            status = "412 Precondition Failed";
+        }
+        else if (!FileOperationsService.is_directory(destination)) {
+            status = "409 Conflict - " + destination;
+        }
+        else if (!LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(fn)) ||
+                !LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(destination))) {
+            status = "423 Locked";
+        }
+        else {
+            if (FileOperationsService.is_plain_file(destination)) {
+                FileOperationsService.unlink(destination);
+            }
+            
+            if (FileOperationsService.file_exits(destination)) {
+                status = "204 No Content";
+            }
+            
+            if (FileOperationsService.rmove(fn, destination)) {
+                DBPropertiesOperations.db_moveProperties(fn, destination);
+                BasicRoutines.db_delete(fn);
+                LockingService.inheritLock(requestParams, destination, true);
+                Logger.log("MOVE(" + fn + ", " + destination + ")");
+            }
+            else {
+                status = "403 Forbidden";
             }
         }
-        debug("_MOVE: status=$status");
-        printHeaderAndContent($status);        
-*/        
         
+        Logger.debug("MOVE: status=" + status);
         
+        OutputService.printHeaderAndContent(requestParams, status);        
     }
     
 }

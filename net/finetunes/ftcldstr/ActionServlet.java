@@ -21,6 +21,7 @@ import net.finetunes.ftcldstr.actionhandlers.webdav.PostActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.TraceActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.InitializationService;
+import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 
 
@@ -37,6 +38,7 @@ public class ActionServlet extends MServlet {
     
     public void destroy() {
         Properties.serialize(ConfigService.PROPERTIES_FILE_PATH, ConfigService.properties);
+        WebDAVLocks.serialize(ConfigService.LOCKS_FILE_PATH, ConfigService.locks);
     }    
     
     

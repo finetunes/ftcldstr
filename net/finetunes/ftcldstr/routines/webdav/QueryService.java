@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class QueryService {
 	
-	public static Object[] getIfHeaderComponents(String header) {
+	public static HashMap<String, Object> getIfHeaderComponents(String header) {
 	    
 	    String rtag = "";
 	    ArrayList<HashMap<String, String>> tokens = new ArrayList<HashMap<String, String>>();
@@ -35,10 +35,12 @@ public class QueryService {
 	            
 	            tokens.add(item);
 	        }
-
 	        
 	        // return {rtag=>$rtag, list=>\@tokens};
-	        return new Object[] {rtag, tokens};
+	        HashMap<String, Object> r = new HashMap<String, Object>();
+	        r.put("rtag", rtag);
+	        r.put("list", tokens);
+	        return r;
 	    }
 	        
 	    return null;

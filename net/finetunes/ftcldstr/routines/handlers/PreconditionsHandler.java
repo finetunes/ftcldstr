@@ -19,7 +19,8 @@ public class PreconditionsHandler {
 	    }
 	    
 	    
-	    Object[] ifheader = QueryService.getIfHeaderComponents(requestParams.getHeader("If")); // String, ArrayList<HashMap<String, String>>
+	    HashMap<String, Object> ifheader = QueryService.getIfHeaderComponents(requestParams.getHeader("If")); // String, ArrayList<HashMap<String, String>>
+	    
 	    //  my $rowsRef = db_get( $fn ); // FROM webdav_locks
 	    boolean t = false; // token found
 	    boolean nnl = false; // not no-lock found
@@ -27,8 +28,10 @@ public class PreconditionsHandler {
 	    boolean e = false; // wrong etag found
 	    String etag = PropertiesHelper.getETag(fn);
 	    
+        // return {rtag=>$rtag, list=>\@tokens};
+
 	    if (ifheader != null) {
-	        ArrayList<HashMap<String, String>> ies = ((ArrayList<HashMap<String, String>>)ifheader[1]);
+	        ArrayList<HashMap<String, String>> ies = ((ArrayList<HashMap<String, String>>)ifheader.get("list"));
 	        Iterator<HashMap<String, String>> it = ies.iterator();
 	        while (it.hasNext()) {
 	            HashMap<String, String> ie = it.next();

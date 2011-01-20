@@ -19,6 +19,11 @@ public class FileOperationsService {
 		
 	}
 	
+    public static boolean rcopy(String sourcePath, String destinationPath) {
+        
+        return rcopy(sourcePath, destinationPath, false);
+    }	
+	
 	public static boolean rmove(String sourcePath, String destinationPath) {
 		
 		// TODO: implement
@@ -288,5 +293,12 @@ public class FileOperationsService {
         return false;
         
     }
+    
+    public static boolean unlink(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }    
     
 }

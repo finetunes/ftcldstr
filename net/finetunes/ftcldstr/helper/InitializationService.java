@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 
 public class InitializationService {
@@ -162,7 +163,11 @@ public class InitializationService {
         ConfigService.properties = p;
         
         // end properties
+
+        WebDAVLocks l = WebDAVLocks.deserialize(ConfigService.LOCKS_FILE_PATH);
+        ConfigService.locks = l;
         
+        // end locks
         
         initialized = true;
     }

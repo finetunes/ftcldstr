@@ -40,4 +40,9 @@ public class BasicRoutines {
 		
 	}
 
+    public static boolean db_delete(String filename) {
+        
+        return db_delete(filename, null);
+    }	
+	
 }
