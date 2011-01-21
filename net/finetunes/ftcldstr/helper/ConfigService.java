@@ -605,58 +605,179 @@ public class ConfigService {
                 'lockdiscovery', 'resourcetype','supportedlock', 'getetag', 'getcontenttype', 
                 'getcontentlength', 'executable' );
     
-    
-    ### XML
-    %NAMESPACES = ( 'DAV:'=>'D', 'http://apache.org/dav/props/'=>'lp2', 'urn:schemas-microsoft-com:' => 'Z', 'urn:schemas-microsoft-com:datatypes'=>'M', 'urn:schemas-microsoft-com:office:office' => 'Office', 'http://schemas.microsoft.com/repl/' => 'Repl', 'urn:ietf:params:xml:ns:caldav'=>'C', 'http://calendarserver.org/ns/'=>'CS', 'http://www.apple.com/webdav_fs/props/'=>'Apple', 'http://www.w3.org/2000/xmlns/'=>'x', 'urn:ietf:params:xml:ns:carddav' => 'A', 'http://www.w3.org/2001/XMLSchema'=>'xs', 'http://groupdav.org/'=>'G');
-    
-    %ELEMENTS = (   'calendar'=>'C','calendar-description'=>'C', 'calendar-timezone'=>'C', 'supported-calendar-component-set'=>'C',
-            'supported-calendar-data'=>'C', 'max-resource-size'=>'C', 'min-date-time'=>'C',
-            'max-date-time'=>'C','max-instances'=>'C', 'max-attendees-per-instance'=>'C',
-            'read-free-busy'=>'C', 'calendar-home-set'=>'C', 'supported-collation-set'=>'C', 'schedule-tag'=>'C',
-            'calendar-data'=>'C', 'mkcalendar-response'=>'C', getctag=>'CS',
-            'calendar-user-address-set'=>'C', 'schedule-inbox-URL'=>'C', 'schedule-outbox-URL'=>'C',
-            'calendar-user-type'=>'C', 'schedule-calendar-transp'=>'C', 'schedule-default-calendar-URL'=>'C',
-            'schedule-inbox'=>'C', 'schedule-outbox'=>'C', 'transparent'=>'C',
-            'calendar-multiget'=>'C', 'calendar-query'=>'C', 'free-busy-query'=>'C',
-            'addressbook'=>'A', 'addressbook-description'=>'A', 'supported-address-data'=>'A', 'addressbook-home-set'=>'A', 'principal-address'=>'A',
-            'address-data'=>'A',
-            'addressbook-query'=>'A', 'addressbook-multiget'=>'A',
-            'string'=>'xs', 'anyURI'=>'xs', 'nonNegativeInteger'=>'xs', 'dateTime'=>'xs',
-            'vevent-collection'=>'G', 'vtodo-collection'=>'G', 'vcard-collection'=>'G', 'component-set'=>'G',
-            'executable'=>'lp2','Win32CreationTime'=>'Z', 'Win32LastModifiedTime'=>'Z', 'Win32LastAccessTime'=>'Z', 
-            'authoritative-directory'=>'Repl', 'resourcetag'=>'Repl', 'repl-uid'=>'Repl', 'modifiedby'=>'Office', 'specialFolderType'=>'Office',
-            'Win32CreationTime'=>'Z', 'Win32FileAttributes'=>'Z', 'Win32LastAccessTime'=>'Z', 'Win32LastModifiedTime'=>'Z',default=>'D' );
-    
-    %NAMESPACEABBR = ( 'D'=>'DAV:', 'lp2'=>'http://apache.org/dav/props/', 'Z'=>'urn:schemas-microsoft-com:', 'Office'=>'urn:schemas-microsoft-com:office:office','Repl'=>'http://schemas.microsoft.com/repl/', 'M'=>'urn:schemas-microsoft-com:datatypes', 'C'=>'urn:ietf:params:xml:ns:caldav', 'CS'=>'http://calendarserver.org/ns/', 'Apple'=>'http://www.apple.com/webdav_fs/props/', 'A'=> 'urn:ietf:params:xml:ns:carddav', 'xs'=>'http://www.w3.org/2001/XMLSchema', 'G'=>'http://groupdav.org/');
-    
-    %DATATYPES = ( isfolder=>'M:dt="boolean"', ishidden=>'M:dt="boolean"', isstructureddocument=>'M:dt="boolean"', hassubs=>'M:dt="boolean"', nosubs=>'M:dt="boolean"', reserved=>'M:dt="boolean"', iscollection =>'M:dt="boolean"', isFolder=>'M:dt="boolean"', isreadonly=>'M:dt="boolean"', isroot=>'M:dt="boolean"', lastaccessed=>'M:dt="dateTime"', Win32CreationTime=>'M:dt="dateTime"',Win32LastAccessTime=>'M:dt="dateTime"',Win32LastModifiedTime=>'M:dt="dateTime"', description=>'xml:lang="en"');
 */
     
-    public static final Map<String, String> NAMESPACEELEMENTS = 
-        Collections.unmodifiableMap(new HashMap<String, String>() {{ 
-            put("multistatus", "1");
-            put("prop", "1");
-            put("error", "1");
-            put("principal-search-property-set", "1");
+    // # XML
+
+    public static final Map<String, String> NAMESPACES = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{
+            put("DAV:", "D");
+            put("http://apache.org/dav/props/", "lp2");
+            put("urn:schemas-microsoft-com:", "Z");
+            put("urn:schemas-microsoft-com:datatypes", "M");
+            put("urn:schemas-microsoft-com:office:office", "Office");
+            put("http://schemas.microsoft.com/repl/", "Repl");
+            put("urn:ietf:params:xml:ns:caldav", "C");
+            put("http://calendarserver.org/ns/", "CS");
+            put("http://www.apple.com/webdav_fs/props/", "Apple");
+            put("http://www.w3.org/2000/xmlns/", "x");
+            put("urn:ietf:params:xml:ns:carddav", "A");
+            put("http://www.w3.org/2001/XMLSchema", "xs");
+            put("http://groupdav.org/", "G");      
+        }});      
+    
+    public static final Map<String, String> ELEMENTS = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{
+            put("calendar", "C");
+            put("calendar-description", "C");
+            put("calendar-timezone", "C");
+            put("supported-calendar-component-set", "C");
+            put("supported-calendar-data", "C");
+            put("max-resource-size", "C");
+            put("min-date-time", "C");
+            put("max-date-time", "C");
+            put("max-instances", "C");
+            put("max-attendees-per-instance", "C");
+            put("read-free-busy", "C");
+            put("calendar-home-set", "C");
+            put("supported-collation-set", "C");
+            put("schedule-tag", "C");
+            put("calendar-data", "C");
+            put("mkcalendar-response", "C"); 
+            put("getctag", "CS");
+            put("calendar-user-address-set", "C");
+            put("schedule-inbox-URL", "C");
+            put("schedule-outbox-URL", "C");
+            put("calendar-user-type", "C");
+            put("schedule-calendar-transp", "C");
+            put("schedule-default-calendar-URL", "C");
+            put("schedule-inbox", "C");
+            put("schedule-outbox", "C");
+            put("transparent", "C");
+            put("calendar-multiget", "C");
+            put("calendar-query", "C");
+            put("free-busy-query", "C");
+            put("addressbook", "A");
+            put("addressbook-description", "A");
+            put("supported-address-data", "A");
+            put("addressbook-home-set", "A");
+            put("principal-address", "A");
+            put("address-data", "A");
+            put("addressbook-query", "A");
+            put("addressbook-multiget", "A");
+            put("string", "xs");
+            put("anyURI", "xs");
+            put("nonNegativeInteger", "xs");
+            put("dateTime", "xs");
+            put("vevent-collection", "G");
+            put("vtodo-collection", "G");
+            put("vcard-collection", "G");
+            put("component-set", "G");
+            put("executable", "lp2");
+            put("Win32CreationTime", "Z");
+            put("Win32LastModifiedTime", "Z");
+            put("Win32LastAccessTime", "Z"); 
+            put("authoritative-directory", "Repl");
+            put("resourcetag", "Repl");
+            put("repl-uid", "Repl");
+            put("modifiedby", "Office");
+            put("specialFolderType", "Office");
+            put("Win32CreationTime", "Z");
+            put("Win32FileAttributes", "Z");
+            put("Win32LastAccessTime", "Z");
+            put("Win32LastModifiedTime", "Z");
+            put("default", "D");          
+        }});        
+    
+    public static final Map<String, String> NAMESPACEABBR = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{
+            put("D", "DAV:");
+            put("lp2", "http://apache.org/dav/props/");
+            put("Z", "urn:schemas-microsoft-com:");
+            put("Office", "urn:schemas-microsoft-com:office:office");
+            put("Repl", "http://schemas.microsoft.com/repl/");
+            put("M", "urn:schemas-microsoft-com:datatypes");
+            put("C", "urn:ietf:params:xml:ns:caldav");
+            put("CS", "http://calendarserver.org/ns/");
+            put("Apple", "http://www.apple.com/webdav_fs/props/");
+            put("A", "urn:ietf:params:xml:ns:carddav");
+            put("xs", "http://www.w3.org/2001/XMLSchema");
+            put("G", "http://groupdav.org/");         
+        }});       
+    
+    public static final Map<String, String> DATATYPES = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{
+            put("isfolder", "M:dt=\"boolean\"");
+            put("ishidden", "M:dt=\"boolean\"");
+            put("isstructureddocument", "M:dt=\"boolean\"");
+            put("hassubs", "M:dt=\"boolean\"");
+            put("nosubs", "M:dt=\"boolean\"");    
+            put("reserved", "M:dt=\"boolean\"");
+            put("iscollection ", "M:dt=\"boolean\"");
+            put("isFolder", "M:dt=\"boolean\"'");
+            put("isreadonly", "M:dt=\"boolean\"");
+            put("isroot", "M:dt=\"boolean\"");
+            put("lastaccessed", "M:dt=\"dateTime\"");
+            put("Win32CreationTime", "M:dt=\"dateTime\"");
+            put("Win32LastAccessTime", "M:dt=\"dateTime\"");
+            put("Win32LastModifiedTime", "M:dt=\"dateTime\"");
+            put("description", "xml:lang=\"en\"");            
+        }});      
+    
+    public static final Map<String, Integer> NAMESPACEELEMENTS = 
+        Collections.unmodifiableMap(new HashMap<String, Integer>() {{ 
+            put("multistatus", 1);
+            put("prop", 1);
+            put("error", 1);
+            put("principal-search-property-set", 1);
         }});    
     
-/*    
-    %ELEMENTORDER = ( multistatus=>1, responsedescription=>4, 
-                allprop=>1, include=>2,
-                prop=>1, propstat=>2,status=>3, error=>4,
-                href=>1, responsedescription=>5, location=>6,
-                locktype=>1, lockscope=>2, depth=>3, owner=>4, timeout=>5, locktoken=>6, lockroot=>7, 
-                getcontentlength=>1001, getlastmodified=>1002, 
-                resourcetype=>0,
-                getcontenttype=>1, 
-                supportedlock=>1010, lockdiscovery=>1011, 
-                src=>1,dst=>2,
-                principal => 1, grant => 2,
-                privilege => 1, abstract=> 2, description => 3, 'supported-privilege' => 4,
-                collection=>1, calendar=>2, 'schedule-inbox'=>3, 'schedule-outbox'=>4,
-                'calendar-data'=>101, getetag=>100,
-                properties => 1, operators=>2,
-                default=>1000);
+    public static final Map<String, Integer> ELEMENTORDER = 
+        Collections.unmodifiableMap(new HashMap<String, Integer>() {{ 
+            put("multistatus", 1);
+            put("responsedescription", 4);
+            put("allprop", 1);
+            put("include", 2);
+            put("prop", 1);
+            put("propstat", 2);
+            put("status", 3);
+            put("error", 4);
+            put("href", 1);
+            put("responsedescription", 5);
+            put("location", 6);
+            put("locktype", 1);
+            put("lockscope", 2);
+            put("depth", 3);
+            put("owner", 4);
+            put("timeout", 5);
+            put("locktoken", 6);
+            put("lockroot", 7);
+            put("getcontentlength", 1001);
+            put("getlastmodified", 1002);
+            put("resourcetype", 0);
+            put("getcontenttype", 1);
+            put("supportedlock", 1010);
+            put("lockdiscovery", 1011);
+            put("src", 1);
+            put("dst", 2);
+            put("principal", 1);
+            put("grant", 2);
+            put("privilege", 1);
+            put("abstract", 2);
+            put("description", 3);
+            put("supported-privilege", 4);
+            put("collection", 1);
+            put("calendar", 2);
+            put("schedule-inbox", 3);
+            put("schedule-outbox", 4);
+            put("calendar-data", 101);
+            put("getetag", 100);
+            put("properties", 1);
+            put("operators", 2);
+            put("default", 1000);
+        }});       
+    
+/*                
     %SEARCH_PROPTYPES = ( default=>'string',
                   '{DAV:}getlastmodified'=> 'dateTime', '{DAV:}lastaccessed'=>'dateTime', '{DAV:}getcontentlength' => 'int', 
                   '{DAV:}creationdate' => 'dateTime','{urn:schemas-microsoft-com:}Win32CreationTime' =>'dateTime', 

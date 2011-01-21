@@ -38,7 +38,7 @@ public class LockingService {
 	}
 	
 	// TODO: second parameter should be an XML structure array
-	public static boolean isLockable(String filename) {
+	public static boolean isLockable(String filename, Object xmldata) {
 		
 		// TODO: implement
 		return false;
@@ -54,8 +54,8 @@ public class LockingService {
 	}
 	
 	// TODO: parameters and return type
-	public static void lockResource() {
-		
+	public static Object lockResource() {
+		return null;
 	}
 	
 	
@@ -213,7 +213,6 @@ public class LockingService {
             // db_insert($$row[0],$fn,$$row[2],$$row[3],$$row[4],$$row[5],$$row[6],$$row[7]);
         }
 	    
-		// TODO: implement
 		return false;
 		
 	}
@@ -228,5 +227,10 @@ public class LockingService {
 
         return inheritLock(requestParams, filename, false);
     }	
+    
+    public static boolean inheritLock(RequestParams requestParams) {
+
+        return inheritLock(requestParams, null);
+    }
 	
 }

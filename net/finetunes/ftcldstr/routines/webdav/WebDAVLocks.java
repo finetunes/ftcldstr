@@ -9,8 +9,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import net.finetunes.ftcldstr.helper.Logger;
 
@@ -20,10 +22,11 @@ public class WebDAVLocks implements Serializable {
      * For Serialization purposes
      */
     private static final long serialVersionUID = -6591814866812883182L;
-    ArrayList<WebDAVLock> locks;
+    List<WebDAVLock> locks;
     
     public WebDAVLocks() {
-        locks = new ArrayList<WebDAVLock>();
+        ArrayList<WebDAVLock> nosynclocks = new ArrayList<WebDAVLock>();
+        locks = Collections.synchronizedList(nosynclocks);
     }
     
     public boolean fnStartingLocksExist(String fn) {

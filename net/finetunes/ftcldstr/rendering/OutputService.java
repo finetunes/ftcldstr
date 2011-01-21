@@ -120,7 +120,7 @@ public class OutputService {
     public static void printHeaderAndContent(
             RequestParams requestParams,
             String status, String type) {
-        printHeaderAndContent(requestParams, status, type, "");
+        printHeaderAndContent(requestParams, status, type, null);
     }
 
     public static void printHeaderAndContent(

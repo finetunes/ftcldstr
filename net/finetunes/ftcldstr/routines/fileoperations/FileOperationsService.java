@@ -16,7 +16,6 @@ public class FileOperationsService {
 		
 		// TODO: implement
 		return false;
-		
 	}
 	
     public static boolean rcopy(String sourcePath, String destinationPath) {
@@ -139,6 +138,52 @@ public class FileOperationsService {
         
     }
     
+    // determines whether the file is a symbolic link
+    public static boolean is_symbolic_link(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }   
+    
+    // determines whether the file is a block special file
+    public static boolean is_block_special_file(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }
+    
+    // determines whether the file is a character special file
+    public static boolean is_character_special_file(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }       
+    
+    // determines whether the file has setuid bit set
+    public static boolean file_has_setuid_bit_set(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }           
+    
+    // determines whether the file has setgid bit set
+    public static boolean file_has_setgid_bit_set(String filename) {
+        
+        // TODO: implement
+        return false;
+        
+    }   
+    
+    public static boolean file_has_sticky_bit_set(String filename) {
+        
+        // TODO: implement
+        return false;
+    }        
+    
     // determines whether the file or directory is readable with the effective uid/gid
     public static boolean is_file_readable(String filename) {
         
@@ -228,15 +273,37 @@ public class FileOperationsService {
         
     }   
     
+    // returns the result of lstat unix funtion
+    public static Object[] lstat(String filename) {
+        
+        // If the file is a symbolic link, it returns the information for the link, 
+        // rather than the file it points to. Otherwise, it returns the information 
+        // for the file.        
+        
+        // ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, 
+        // $atime,$mtime,$ctime,$blksize,$blocks) = stat($filename);
+        
+        // TODO: implement
+        // return true;
+        
+        return new Object[] {0, 0, "0888", 0, 0, 0, 0, 0, 0, "", 0, 0, 0};
+        
+    }       
+    
     public static boolean mkdir(String dirname, ArrayList<String> err) {
         
         // push into err any system errors
-        // create it first if empty
+        // create it first if null
         
         // TODO: implement
         return false;
         
     }
+    
+    public static boolean mkdir(String dirname) {
+        
+        return mkdir(dirname, null);
+    }    
     
     public static boolean chmod(int mode, String filename) {
         
@@ -298,7 +365,6 @@ public class FileOperationsService {
         
         // TODO: implement
         return false;
-        
-    }    
+    }
     
 }

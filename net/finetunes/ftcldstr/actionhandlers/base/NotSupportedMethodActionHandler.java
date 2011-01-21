@@ -1,14 +1,12 @@
 package net.finetunes.ftcldstr.actionhandlers.base;
 
+import net.finetunes.ftcldstr.RequestParams;
+import net.finetunes.ftcldstr.rendering.OutputService;
+
 public class NotSupportedMethodActionHandler extends AbstractActionHandler {
 
-//    // probably handle this in a HttpServlet.doGet() way: 
-//    String protocol = req.getProtocol();
-//    String msg = lStrings.getString("http.method_get_not_supported");
-//    if (protocol.endsWith("1.1")) {
-//        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
-//    } else {
-//        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
-//    }
-    
+    public void handle(final RequestParams requestParams) {
+
+        OutputService.printHeaderAndContent(requestParams, "405 Method not allowed", "text/html");
+    }
 }

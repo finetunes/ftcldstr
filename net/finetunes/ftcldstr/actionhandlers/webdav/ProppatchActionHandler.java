@@ -10,6 +10,7 @@ import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.handlers.PropertyRequestHandler;
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
+import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
 import net.finetunes.ftcldstr.routines.xml.XMLService;
 
 /**
@@ -56,10 +57,8 @@ public class ProppatchActionHandler extends AbstractActionHandler {
 */        
             
             // TODO: set types
-            ArrayList<Object> resps = new ArrayList<Object>();
-            HashMap<Object, Object> resp_200 = new HashMap<Object, Object>(); 
-            HashMap<Object, Object> resp_403 = new HashMap<Object, Object>();
-            
+            StatusResponse resp_200 = null;
+            StatusResponse resp_403 = null;
             
             PropertyRequestHandler.handlePropertyRequest(xml, dataRef, resp_200, resp_403); // TODO: implement
 

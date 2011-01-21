@@ -235,7 +235,16 @@ public class DirectoryOperationsService {
             // TODO
             // my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($full);
             Object[] stat = FileOperationsService.stat(full);
-            String mode = (String)stat[2];
+            String modestr = (String)stat[2];
+
+            int mode = 0;
+            try {
+                mode = Integer.parseInt(modestr);
+            }
+            catch (NumberFormatException e) {
+                // do nothing
+            }
+            
             int uid = ((Integer)stat[4]).intValue();
             int gid = ((Integer)stat[4]).intValue();
             int size = ((Integer)stat[7]).intValue();
@@ -260,7 +269,7 @@ public class DirectoryOperationsService {
             if (ConfigService.SHOW_PERM) {
                 list += "<span " +
                       " style=\"" + RenderingHelper.getmodecolors(full, mode) + "\"" +
-                      " title=\"" + String.format("mode: %04o, uid: %s (%s), gid: %s (%s)", (new Integer(mode).intValue()) & 07777, SystemCalls.getpwuid(uid), uid, SystemCalls.getgrgid(gid), gid) + "\">";
+                      " title=\"" + String.format("mode: %04o, uid: %s (%s), gid: %s (%s)", mode & 07777, SystemCalls.getpwuid(uid), uid, SystemCalls.getgrgid(gid), gid) + "\">";
                 list += String.format("%-11s", RenderingHelper.mode2str(full, mode));
                 list += "</span>";
             }

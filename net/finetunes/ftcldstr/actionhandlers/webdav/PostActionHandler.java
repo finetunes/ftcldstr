@@ -13,8 +13,10 @@ import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.rendering.RenderingService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.webdav.QueryService;
 
 /**
  * The POST method is used to request that the origin server accept the
@@ -50,9 +52,9 @@ public class PostActionHandler extends AbstractActionHandler {
         }
         */
         
-        String msg;
-        String msgparam;
-        String errmsg;
+        String msg = null;
+        String msgparam = null;
+        String errmsg = null;
         ArrayList<String> err = new ArrayList<String>();
 
         String redirtarget = requestParams.getRequestURI();
@@ -218,10 +220,15 @@ public class PostActionHandler extends AbstractActionHandler {
                 }
             }
             
-/*
-  TODO: redirects
-            print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam, $errmsg, $msgparam));            
-*/            
+            String rt = redirtarget + RenderingService.createMsgQuery(msg, msgparam, errmsg, msgparam); 
+            try {
+                
+                requestParams.getResponse().sendRedirect(rt);
+            }
+            catch (IOException e) {
+                Logger.log("Error: Unable to perform redirect (" + rt + "): " + e.getMessage());
+                System.err.println("Error: Unable to perform redirect (" + rt + "): " + e.getMessage());
+            }
         }
         else if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_directory(fn) && requestParams.requestParamExists("file_upload")) {
 /*            

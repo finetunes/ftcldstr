@@ -13,13 +13,30 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.base.NotSupportedMethodActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.ACLActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.BindActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.CopyActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.DeleteActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.GetActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.GetlibActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.HeadActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.LockActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.MkCalendarActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.MkcolActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.MoveActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.OptionsActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.PostActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.PropfindActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.ProppatchActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.PutActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.RebindActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.ReportActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.SearchActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.TraceActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.UnbindActionHandler;
+import net.finetunes.ftcldstr.actionhandlers.webdav.UnlockActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.GeneratorService;
 import net.finetunes.ftcldstr.helper.InitializationService;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
@@ -140,8 +157,22 @@ public class ActionServlet extends MServlet {
         addMethodHandler("OPTIONS", new OptionsActionHandler());
         addMethodHandler("TRACE", new TraceActionHandler());
         addMethodHandler("GETLIB", new GetlibActionHandler());
-        
-        // TODO: add the rest of the method handlers
+        addMethodHandler("PROPFIND", new PropfindActionHandler());
+        addMethodHandler("PROPPATCH", new ProppatchActionHandler());
+        addMethodHandler("PUT", new PutActionHandler());
+        addMethodHandler("COPY", new CopyActionHandler());
+        addMethodHandler("MOVE", new MoveActionHandler());
+        addMethodHandler("DELETE", new DeleteActionHandler());
+        addMethodHandler("MKCALENDAR", new MkCalendarActionHandler());
+        addMethodHandler("MKCOL", new MkcolActionHandler());
+        addMethodHandler("LOCK", new LockActionHandler());
+        addMethodHandler("UNLOCK", new UnlockActionHandler());
+        addMethodHandler("ACL", new ACLActionHandler());
+        addMethodHandler("REPORT", new ReportActionHandler());
+        addMethodHandler("SEARCH", new SearchActionHandler());
+        addMethodHandler("BIND", new BindActionHandler());
+        addMethodHandler("UNBIND", new UnbindActionHandler());
+        addMethodHandler("REBIND", new RebindActionHandler());
         
         addMethodHandler(ActionServlet.NOT_SUPPORTED, new NotSupportedMethodActionHandler());
     }
