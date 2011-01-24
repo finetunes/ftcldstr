@@ -8,6 +8,11 @@ public class DatabaseHelper {
 	// TODO: try to find a more suitable return type
 	public static List db_getLike(String filename) {
 		
+        // deprecated
+        // replaced with:
+	    //   * ConfigService.locks.getLocksStartingFrom();
+	    
+	    
 		// TODO: implement
 		return null;
 		

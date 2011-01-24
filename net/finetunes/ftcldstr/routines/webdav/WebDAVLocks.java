@@ -169,7 +169,8 @@ public class WebDAVLocks implements Serializable {
         private String token;
         private String depth; // indeed string?
         private String timeout; // indeed string?
-        Date timestamp;
+        private String owner;
+        // Date timestamp;
 
         public WebDAVLock() {
             basefn = null;
@@ -179,7 +180,8 @@ public class WebDAVLocks implements Serializable {
             token = null;
             depth = null;
             timeout = null;
-            timestamp = new Date();            
+            owner = null;
+            // timestamp = new Date();            
         }
 
         public String getBasefn() {
@@ -238,12 +240,22 @@ public class WebDAVLocks implements Serializable {
             this.timeout = timeout;
         }
 
-        public Date getTimestamp() {
-            return timestamp;
+        public String getOwner() {
+            return owner;
         }
 
-        public void setTimestamp(Date timestamp) {
-            this.timestamp = timestamp;
+        public void setOwner(String owner) {
+            this.owner = owner;
         }
+
+//        public Date getTimestamp() {
+//            return timestamp;
+//        }
+//
+//        public void setTimestamp(Date timestamp) {
+//            this.timestamp = timestamp;
+//        }
+        
+        
     }
 }

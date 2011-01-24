@@ -2,6 +2,8 @@ package net.finetunes.ftcldstr.serialization;
 
 import java.util.List;
 
+import net.finetunes.ftcldstr.helper.ConfigService;
+
 import org.w3c.dom.Element;
 
 public class BasicRoutines {
@@ -10,6 +12,9 @@ public class BasicRoutines {
 	// TODO: try to find a more suitable return type
 	public static List db_get(String filename, String token) {
 		
+	    // deprecated
+	    // replaced with ConfigService.locks.getLocks();
+	    
 		// TODO: implement
 		return null;
 		

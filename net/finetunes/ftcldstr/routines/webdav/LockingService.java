@@ -1,10 +1,10 @@
 package net.finetunes.ftcldstr.routines.webdav;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
@@ -38,19 +38,129 @@ public class LockingService {
 	}
 	
 	// TODO: second parameter should be an XML structure array
-	public static boolean isLockable(String filename, Object xmldata) {
-		
-		// TODO: implement
-		return false;
+	public static boolean isLockable(String fn, Object xmldata) {
+	    // check lock and exclusive
+	    
+	    // TODO: check types and data
+	    HashMap<String, Object> data = (HashMap<String, Object>)xmldata;
+	    HashMap<String, Object> lockdata = (HashMap<String, Object>)data.get("{DAV:}lockscope");
+	    Set<String> lockscopes = lockdata.keySet();
+	    String lockscope = "exclusive";
+	    if (lockscopes != null && lockscopes.size() > 0) {
+	        lockscope = (String)lockscopes.toArray()[0];
+	    }
+	    
+	    List<WebDAVLock> rowsRef = null;
+
+	    if (!FileOperationsService.file_exits(fn)) {
+	        rowsRef = ConfigService.locks.getLocks(FileOperationsService.dirname(fn) + "/");
+	    }
+	    else if (FileOperationsService.is_directory(fn)) {
+            rowsRef = ConfigService.locks.getLocksStartingFrom(fn);
+	    }
+	    else {
+            rowsRef = ConfigService.locks.getLocks(fn);
+	    }
+	    
+	    boolean ret = false;
+	    int rowcount = 0;
+	    if (rowsRef != null) {
+	        rowcount = rowsRef.size();
+	    }
+	    Logger.debug("isLockable: " + rowcount +", lockscope=" + lockscope);
+	    
+	    if (rowcount > 0) {
+	        WebDAVLock lock = rowsRef.get(0);
+	        // $ret =  lc($$row[3]) ne 'exclusive' && $lockscope ne '{DAV:}exclusive'?1:0;
+	        ret = !lock.getScope().equalsIgnoreCase("exclusive") && !lockscope.equals("{DAV:}exclusive");
+	    }
+	    else {
+	        ret = true;
+	    }
+	    
+	    return ret;
+	    
+	
+		/*      
+		 * original code (for reference)
+        # check lock and exclusive
+        my ($fn,$xmldata) = @_;
+        my @lockscopes = keys %{$$xmldata{'{DAV:}lockscope'}};
+        my $lockscope = @lockscopes && $#lockscopes >-1 ? $lockscopes[0] : 'exclusive';
+
+        my $rowsRef;
+        if (! -e $fn) {
+            $rowsRef = db_get(dirname($fn).'/');
+        } elsif (-d $fn) {
+            $rowsRef = db_getLike("$fn\%");
+        } else {
+            $rowsRef = db_get($fn);
+        }
+        my $ret = 0;
+        debug("isLockable: $#{$rowsRef}, lockscope=$lockscope");
+        if ($#{$rowsRef}>-1) {
+            my $row = $$rowsRef[0];
+            $ret =  lc($$row[3]) ne 'exclusive' && $lockscope ne '{DAV:}exclusive'?1:0;
+        } else {
+            $ret = 1;
+        }
+        return $ret;
+*/     		
 		
 	}
 	
-	// TODO: note types; returns XML structure
-	public static Object[] getLockDiscovery(String filename) {
+	// TODO: note return type
+	public static ArrayList<HashMap<String, Object>> getLockDiscovery(String fn) {
 		
-		// TODO: implement
-		return new Object[]{};
-		
+	    List<WebDAVLock> rowsRef = ConfigService.locks.getLocks(fn);
+	    ArrayList<HashMap<String, Object>> resp = new ArrayList<HashMap<String,Object>>();
+	    if (rowsRef != null && rowsRef.size() > 0) {
+	        Logger.debug("getLockDiscovery: rowcount=" + rowsRef.size());
+	        Iterator<WebDAVLock> it = rowsRef.iterator();
+	        
+	        while (it.hasNext()) {
+	            // # basefn,fn,type,scope,token,depth,timeout,owner
+	            WebDAVLock row = it.next();
+                HashMap<String, Object> lock = new HashMap<String, Object>();
+                HashMap<String, Object> type = new HashMap<String, Object>();
+                HashMap<String, Object> scope = new HashMap<String, Object>();
+                HashMap<String, Object> href = new HashMap<String, Object>();
+                
+                type.put(row.getType(), null); // TODO: check whether null is a valid value; otherwise use "" 
+                scope.put(row.getScope(), null); // TODO: check whether null is a valid value; otherwise use "" 
+                href.put("href", row.getToken()); // TODO: check whether null is a valid value; otherwise use ""
+                
+                String timeout = "Infinite";
+                if (row.getTimeout() != null) {
+                    timeout = row.getTimeout();
+                }
+
+                lock.put("locktype", type);
+                lock.put("lockscope", scope);
+                lock.put("locktoken", href);
+                
+                
+                lock.put("depth", row.getDepth());
+                lock.put("timeout", timeout);
+                
+                if (row.getOwner() != null) {
+                    lock.put("owner", row.getOwner());
+                }
+                
+                
+                HashMap<String, Object> l = new HashMap<String, Object>();
+                l.put("activelock", lock);
+                resp.add(l);
+            }
+	    }
+	    
+	    Logger.debug("getLockDiscovery: resp count=" + resp.size());
+	    
+	    if (resp.size() > 0) {
+	        return resp;
+	    }
+	    
+	    return null;
 	}
 	
 	// TODO: parameters and return type

@@ -19,8 +19,16 @@ import net.finetunes.ftcldstr.routines.xml.XMLService;
  * MUST, at minimum, support the XML request and response formats defined 
  * herein.
  * 
- * Description from RF4918 (c) The IETF Trust (2007).
+ * A LOCK method invocation creates the lock specified by the lockinfo 
+ * XML element on the Request-URI. Lock method requests SHOULD have a 
+ * XML request body which contains an owner XML element for this lock 
+ * request, unless this is a refresh request. The LOCK request may 
+ * have a Timeout header.
+ * 
+ * Description from RF4918 (c) The IETF Trust (2007)
+ * and RFC2518 (c) he Internet Society (1999)
  * http://www.ietf.org/rfc/rfc4918.txt
+ * http://www.ietf.org/rfc/rfc2518.txt
  * 
  */
 
