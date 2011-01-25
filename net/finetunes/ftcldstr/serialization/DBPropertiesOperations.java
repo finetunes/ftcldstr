@@ -1,65 +1,71 @@
 package net.finetunes.ftcldstr.serialization;
 
-import java.awt.List;
-
 public class DBPropertiesOperations {
 	
-	public static boolean db_insertProperty(String filename, 
+    /**
+     * @deprecated
+     */
+	public static void db_insertProperty(String filename, 
 			String propertyName, String propertyValue) {
 		
-		// TODO: implement
-		return false;
-		
+        // replaced with PropertiesService.setProperty
 	}
 	
-	public static boolean db_updateProperty(String filename, 
+    /**
+     * @deprecated
+     */
+	public static void db_updateProperty(String filename, 
 			String propertyName, String propertyValue) {
 		
-		// TODO: implement
-		return false;
-		
+        // replaced with PropertiesService.setProperty
 	}
 	
-	public static boolean db_moveProperties(String source, String destination) {
+    /**
+     * @deprecated
+     */
+	public static void db_moveProperties(String source, String destination) {
 		
-		// TODO: implement
-		return false;
-		
+        // replaced with PropertiesService.moveProperties
 	}
 	
-	public static boolean db_copyProperties(String source, String destination) {
+    /**
+     * @deprecated
+     */
+	public static void db_copyProperties(String source, String destination) {
 		
-		// TODO: implement
-		return false;
-		
+        // replaced with PropertiesService.copyProperties
 	}
 	
-	public static boolean db_deleteProperties(String filename) {
+    /**
+     * @deprecated
+     */
+	public static void db_deleteProperties(String filename) {
 		
-		// TODO: implement
-		return false;
-		
+	    // replaced with PropertiesService.deleteProperties
 	}
 	
-	public static List db_getProperties(String filename) {
+    /**
+     * @deprecated
+     */
+	public static void db_getProperties(String filename) {
 		
-		// TODO: implement
-		return new List();
-		
+	    // replaced with PropertiesService.getProperties
 	}
 	
-	public static String db_getProperty(String filename, String propertyName) {
+    /**
+     * @deprecated
+     */
+	public static void db_getProperty(String filename, String propertyName) {
 		
-		// TODO: implement
-		return null;
-		
+	    // replaced with PropertiesService.getProperty
 	}
 	
-	public static boolean db_removeProperty(String filename, String propertyName) {
+    /**
+     * @deprecated
+     */
+	public static void db_removeProperty(String filename, String propertyName) {
 		
-		// TODO: implement
-		return false;
-		
+	    // replaced with Properties.removeProperty
 	}
 
 }

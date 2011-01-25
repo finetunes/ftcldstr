@@ -44,7 +44,7 @@ public class HeadActionHandler extends AbstractActionHandler {
         }
         else if (FileOperationsService.file_exits(fn)) {
             Logger.debug("HEAD: " + fn + " exists!");
-            OutputService.printFileHeader(fn);
+            OutputService.printFileHeader(requestParams, fn);
         }
         else {
             Logger.debug("HEAD: " + fn + " does not exist!");

@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 
 import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
 public class RenderingHelper {
@@ -77,26 +78,28 @@ public class RenderingHelper {
     }
     
     public static String uri_unescape(String s) {
-        String r;
+        String r = "";
         
         try {
             r = URLDecoder.decode(s, ConfigService.CHARSET);
         }
         catch (UnsupportedEncodingException e) {
-            r = URLDecoder.decode(s);
+            Logger.log("Exception: " + e.getMessage());
+            e.printStackTrace();
         }
         
         return r;
     }
     
     public static String uri_escape(String s) {
-        String r;
+        String r = "";
         
         try {
             r = URLEncoder.encode(s, ConfigService.CHARSET);
         }
         catch (UnsupportedEncodingException e) {
-            r = URLEncoder.encode(s);
+            Logger.log("Exception: " + e.getMessage());
+            e.printStackTrace();
         }
         
         return r;

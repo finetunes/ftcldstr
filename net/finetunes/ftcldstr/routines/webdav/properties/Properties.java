@@ -29,6 +29,7 @@ public class Properties implements Serializable {
         return properties.get(fn);
     }
     
+    // db_getProperty
     public String getProperty(String fn, String property) {
         
         FileProperties fp = getProperties(fn);
@@ -39,7 +40,7 @@ public class Properties implements Serializable {
         return null;
     }
     
-    public void setProperty(String fn, String property, String value) {
+    public boolean setProperty(String fn, String property, String value) {
         FileProperties fp = getProperties(fn);
         if (fp == null) {
             fp = new FileProperties(fn);
@@ -47,8 +48,54 @@ public class Properties implements Serializable {
         }
         
         fp.setProperty(property, value);
+        
+        return true;
     }
     
+    // db_removeProperty
+    public boolean removeProperty(String fn, String property) {
+        
+        FileProperties fp = getProperties(fn);
+        if (fp != null) {
+            return fp.removeProperty(property) != null;
+        }
+        
+        return false;
+    }    
+    
+    // db_deleteProperties
+    public boolean deleteProperties(String fn) {
+        
+        if (properties != null) {
+            return properties.remove(fn) != null;
+        }
+        
+        return false;
+    }
+    
+    // db_copyProperties
+    public boolean copyProperties(String src, String dst) {
+        
+        FileProperties srcprop = getProperties(src);
+        FileProperties dstprop = new FileProperties(dst, srcprop);
+        
+        properties.put(dst, dstprop);
+        
+        return true;
+    }
+    
+    // db_moveProperties
+    public boolean moveProperties(String src, String dst) {
+        
+        FileProperties prop = properties.remove(src);
+        
+        if (prop != null) {
+            properties.put(dst, prop);
+            return true;
+        }
+        
+        return false;
+    }    
     
     public static boolean serialize(String filename, Properties properties) {
         
@@ -108,10 +155,9 @@ public class Properties implements Serializable {
         
         return null;
     }
+
     
-    
-    
-    public class FileProperties implements Serializable {
+    public class FileProperties implements Serializable, Cloneable {
         
         /*
          * For Serialization purposes
@@ -125,12 +171,38 @@ public class Properties implements Serializable {
             properties = new HashMap<String, String>();
         }
         
+        public FileProperties(String filename, FileProperties properties) {
+            this(filename);
+            
+            if (properties != null) {
+                try {
+                    this.properties = (HashMap<String, String>)properties.clone();
+                }
+                catch (CloneNotSupportedException e) {
+                    Logger.log("Clone not supported: " + e);
+                    e.printStackTrace();
+                }
+            }
+        }
+
         public void setProperty(String property, String value) {
             properties.put(property, value);
         }
         
         public String getProperty(String propertyname) {
             return properties.get(propertyname);
+        }
+        
+        public String removeProperty(String propertyname) {
+            return properties.remove(propertyname);
+        }     
+        
+        protected Object clone() throws CloneNotSupportedException {
+
+            FileProperties clone = (FileProperties)super.clone();
+            clone.properties = (HashMap<String, String>)properties.clone(); 
+
+            return clone;
         }
     }
     

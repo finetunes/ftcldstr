@@ -14,7 +14,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import net.finetunes.ftcldstr.helper.Logger;
+
+// PZ: TODO: make all the methods synchronized?
 
 public class WebDAVLocks implements Serializable {
     
@@ -59,7 +63,12 @@ public class WebDAVLocks implements Serializable {
         return false;
     }
     
-    public ArrayList<WebDAVLock> getLocks(String fn) {
+    // db_get
+    public ArrayList<WebDAVLock> getLocks(String fn, String token) {
+
+        // PZ: TODO: check this for multi-threading, as the method
+        // return references to locks, not new instances
+        // otherwise implement cloning
         
         ArrayList<WebDAVLock> ref = new ArrayList<WebDAVLock>();
         Iterator<WebDAVLock> it = locks.iterator();
@@ -68,12 +77,69 @@ public class WebDAVLocks implements Serializable {
             WebDAVLock l = it.next();
             if (l.getFn() != null) {
                 if (l.getFn().equals(fn)) {
-                    ref.add(l);
+                    if (token != null) {
+                        if (token.equals(l.getToken())) {
+                            ref.add(l);
+                        }
+                    }
+                    else {
+                        ref.add(l);
+                    }
                 }
             }
         }
         
         return ref;        
+    }
+    
+    public ArrayList<WebDAVLock> getLocks(String fn) {
+        
+        return getLocks(fn, null);
+    }    
+    
+    
+    public WebDAVLock getLock(String fn, String basefn) {
+
+        Iterator<WebDAVLock> it = locks.iterator();
+        
+        while (it.hasNext()) {
+            WebDAVLock l = it.next();
+            if (l.getFn() != null) {
+                if (l.getFn().equals(fn)) {
+                    if (l.getBasefn() != null) {
+                        if (l.getBasefn().equals(basefn)) {
+                            return l;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return null;        
+    }    
+    
+    public boolean lockExists(String fn, String basefn, String token) {
+        
+        Iterator<WebDAVLock> it = locks.iterator();
+        
+        while (it.hasNext()) {
+            WebDAVLock l = it.next();
+            if (l.getFn() != null) {
+                if (l.getFn().equals(fn)) {
+                    if (l.getBasefn() != null) {
+                        if (l.getBasefn().equals(basefn)) {
+                            if (l.getToken() != null) {
+                                if (l.getToken().equals(token)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return false;        
     }
     
     public ArrayList<WebDAVLock> getLocksStartingFrom(String fn) {
@@ -92,7 +158,80 @@ public class WebDAVLocks implements Serializable {
         
         return ref;   
     }
+
+    // db_insert
+    public boolean insertLock(String basefn, String fn, 
+            String type, String scope, String token, 
+            String depth, String timeout, 
+            String owner) {
+        
+        Logger.debug("insertLock(" + basefn + "," + fn + "," + type + "," + scope + "," + token + "," + depth + "," + timeout + "," + owner + ")");
+        
+        WebDAVLock lock = new WebDAVLock();
+        lock.setBasefn(basefn);
+        lock.setFn(fn);
+        lock.setType(type);
+        lock.setScope(scope);
+        lock.setToken(token);
+        lock.setDepth(depth);
+        lock.setTimeout(timeout);
+        lock.setOwner(owner);
+        
+        return locks.add(lock);
+    }    
+
+    // db_update
+    public boolean updateLock(String basefn, String fn, String timeout) {
+        
+        Logger.debug("updateLock(" + basefn + "," + fn + "," + timeout + ")");
+        
+        WebDAVLock lock = getLock(fn, basefn);
+        if (lock != null) {
+            lock.setTimeout(timeout);
+            return true;
+        }
+        
+        return false;
+    }      
     
+    // db_delete
+    public boolean deleteLock(String fn, String token) {
+        
+        Logger.debug("deleteLock(" + fn + "," + token + ")");
+        
+        Iterator<WebDAVLock> it = locks.iterator();
+        
+        while (it.hasNext()) {
+            WebDAVLock l = it.next();
+            String f = l.getFn();
+            String bf = l.getBasefn();
+            
+            if (f == null) {
+                f = "";
+            }
+            
+            if (bf == null) {
+                bf = "";
+            }
+            
+            if (f.equals(fn) || bf.equals(fn)) {
+                if (token != null) {
+                    if (l.getToken() != null && l.getToken().equals(token)) {
+                        it.remove();
+                    }
+                }
+                else {
+                    it.remove();
+                }
+            }
+        }
+        
+        return true;
+    }     
+    
+    public boolean deleteLock(String fn) {
+        return deleteLock(fn, null);
+    }
     
     public static boolean serialize(String filename, WebDAVLocks locks) {
         

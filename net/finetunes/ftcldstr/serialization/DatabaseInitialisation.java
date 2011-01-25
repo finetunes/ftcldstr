@@ -2,10 +2,12 @@ package net.finetunes.ftcldstr.serialization;
 
 public class DatabaseInitialisation {
 	
-	// TODO: returns connection to the database
+	/**
+	 * @deprecated
+	 */
 	public static void db_init() {
 		
-		// TODO: implement
+		// not used
 		
 	}
 

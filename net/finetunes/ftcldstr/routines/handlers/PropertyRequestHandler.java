@@ -6,6 +6,7 @@ public class PropertyRequestHandler {
 	
 	// TODO: params and return type
 	public static void handlePropertyRequest(Object xml, Object dataRef, StatusResponse resp_200, StatusResponse resp_403) {
+	    // TODO: implement
 		
 	}
 

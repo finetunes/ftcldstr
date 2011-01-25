@@ -165,15 +165,15 @@ public class LockingService {
 	
 	// TODO: parameters and return type
 	public static Object lockResource() {
-		return null;
+        // TODO: implement
+	    throw new RuntimeException("Not Implemented");
+		// return null;
 	}
 	
 	
-	public static boolean unlockResource(String filename, String token) {
+	public static boolean unlockResource(String fn, String token) {
 		
-		// TODO: implement
-		return false;
-		
+	    return isRootFolder(fn, token) && ConfigService.locks.deleteLock(fn, token);
 	}
 	
 	public static boolean isAllowed(RequestParams requestParams, String fn, boolean recurse) {
@@ -288,8 +288,9 @@ public class LockingService {
         if (FileOperationsService.is_directory(fn)) {
             
             Logger.debug("inheritLock: " + fn + " is a collection");
-            // TODO: insert lock
-            // db_insert($$row[0],$fn,$$row[2],$$row[3],$$row[4],$$row[5],$$row[6],$$row[7]);
+            
+            ConfigService.locks.insertLock(row.getBasefn(), fn, row.getType(), 
+                    row.getScope(), row.getToken(), row.getDepth(), row.getTimeout(), row.getOwner());
             
             List<String> files = new ArrayList<String>();
             ReadDirectoryContentWrapper rdw = new ReadDirectoryContentWrapper();
@@ -312,15 +313,16 @@ public class LockingService {
                 String full = fn + f;
                 if (FileOperationsService.is_directory(full) && !full.endsWith("/")) {
                     full += "/";
-                    // TODO: insert lock
-                    // db_insert($$row[0],$full,$$row[2],$$row[3],$$row[4],$$row[5],$$row[6],$$row[7]);
+                    
+                    ConfigService.locks.insertLock(row.getBasefn(), full, row.getType(), 
+                            row.getScope(), row.getToken(), row.getDepth(), row.getTimeout(), row.getOwner());
                     LockingService.inheritLock(requestParams, full, false, visited);
                 }
             }            
         }
         else {
-            // TODO: insert lock
-            // db_insert($$row[0],$fn,$$row[2],$$row[3],$$row[4],$$row[5],$$row[6],$$row[7]);
+            ConfigService.locks.insertLock(row.getBasefn(), fn, row.getType(), 
+                    row.getScope(), row.getToken(), row.getDepth(), row.getTimeout(), row.getOwner());
         }
 	    
 		return false;
@@ -342,5 +344,11 @@ public class LockingService {
 
         return inheritLock(requestParams, null);
     }
+    
+    // db_isRootFolder
+    public static boolean isRootFolder(String fn, String token) {
+        
+        return ConfigService.locks.lockExists(fn, fn, token);
+    }    
 	
 }

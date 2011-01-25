@@ -85,7 +85,7 @@ public class GetActionHandler extends AbstractActionHandler {
             OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
         }
         else if (FileOperationsService.file_exits(fn)) {
-            doFileExists(fn);
+            doFileExists(requestParams, fn);
         }
         else {
             Logger.debug("GET: " + fn + " NOT FOUND!");
@@ -477,7 +477,7 @@ public class GetActionHandler extends AbstractActionHandler {
         content += "<table style=\"width: 100%; table-layout:fixed;\">";
         
 /*
- * TODO: finish when properties are implemented        
+// * TODO: finish when properties are implemented        
         HashMap<String, String> namespaceElements = new HashMap<String, String>(ConfigService.NAMESPACEELEMENTS);
         List dbprops = DBPropertiesOperations.db_getProperties(fn);
         ArrayList<String> bgcolors = new ArrayList<String>(Arrays.asList("#ffffff", "#eeeeee"));
@@ -538,9 +538,9 @@ public class GetActionHandler extends AbstractActionHandler {
     
 
     // TODO
-    private void doFileExists(String fn) {
+    private void doFileExists(RequestParams requestParams, String fn) {
         Logger.debug("GET: DOWNLOAD");
-        OutputService.printFileHeader(fn);
+        OutputService.printFileHeader(requestParams, fn);
 //      if (open(F,"<$fn")) {
 //          binmode(STDOUT);
 //          while (read(F,my $buffer, $BUFSIZE)>0) {

@@ -89,8 +89,7 @@ public class FileHelper {
 	    String align = "";
 	    String id = PropertiesHelper.getETag(fn);
 	    
-	    // TODO
-//	    $id=~s/\"//g;
+	    id = id.replaceAll("\"", "");
 
 	    if (ConfigService.ENABLE_THUMBNAIL && FileOperationsService.is_file_readable(fn) &&
 	            MIMETypesHelper.getMIMEType(fn).startsWith("image/")) {

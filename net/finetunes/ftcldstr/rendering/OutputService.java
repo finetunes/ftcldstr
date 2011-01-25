@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.MIMETypesHelper;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
 
 public class OutputService {
@@ -65,10 +67,13 @@ public class OutputService {
         }
         
         // print content
-
+        printContent(requestParams, content);
+    }
+    
+    public static void printContent(RequestParams requestParams, String content) {
+        
         try {
             OutputStream outStream = requestParams.getResponse().getOutputStream();
-            
             PrintWriter pw = new PrintWriter(new OutputStreamWriter(outStream, ConfigService.CHARSET));
             pw.println(content);
 
@@ -82,8 +87,8 @@ public class OutputService {
         catch (IOException e) {
             System.err.println("Unable to get output stream for writing.");
             e.printStackTrace();
-        }
-	}
+        }       
+    }
 	
 	
     /**
@@ -98,7 +103,7 @@ public class OutputService {
             requestParams.getResponse().setStatus(extractStatusCode(status));
         }
         
-        requestParams.getResponse().addHeader("Content-Type", type + "; charset=" + ConfigService.CHARSET);
+        requestParams.getResponse().addHeader("Content-Type", type);
 
         // adding extra headers
         if (headers != null) {
@@ -136,11 +141,29 @@ public class OutputService {
 	/*
 	 * sends header directly to the out
 	 */
-	public static void printFileHeader(String filename) {
-		
-		// TODO: implement
-		
-	}
+    public static void printFileHeader(RequestParams requestParams, String fn) {
+
+        Object[] stat = FileOperationsService.stat(fn);
+        
+        // print header
+        requestParams.getResponse().setStatus(200);
+        requestParams.getResponse().addHeader("Content-Type", MIMETypesHelper.getMIMEType(fn));
+        requestParams.getResponse().addHeader("Content-Length", String.valueOf(((Integer)stat[7]).intValue()));
+        requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(fn));
+        
+        long timestamp = (new Long((String)stat[9]).longValue()) * 1000;  // msec  
+        java.util.Date lastModified = new java.util.Date(timestamp);  
+        
+        requestParams.getResponse().addHeader("Last-Modified", String.format("%a, %d %b %Y %T GMT", lastModified));
+        requestParams.getResponse().addHeader("charset", ConfigService.CHARSET);
+        
+        requestParams.getResponse().addHeader("MS-Author-Via", "DAV");
+        requestParams.getResponse().addHeader("DAV", ConfigService.DAV);
+
+        if (requestParams.getRequest().getHeader("Translate") != null) {
+            requestParams.getResponse().addHeader("Translate", "f");
+        }
+    }   
 	
 	/* 
 	 * Helper function to obtain integer status code from the 
