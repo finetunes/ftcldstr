@@ -3,6 +3,7 @@ package net.finetunes.ftcldstr.routines.fileoperations;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
@@ -14,10 +15,9 @@ public class FileHelper {
 	
 	// TODO: find out what all these filename parameters mean
 	public static String getfancyfilename(
-			String full,
-			String s,
-			String m,
-			String fn) {
+	        RequestParams requestParams,
+			String full, String s,
+			String m, String fn) {
 		
 	    if (s == null) {
 	        s = "";
@@ -87,7 +87,7 @@ public class FileHelper {
 	    String onmouseover = "";
 	    String onmouseout = "";
 	    String align = "";
-	    String id = PropertiesHelper.getETag(fn);
+	    String id = PropertiesHelper.getETag(requestParams, fn);
 	    
 	    id = id.replaceAll("\"", "");
 

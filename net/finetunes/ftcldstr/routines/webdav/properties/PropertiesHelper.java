@@ -9,8 +9,37 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
 public class PropertiesHelper {
 	
-	public static String getPropValue(String propertyName, String filename, String uri) {
+	public static String getPropValue(String prop, String fn, String uri) {
+	    
+	    
+//        StatusResponse r200;
+//        StatusResponse r404;
+	    
+/*	    
+	    my ($prop, $fn, $uri) = @_;
+	    my (%stat,%r200,%r404);
 
+	    return $CACHE{getPropValue}{$fn}{$prop} if exists $CACHE{getPropValue}{$fn}{$prop};
+
+	    my $propname = $prop;
+	    $propname=~s/^{[^}]*}//;
+
+	    my $propval = grep(/^\Q$propname\E$/,@PROTECTED_PROPS)==0 ? db_getProperty($fn, $prop) : undef;
+
+	    if (! defined $propval) {
+	        getProperty($fn, $uri, $propname, undef, \%r200, \%r404) ;
+	        $propval = $r200{prop}{$propname};
+	    }
+
+	    $propval = defined $propval ? $propval : '__undef__';
+
+	    $CACHE{getPropValue}{$fn}{$prop} = $propval;
+
+	    debug("getPropValue: $prop = $propval");
+
+	    return $propval;	    
+	    
+*/	    
 		// TODO: implement
 		return null;
 	}

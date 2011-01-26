@@ -26,7 +26,7 @@ public class PreconditionsHandler {
 	    boolean nnl = false; // not no-lock found
 	    boolean nl = false; // no-lock found
 	    boolean e = false; // wrong etag found
-	    String etag = PropertiesHelper.getETag(fn);
+	    String etag = PropertiesHelper.getETag(requestParams, fn);
 	    
         // return {rtag=>$rtag, list=>\@tokens};
 

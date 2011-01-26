@@ -139,7 +139,7 @@ public class DirectoryOperationsService {
         
 	    if (!(fn.equals(ConfigService.DOCUMENT_ROOT) || ru.equals("/") || (filter != null && !filter.isEmpty()))) {
             list += "<input type=\"checkbox\" name=\"hidden\" value=\"\" disabled=\"disabled\" style=\"visibility:hidden\">";
-            list += FileHelper.getfancyfilename(FileOperationsService.splitFilename(ru)[0] + "/", "..", "< .. >", FileOperationsService.splitFilename(fn)[0]) + "\n";
+            list += FileHelper.getfancyfilename(requestParams, FileOperationsService.splitFilename(ru)[0] + "/", "..", "< .. >", FileOperationsService.splitFilename(fn)[0]) + "\n";
 	    }
 	    
         List<String> files = new ArrayList<String>();
@@ -264,7 +264,7 @@ public class DirectoryOperationsService {
             DateFormat dateFormat = new SimpleDateFormat(ConfigService.stringMessages.get("lastmodifiedformat"));
             String lmf = dateFormat.format(date) + " --TODO";
             
-            list += FileHelper.getfancyfilename(nru, filename, mimetype, full);
+            list += FileHelper.getfancyfilename(requestParams, nru, filename, mimetype, full);
             list += String.format(" %-" + ConfigService.MAXLASTMODIFIEDSIZE + "s %" + ConfigService.MAXSIZESIZE + "d", lmf, size);
             if (ConfigService.SHOW_PERM) {
                 list += "<span " +
