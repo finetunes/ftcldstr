@@ -1,5 +1,7 @@
 package net.finetunes.ftcldstr.helper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
@@ -24,6 +26,8 @@ public class InitializationService {
         if (initialized) {
             return;
         }
+        
+        initProps();
         
 /*
         use strict;
@@ -370,6 +374,254 @@ public class InitializationService {
         
         ConfigService.stringMessages = strings;
         
+    }
+    
+    public static void initProps() {
+
+        ConfigService.KNOWN_COLL_PROPS = new ArrayList<String>(Arrays.asList(
+                "creationdate", 
+                "displayname", 
+                "getcontentlanguage", 
+                "getlastmodified", 
+                "lockdiscovery", 
+                "resourcetype", 
+                "getetag", 
+                "getcontenttype", 
+                "supportedlock", 
+                "source", 
+                "quota-available-bytes", 
+                "quota-used-bytes", 
+                "quota", 
+                "quotaused", 
+                "childcount", 
+                "id", 
+                "isfolder", 
+                "ishidden", 
+                "isstructureddocument", 
+                "hassubs", 
+                "nosubs", 
+                "objectcount", 
+                "reserved", 
+                "visiblecount", 
+                "iscollection", 
+                "isFolder", 
+                "authoritative-directory", 
+                "resourcetag", 
+                "repl-uid", 
+                "modifiedby", 
+                "Win32CreationTime", 
+                "Win32FileAttributes", 
+                "Win32LastAccessTime", 
+                "Win32LastModifiedTime", 
+                "name", 
+                "href", 
+                "parentname", 
+                "isreadonly", 
+                "isroot", 
+                "getcontentclass", 
+                "lastaccessed", 
+                "contentclass", 
+                "supported-report-set", 
+                "supported-method-set"
+                ));
+        
+        ConfigService.KNOWN_ACL_PROPS = new ArrayList<String>(Arrays.asList(
+                "owner",
+                "group",
+                "supported-privilege-set", 
+                "current-user-privilege-set", 
+                "acl",
+                "acl-restrictions",
+                "inherited-acl-set", 
+                "principal-collection-set", 
+                "current-user-principal"
+                ));
+        
+        ConfigService.KNOWN_CALDAV_COLL_PROPS = new ArrayList<String>(Arrays.asList(
+                "calendar-description",
+                "calendar-timezone",
+                "supported-calendar-component-set",
+                "supported-calendar-data",
+                "max-resource-size",
+                "min-date-time",
+                "max-date-time",
+                "max-instances",
+                "max-attendees-per-instance",
+                "getctag",
+                "principal-URL",
+                "calendar-home-set",
+                "schedule-inbox-URL",
+                "schedule-outbox-URL",
+                "calendar-user-type",
+                "schedule-calendar-transp",
+                "schedule-default-calendar-URL",
+                "schedule-tag",
+                "calendar-user-address-set"                
+                ));
+    
+        ConfigService.KNOWN_CALDAV_FILE_PROPS = new ArrayList<String>(Arrays.asList(
+                "calendar-data"                
+                ));
+        
+        ConfigService.KNOWN_CARDDAV_COLL_PROPS = new ArrayList<String>(Arrays.asList(
+                "addressbook-description",
+                "supported-address-data",
+                "addressbook-home-set",
+                "principal-address"
+                ));
+
+        ConfigService.KNOWN_CARDDAV_FILE_PROPS = new ArrayList<String>(Arrays.asList(
+                "address-data"
+                ));
+        
+        ConfigService.KNOWN_COLL_LIVE_PROPS = new ArrayList<String>();
+        ConfigService.KNOWN_FILE_LIVE_PROPS = new ArrayList<String>();
+        
+        ConfigService.KNOWN_CALDAV_COLL_LIVE_PROPS = new ArrayList<String>(Arrays.asList(
+                "resourcetype", 
+                "displayname", 
+                "calendar-description", 
+                "calendar-timezone", 
+                "calendar-user-address-set"
+                ));
+        
+        ConfigService.KNOWN_CALDAV_FILE_LIVE_PROPS = new ArrayList<String>();
+        
+        ConfigService.KNOWN_CARDDAV_COLL_LIVE_PROPS = new ArrayList<String>(Arrays.asList(
+                "addressbook-description"
+                ));
+
+        ConfigService.KNOWN_CARDDAV_FILE_LIVE_PROPS = new ArrayList<String>();
+        
+        if (ConfigService.ENABLE_CALDAV || ConfigService.ENABLE_CALDAV_SCHEDULE || ConfigService.ENABLE_CARDDAV) {
+            ConfigService.KNOWN_COLL_LIVE_PROPS.addAll(ConfigService.KNOWN_CALDAV_COLL_LIVE_PROPS);
+            ConfigService.KNOWN_FILE_LIVE_PROPS.addAll(ConfigService.KNOWN_CALDAV_FILE_LIVE_PROPS);
+        }
+        
+        if (ConfigService.ENABLE_CARDDAV) {
+            ConfigService.KNOWN_COLL_LIVE_PROPS.addAll(ConfigService.KNOWN_CARDDAV_COLL_LIVE_PROPS);
+        }
+        
+        if (ConfigService.ENABLE_ACL || ConfigService.ENABLE_CALDAV || ConfigService.ENABLE_CALDAV_SCHEDULE || ConfigService.ENABLE_CARDDAV) {
+            ConfigService.KNOWN_COLL_PROPS.addAll(ConfigService.KNOWN_ACL_PROPS);
+        }
+        
+        if (ConfigService.ENABLE_CALDAV || ConfigService.ENABLE_CALDAV_SCHEDULE) {
+            ConfigService.KNOWN_COLL_PROPS.addAll(ConfigService.KNOWN_CALDAV_COLL_PROPS);
+        }
+        
+        if (ConfigService.ENABLE_CARDDAV) {
+            ConfigService.KNOWN_COLL_PROPS.addAll(ConfigService.KNOWN_CARDDAV_COLL_PROPS);
+        }
+        
+        if (ConfigService.ENABLE_BIND) {
+            ConfigService.KNOWN_COLL_PROPS.add("resource-id");
+        }
+        
+        
+        ConfigService.KNOWN_FILE_PROPS = new ArrayList<String>();
+        ConfigService.KNOWN_FILE_PROPS.addAll(ConfigService.KNOWN_COLL_PROPS);
+        ConfigService.KNOWN_FILE_PROPS.add("getcontentlength");
+        ConfigService.KNOWN_FILE_PROPS.add("executable");
+        
+        if (ConfigService.ENABLE_CALDAV || ConfigService.ENABLE_CALDAV_SCHEDULE) {
+            ConfigService.KNOWN_FILE_PROPS.addAll(ConfigService.KNOWN_CALDAV_FILE_PROPS);
+        }
+        
+        if (ConfigService.ENABLE_CARDDAV) {
+            ConfigService.KNOWN_FILE_PROPS.addAll(ConfigService.KNOWN_CARDDAV_FILE_PROPS);
+        }
+        
+        if (ConfigService.ENABLE_GROUPDAV) {
+            ConfigService.KNOWN_COLL_PROPS.add("component-set");
+        }
+        
+        ConfigService.UNSUPPORTED_PROPS = new ArrayList<String>(Arrays.asList(
+                "checked-in", 
+                "checked-out", 
+                "xmpp-uri", 
+                "dropbox-home-URL",
+                "appledoubleheader",
+                "parent-set"
+                ));
+        
+        ConfigService.PROTECTED_PROPS = new ArrayList<String>();
+        ConfigService.PROTECTED_PROPS.addAll(ConfigService.UNSUPPORTED_PROPS);
+        ConfigService.PROTECTED_PROPS.addAll(Arrays.asList(
+                "getcontentlength",
+                "getcontenttype",
+                "getetag",
+                "lockdiscovery",
+                "source",
+                "supportedlock",
+                "supported-report-set",
+                "quota-available-bytes, quota-used-bytes",
+                "quota",
+                "quotaused",
+                "childcount",
+                "id",
+                "isfolder",
+                "ishidden",
+                "isstructureddocument",
+                "hassubs",
+                "nosubs",
+                "objectcount",
+                "reserved",
+                "visiblecount",
+                "iscollection","isFolder",
+                "authoritative-directory",
+                "resourcetag",
+                "repl-uid",
+                "modifiedby",
+                "name","href",
+                "parentname",
+                "isreadonly",
+                "isroot",
+                "getcontentclass",
+                "contentclass",
+                "owner",
+                "group",
+                "supported-privilege-set",
+                "current-user-privilege-set",
+                "acl",
+                "acl-restrictions",
+                "inherited-acl-set",
+                "principal-collection-set",
+                "supported-calendar-component-set",
+                "supported-calendar-data",
+                "max-resource-size",
+                "min-date-time",
+                "max-date-time",
+                "max-instances",
+                "max-attendees-per-instance",
+                "getctag",
+                "current-user-principal",
+                "calendar-user-address-set",
+                "schedule-inbox-URL",
+                "schedule-outbox-URL",
+                "schedule-calendar-transp",
+                "schedule-default-calendar-URL",
+                "schedule-tag",
+                "supported-address-data",
+                "supported-collation-set",
+                "supported-method-set",
+                "supported-method",
+                "supported-query-grammar"
+                ));
+        
+        ConfigService.ALLPROP_PROPS = new ArrayList<String>(Arrays.asList(
+                "creationdate",
+                "displayname",
+                "getcontentlanguage",
+                "getlastmodified",
+                "lockdiscovery",
+                "resourcetype",
+                "supportedlock",
+                "getetag",
+                "getcontenttype",
+                "getcontentlength",
+                "executable" 
+                ));        
     }
 
 }

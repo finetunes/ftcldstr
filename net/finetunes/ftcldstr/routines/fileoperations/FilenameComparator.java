@@ -3,6 +3,7 @@ package net.finetunes.ftcldstr.routines.fileoperations;
 import java.util.Comparator;
 
 import net.finetunes.ftcldstr.helper.MIMETypesHelper;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 
 public class FilenameComparator implements Comparator<String> {
     
@@ -29,8 +30,8 @@ public class FilenameComparator implements Comparator<String> {
         
         if (order != null && !order.isEmpty()) {
             if (order.matches("(lastmodified|size|mode).*")) {
-                Object[] a_stats = FileOperationsService.stat(fp_a);
-                Object[] b_stats = FileOperationsService.stat(fp_b);
+                StatData a_stats = FileOperationsService.stat(fp_a);
+                StatData b_stats = FileOperationsService.stat(fp_b);
 
                 int idx = 7;
                 if (order.matches(".*(lastmodified).*")) {
@@ -40,27 +41,7 @@ public class FilenameComparator implements Comparator<String> {
                     idx = 2;
                 }
                 
-                if (!a_stats[idx].equals(a_stats[idx])) {
-                    if (order.matches(".*(_desc)")) {
-
-                        // TODO: check whether this code works correctly
-                        if (((Comparable)b_stats[idx]).compareTo(a_stats[idx]) != 0) {
-                            return ((Comparable)b_stats[idx]).compareTo(a_stats[idx]);
-                        }
-                        else {
-                            return b.compareToIgnoreCase(a);
-                        }
-                    }
-                    
-                    // TODO: check whether this code works correctly
-                    if (((Comparable)a_stats[idx]).compareTo(b_stats[idx]) != 0) {
-                        return ((Comparable)a_stats[idx]).compareTo(b_stats[idx]);
-                    }
-                    else {
-                        return a.compareToIgnoreCase(b);
-                    }
-                }
-                
+                return compareStat(a_stats, b_stats, a, b, idx, order.matches(".*(_desc)"));
             }
             else if (order.matches(".*(mimetype).*")) {
                 String a_mime = MIMETypesHelper.getMIMEType(a);
@@ -87,6 +68,37 @@ public class FilenameComparator implements Comparator<String> {
         }
         
         return a.compareToIgnoreCase(b);
+    }
+    
+    private int compareStat(StatData astat, StatData bstat, String a, String b, int idx, boolean desc) {
+        
+        int c = 0;
+        switch (idx) {
+        case 2: // mode
+            c = astat.getMode() - bstat.getMode();
+            if (desc) {
+                c = -c;
+            }
+            return c;
+        case 7: // size
+            c = astat.getSize() - bstat.getSize();
+            if (desc) {
+                c = -c;
+            }
+            return c;
+        case 9: // last modified
+            // TODO: implement
+            // depends on the returning type;
+            // Date?
+            break;
+        }
+        
+        c = a.compareToIgnoreCase(b);
+        if (desc) {
+            c = -c;
+        }
+        
+        return c;
     }
 
 }

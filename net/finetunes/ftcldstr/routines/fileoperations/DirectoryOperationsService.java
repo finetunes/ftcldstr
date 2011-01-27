@@ -21,6 +21,7 @@ import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.helper.SystemCalls;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.rendering.RenderingService;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryResult;
@@ -234,35 +235,20 @@ public class DirectoryOperationsService {
             
             // TODO
             // my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($full);
-            Object[] stat = FileOperationsService.stat(full);
-            String modestr = (String)stat[2];
+            StatData stat = FileOperationsService.stat(full);
+            int mode = stat.getMode(); 
 
-            int mode = 0;
-            try {
-                mode = Integer.parseInt(modestr);
-            }
-            catch (NumberFormatException e) {
-                // do nothing
-            }
-            
-            int uid = ((Integer)stat[4]).intValue();
-            int gid = ((Integer)stat[4]).intValue();
-            int size = ((Integer)stat[7]).intValue();
-            String mtime = ((String)stat[9]);
+            int uid = stat.getUid(); 
+            int gid = stat.getGid(); 
+            int size = stat.getSize(); 
+            Date mtime = stat.getMtimeDate(); 
 
             if (ConfigService.ALLOW_FILE_MANAGEMENT) {
                 list += "<input type=\"checkbox\" name=\"file\" value=\"" + filename + "\">";
             }
 
-            // TODO: take string date from mtime
-            // convert it to java.util.Date
-            // use the value in dateFormat.format(date)
-            //
-            // current date to show something
-            Date date = new Date();
-            
             DateFormat dateFormat = new SimpleDateFormat(ConfigService.stringMessages.get("lastmodifiedformat"));
-            String lmf = dateFormat.format(date) + " --TODO";
+            String lmf = dateFormat.format(mtime);
             
             list += FileHelper.getfancyfilename(requestParams, nru, filename, mimetype, full);
             list += String.format(" %-" + ConfigService.MAXLASTMODIFIEDSIZE + "s %" + ConfigService.MAXSIZESIZE + "d", lmf, size);

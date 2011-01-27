@@ -1,6 +1,7 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import net.finetunes.ftcldstr.rendering.OutputService;
@@ -65,7 +66,8 @@ public class PropfindActionHandler extends AbstractActionHandler {
         }
 
         // TODO
-        String xmldata = "";
+        // String xmldata = "";
+        HashMap<String, Object> xmldata = new HashMap<String, Object>();
 //        xmldata = (String)XMLParser.simpleXMLParser(xml);
 //        try / except
 /*        
@@ -102,7 +104,7 @@ public class PropfindActionHandler extends AbstractActionHandler {
             // do nothing
         }
         else if (FileOperationsService.file_exits(fn)) {
-            Object[] propFindElement = PropertiesActions.handlePropFindElement(xmldata); // TODO: implement
+            Object[] propFindElement = PropertiesActions.handlePropFindElement(requestParams, xmldata);
             String props = (String)propFindElement[0];
             String all = (String)propFindElement[1];
             String noval = (String)propFindElement[2];

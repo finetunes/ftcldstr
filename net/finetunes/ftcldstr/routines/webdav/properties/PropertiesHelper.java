@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 
 public class PropertiesHelper {
 	
@@ -56,9 +57,9 @@ public class PropertiesHelper {
 	    }
 	    
         // my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($file);
-	    Object[] stat = FileOperationsService.stat(file);
-        int size = ((Integer)stat[7]).intValue();
-        long mtime = ((Long)stat[9]).longValue();
+	    StatData stat = FileOperationsService.stat(file);
+        int size = stat.getSize(); 
+        long mtime = stat.getMtime(); 
 	    
 	    String digest = file + String.valueOf(size) + String.valueOf(mtime);
 	    

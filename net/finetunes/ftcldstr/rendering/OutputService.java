@@ -5,17 +5,18 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
 
 public class OutputService {
@@ -143,16 +144,15 @@ public class OutputService {
 	 */
     public static void printFileHeader(RequestParams requestParams, String fn) {
 
-        Object[] stat = FileOperationsService.stat(fn);
+        StatData stat = FileOperationsService.stat(fn);
         
         // print header
         requestParams.getResponse().setStatus(200);
         requestParams.getResponse().addHeader("Content-Type", MIMETypesHelper.getMIMEType(fn));
-        requestParams.getResponse().addHeader("Content-Length", String.valueOf(((Integer)stat[7]).intValue()));
+        requestParams.getResponse().addHeader("Content-Length", String.valueOf(stat.getSize()));
         requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, fn));
         
-        long timestamp = (new Long((String)stat[9]).longValue()) * 1000;  // msec  
-        java.util.Date lastModified = new java.util.Date(timestamp);  
+        Date lastModified = stat.getMtimeDate(); 
         
         requestParams.getResponse().addHeader("Last-Modified", String.format("%a, %d %b %Y %T GMT", lastModified));
         requestParams.getResponse().addHeader("charset", ConfigService.CHARSET);

@@ -42,14 +42,14 @@ public class FileOperationsService {
 	        FileOperationsService.chmod(mode, fn);
 	    }
 	    else {
-	        Object[] stat = FileOperationsService.stat(fn);
+	        StatData stat = FileOperationsService.stat(fn);
 	        int newmode = 0;
 	        if (type.equals("a")) {
-	            newmode = ((Integer)stat[2]).intValue() | mode;
+	            newmode = stat.getMode() | mode;
 	        }
 	        
             if (type.equals("r")) {
-                newmode = ((Integer)stat[2]).intValue() ^ (((Integer)stat[2]).intValue() & mode);
+                newmode = stat.getMode() ^ (stat.getMode() & mode);
             }
             
             FileOperationsService.chmod(newmode, fn);
@@ -212,6 +212,10 @@ public class FileOperationsService {
         return splitFilename(filename)[0];
     }
     
+    public static String basename(String filename) {
+        return splitFilename(filename)[1];
+    }
+    
     public static String[] splitFilename(String filename) {
         
         String fullparent = "";
@@ -261,7 +265,7 @@ public class FileOperationsService {
     }
     
     // returns the result of stat unix funtion
-    public static Object[] stat(String filename) {
+    public static StatData stat(String filename) {
         
         // ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, 
         // $atime,$mtime,$ctime,$blksize,$blocks) = stat($filename);
@@ -269,7 +273,8 @@ public class FileOperationsService {
         // TODO: implement
         // return true;
         
-        return new Object[] {0, 0, "0888", 0, 0, 0, 0, 0, 0, "", 0, 0, 0};
+        // return new Object[] {0, 0, "0888", 0, 0, 0, 0, 0, 0, "", 0, 0, 0};
+        return new FileOperationsService().new StatData();
         
     }   
     
@@ -366,5 +371,123 @@ public class FileOperationsService {
         // TODO: implement
         return false;
     }
+    
+    
+    public class StatData {
+
+        // $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks
+
+        int dev;
+        int ino;
+        int mode; // 2
+        int nlink;
+        int uid;
+        int gid;
+        int rdev;
+        int size; // 7
+        long atime;
+        long mtime; // 9
+        long ctime;
+        int blksize;
+        int blocks;
+        
+        public java.util.Date getMtimeDate() {
+            return convertToDate(getMtime());
+        }
+        
+        public java.util.Date getAtimeDate() {
+            return convertToDate(getAtime());
+        }      
+        
+        public java.util.Date getCtimeDate() {
+            return convertToDate(getCtime());
+        }        
+        
+        private java.util.Date convertToDate(long d) {
+            long timestamp = d * 1000L;
+            java.util.Date md = new java.util.Date(timestamp);
+            return md;
+        }
+        
+        public int getDev() {
+            return dev;
+        }
+        public void setDev(int dev) {
+            this.dev = dev;
+        }
+        public int getIno() {
+            return ino;
+        }
+        public void setIno(int ino) {
+            this.ino = ino;
+        }
+        public int getMode() {
+            return mode;
+        }
+        public void setMode(int mode) {
+            this.mode = mode;
+        }
+        public int getNlink() {
+            return nlink;
+        }
+        public void setNlink(int nlink) {
+            this.nlink = nlink;
+        }
+        public int getUid() {
+            return uid;
+        }
+        public void setUid(int uid) {
+            this.uid = uid;
+        }
+        public int getGid() {
+            return gid;
+        }
+        public void setGid(int gid) {
+            this.gid = gid;
+        }
+        public int getRdev() {
+            return rdev;
+        }
+        public void setRdev(int rdev) {
+            this.rdev = rdev;
+        }
+        public int getSize() {
+            return size;
+        }
+        public void setSize(int size) {
+            this.size = size;
+        }
+        public long getAtime() {
+            return atime;
+        }
+        public void setAtime(long atime) {
+            this.atime = atime;
+        }
+        public long getMtime() {
+            return mtime;
+        }
+        public void setMtime(long mtime) {
+            this.mtime = mtime;
+        }
+        public long getCtime() {
+            return ctime;
+        }
+        public void setCtime(long ctime) {
+            this.ctime = ctime;
+        }
+        public int getBlksize() {
+            return blksize;
+        }
+        public void setBlksize(int blksize) {
+            this.blksize = blksize;
+        }
+        public int getBlocks() {
+            return blocks;
+        }
+        public void setBlocks(int blocks) {
+            this.blocks = blocks;
+        }
+    }
+    
     
 }

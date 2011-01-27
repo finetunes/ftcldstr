@@ -91,6 +91,7 @@ public class RenderingHelper {
         return r;
     }
     
+    // $cgi->escape
     public static String uri_escape(String s) {
         String r = "";
         

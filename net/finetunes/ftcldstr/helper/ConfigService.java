@@ -147,11 +147,11 @@ public class ConfigService {
     public static final int ICON_WIDTH = 22;
 
     /*
-     * ## -- FORBIDDEN_UID
-     * ## a comman separated list of UIDs to block
-     * ## (process id of this CGI will be checked against this list)
-     * ## common "forbidden" UIDs: root, Apache process owner UID
-     * ## DEFAULT: @FORBIDDEN_UID = ( 0 );
+     * -- FORBIDDEN_UID
+     * a comman separated list of UIDs to block
+     * (process id of this CGI will be checked against this list)
+     * common "forbidden" UIDs: root, Apache process owner UID
+     * DEFAULT: @FORBIDDEN_UID = ( 0 );
      */
     // TODO
     // @FORBIDDEN_UID = ( 0 );
@@ -521,131 +521,22 @@ public class ConfigService {
     #########################################################################
 */    
 
-    
-    public static ArrayList<String> KNOWN_COLL_PROPS = new ArrayList<String>(Arrays.asList(
-            "creationdate", 
-            "displayname", 
-            "getcontentlanguage", 
-            "getlastmodified", 
-            "lockdiscovery", 
-            "resourcetype", 
-            "getetag", 
-            "getcontenttype", 
-            "supportedlock", 
-            "source", 
-            "quota-available-bytes", 
-            "quota-used-bytes", 
-            "quota", 
-            "quotaused", 
-            "childcount", 
-            "id", 
-            "isfolder", 
-            "ishidden", 
-            "isstructureddocument", 
-            "hassubs", 
-            "nosubs", 
-            "objectcount", 
-            "reserved", 
-            "visiblecount", 
-            "iscollection", 
-            "isFolder", 
-            "authoritative-directory", 
-            "resourcetag", 
-            "repl-uid", 
-            "modifiedby", 
-            "Win32CreationTime", 
-            "Win32FileAttributes", 
-            "Win32LastAccessTime", 
-            "Win32LastModifiedTime", 
-            "name", 
-            "href", 
-            "parentname", 
-            "isreadonly", 
-            "isroot", 
-            "getcontentclass", 
-            "lastaccessed", 
-            "contentclass", 
-            "supported-report-set", 
-            "supported-method-set"
-            ));
-            
-/*            
- * TODO: init this in initializationservice
-    @KNOWN_ACL_PROPS = (
-                'owner','group','supported-privilege-set', 'current-user-privilege-set', 'acl', 'acl-restrictions',
-                'inherited-acl-set', 'principal-collection-set', 'current-user-principal'
-                  );
-    @KNOWN_CALDAV_COLL_PROPS = (
-                'calendar-description', 'calendar-timezone', 'supported-calendar-component-set',
-                'supported-calendar-data', 'max-resource-size', 'min-date-time',
-                'max-date-time', 'max-instances', 'max-attendees-per-instance',
-                'getctag',
-                    'principal-URL', 'calendar-home-set', 'schedule-inbox-URL', 'schedule-outbox-URL',
-                'calendar-user-type', 'schedule-calendar-transp', 'schedule-default-calendar-URL',
-                'schedule-tag', 'calendar-user-address-set',
-                );
-    @KNOWN_CALDAV_FILE_PROPS = ( 'calendar-data' );
-    
-    @KNOWN_CARDDAV_COLL_PROPS = ('addressbook-description', 'supported-address-data', 'addressbook-home-set', 'principal-address');
-    @KNOWN_CARDDAV_FILE_PROPS = ('address-data');
-    
-    @KNOWN_COLL_LIVE_PROPS = ( );
-    @KNOWN_FILE_LIVE_PROPS = ( );
-    @KNOWN_CALDAV_COLL_LIVE_PROPS = ( 'resourcetype', 'displayname', 'calendar-description', 'calendar-timezone', 'calendar-user-address-set');
-    @KNOWN_CALDAV_FILE_LIVE_PROPS = ( );
-    @KNOWN_CARDDAV_COLL_LIVE_PROPS = ( 'addressbook-description');
-    @KNOWN_CARDDAV_FILE_LIVE_PROPS = ( );
-    
-    push @KNOWN_COLL_LIVE_PROPS, @KNOWN_CALDAV_COLL_LIVE_PROPS if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE || $ENABLE_CARDDAV;
-    push @KNOWN_FILE_LIVE_PROPS, @KNOWN_CALDAV_FILE_LIVE_PROPS if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE || $ENABLE_CARDDAV;
-    push @KNOWN_COLL_LIVE_PROPS, @KNOWN_CARDDAV_COLL_LIVE_PROPS if $ENABLE_CARDDAV;
-    
-    push @KNOWN_COLL_PROPS, @KNOWN_ACL_PROPS if $ENABLE_ACL || $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE || $ENABLE_CARDDAV;
-    push @KNOWN_COLL_PROPS, @KNOWN_CALDAV_COLL_PROPS if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE;
-    push @KNOWN_COLL_PROPS, @KNOWN_CARDDAV_COLL_PROPS if $ENABLE_CARDDAV;
-    push @KNOWN_COLL_PROPS, 'resource-id' if $ENABLE_BIND;    
-    // TODO make lists final if possible after initialization
-*/
-    
+    public static ArrayList<String> KNOWN_COLL_PROPS = null;
+    public static ArrayList<String> KNOWN_ACL_PROPS = null;
+    public static ArrayList<String> KNOWN_CALDAV_COLL_PROPS = null;
+    public static ArrayList<String> KNOWN_CALDAV_FILE_PROPS = null;
+    public static ArrayList<String> KNOWN_CARDDAV_COLL_PROPS = null;
+    public static ArrayList<String> KNOWN_CARDDAV_FILE_PROPS = null;
+    public static ArrayList<String> KNOWN_COLL_LIVE_PROPS = null;
+    public static ArrayList<String> KNOWN_FILE_LIVE_PROPS = null;
+    public static ArrayList<String> KNOWN_CALDAV_COLL_LIVE_PROPS = null;
+    public static ArrayList<String> KNOWN_CALDAV_FILE_LIVE_PROPS = null;
+    public static ArrayList<String> KNOWN_CARDDAV_COLL_LIVE_PROPS = null;
+    public static ArrayList<String> KNOWN_CARDDAV_FILE_LIVE_PROPS = null;
     public static ArrayList<String> KNOWN_FILE_PROPS = null;
-/*    
-    @KNOWN_FILE_PROPS = ( @KNOWN_COLL_PROPS, 'getcontentlength', 'executable' );
-    push @KNOWN_FILE_PROPS, @KNOWN_CALDAV_FILE_PROPS if $ENABLE_CALDAV || $ENABLE_CALDAV_SCHEDULE;
-    push @KNOWN_FILE_PROPS, @KNOWN_CARDDAV_FILE_PROPS if $ENABLE_CARDDAV;
-    
-    push @KNOWN_COLL_PROPS, 'component-set' if $ENABLE_GROUPDAV;    
-*/    
-    
-/*    
-    @UNSUPPORTED_PROPS = ( 'checked-in', 'checked-out', 'xmpp-uri', 'dropbox-home-URL' ,'appledoubleheader','parent-set' );
-    
-    @PROTECTED_PROPS = ( @UNSUPPORTED_PROPS, 
-                'getcontentlength', 'getcontenttype', 'getetag', 'lockdiscovery', 
-                'source', 'supportedlock',
-                'supported-report-set',
-                'quota-available-bytes, quota-used-bytes', 'quota', 'quotaused',
-                'childcount', 'id', 'isfolder', 'ishidden', 'isstructureddocument', 
-                'hassubs', 'nosubs', 'objectcount', 'reserved', 'visiblecount',
-                'iscollection', 'isFolder',
-                'authoritative-directory', 'resourcetag', 'repl-uid',
-                'modifiedby', 
-                'name', 'href', 'parentname', 'isreadonly', 'isroot', 'getcontentclass', 'contentclass',
-                'owner', 'group', 'supported-privilege-set', 'current-user-privilege-set', 
-                'acl', 'acl-restrictions', 'inherited-acl-set', 'principal-collection-set',
-                'supported-calendar-component-set','supported-calendar-data', 'max-resource-size',
-                'min-date-time','max-date-time','max-instances','max-attendees-per-instance', 'getctag',
-                'current-user-principal', 
-                'calendar-user-address-set', 'schedule-inbox-URL', 'schedule-outbox-URL', 'schedule-calendar-transp',
-                'schedule-default-calendar-URL', 'schedule-tag', 'supported-address-data', 
-                'supported-collation-set', 'supported-method-set', 'supported-method',
-                'supported-query-grammar'
-            );
-    
-    @ALLPROP_PROPS = ( 'creationdate', 'displayname', 'getcontentlanguage', 'getlastmodified', 
-                'lockdiscovery', 'resourcetype','supportedlock', 'getetag', 'getcontenttype', 
-                'getcontentlength', 'executable' );
-    
-*/
+    public static ArrayList<String> UNSUPPORTED_PROPS = null;
+    public static ArrayList<String> PROTECTED_PROPS = null;
+    public static ArrayList<String> ALLPROP_PROPS = null;
     
     // # XML
 
@@ -840,10 +731,12 @@ public class ConfigService {
                                dateTime => { eq => '==', gt => '>', lt =>'<', gte=>'>=', lte=>'<=', cmp=>'<=>' }, 
                                string => { lte=>'le', gte=>'ge' } );
     
-    @IGNORE_PROPS = ( 'xmlns', 'CS');
 */
     
-    
+    public final static ArrayList<String> IGNORE_PROPS = new ArrayList<String>(Arrays.asList(
+            "xmlns", 
+            "CS" 
+            ));    
     
     
 	
