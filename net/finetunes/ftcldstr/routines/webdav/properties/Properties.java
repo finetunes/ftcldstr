@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Set;
 
 import net.finetunes.ftcldstr.helper.Logger;
 
@@ -24,12 +25,17 @@ public class Properties implements Serializable {
         properties = new HashMap<String, FileProperties>(); 
     }
     
+    /**
+     * db_getProperties
+     */
     public FileProperties getProperties(String fn) {
         
         return properties.get(fn);
     }
     
-    // db_getProperty
+    /**
+     * db_getProperty
+     */
     public String getProperty(String fn, String property) {
         
         FileProperties fp = getProperties(fn);
@@ -52,7 +58,9 @@ public class Properties implements Serializable {
         return true;
     }
     
-    // db_removeProperty
+    /**
+     * db_removeProperty
+     */
     public boolean removeProperty(String fn, String property) {
         
         FileProperties fp = getProperties(fn);
@@ -63,7 +71,9 @@ public class Properties implements Serializable {
         return false;
     }    
     
-    // db_deleteProperties
+    /**
+     * db_deleteProperties
+     */
     public boolean deleteProperties(String fn) {
         
         if (properties != null) {
@@ -73,7 +83,9 @@ public class Properties implements Serializable {
         return false;
     }
     
-    // db_copyProperties
+    /**
+     * db_copyProperties
+     */
     public boolean copyProperties(String src, String dst) {
         
         FileProperties srcprop = getProperties(src);
@@ -84,7 +96,9 @@ public class Properties implements Serializable {
         return true;
     }
     
-    // db_moveProperties
+    /**
+     * db_moveProperties
+     */
     public boolean moveProperties(String src, String dst) {
         
         FileProperties prop = properties.remove(src);
@@ -183,6 +197,14 @@ public class Properties implements Serializable {
                     e.printStackTrace();
                 }
             }
+        }
+        
+        public Set<String> getKeys() {
+            if (properties != null) {
+                return properties.keySet();
+            }
+            
+            return null;
         }
 
         public void setProperty(String property, String value) {

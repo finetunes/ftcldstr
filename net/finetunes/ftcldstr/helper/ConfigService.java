@@ -655,14 +655,13 @@ public class ConfigService {
             put("description", "xml:lang=\"en\"");            
         }});      
     
-    public static final Map<String, Integer> NAMESPACEELEMENTS = 
-        Collections.unmodifiableMap(new HashMap<String, Integer>() {{ 
+    public static volatile Map<String, Integer> NAMESPACEELEMENTS = new HashMap<String, Integer>() {{ 
             put("multistatus", 1);
             put("prop", 1);
             put("error", 1);
             put("principal-search-property-set", 1);
-        }});    
-    
+        }};    
+        
     public static final Map<String, Integer> ELEMENTORDER = 
         Collections.unmodifiableMap(new HashMap<String, Integer>() {{ 
             put("multistatus", 1);

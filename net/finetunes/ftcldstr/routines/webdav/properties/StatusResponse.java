@@ -4,10 +4,11 @@ import java.util.HashMap;
 
 public class StatusResponse {
     
-    String status;
-    String href;
-    HashMap<String, Object> prop;
-    StatusResponse propstat;
+    // FIXME: create access methods if required
+    public String status = null;
+    public String href = null;
+    public HashMap<String, Object> prop = null;
+    public StatusResponse propstat = null;
     
 //    public StatusResponse() {
 //        

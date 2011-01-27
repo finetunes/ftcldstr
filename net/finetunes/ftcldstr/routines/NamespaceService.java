@@ -1,23 +1,31 @@
 package net.finetunes.ftcldstr.routines;
 
+import net.finetunes.ftcldstr.helper.ConfigService;
+
 public class NamespaceService {
 	
-	public static String getNameSpace(String property) {
+	public static String getNameSpace(String prop) {
 		
-		// TODO: implement
-		return "";
+	    if (ConfigService.ELEMENTS.containsKey(prop)) {
+	        return ConfigService.ELEMENTS.get(prop);
+	    }
+	    else {
+	        return ConfigService.ELEMENTS.get("default");
+	    }
 	}
 	
-	public static String getNameSpaceUri(String property) {
+	public static String getNameSpaceUri(String prop) {
 	
-		// TODO: implement
-		return "";
+	    return ConfigService.NAMESPACEABBR.get(getNameSpace(prop));
 	}
 	
-	public static String nonamespace(String property) {
-		
-		// TODO: implement
-		return "";
+	public static String nonamespace(String prop) {
+	    
+	    if (prop != null) {
+	        prop = prop.replaceFirst("^{[^}]*}", "");
+	    }
+	    
+	    return prop;
 	}  
 
 }

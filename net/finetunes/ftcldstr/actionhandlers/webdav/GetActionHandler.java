@@ -2,10 +2,13 @@ package net.finetunes.ftcldstr.actionhandlers.webdav;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.MissingFormatArgumentException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,10 +23,15 @@ import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.rendering.RenderingService;
+import net.finetunes.ftcldstr.routines.NamespaceService;
 import net.finetunes.ftcldstr.routines.fileoperations.DirectoryOperationsService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.routines.webdav.SearchService;
+import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesActions;
+import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
+import net.finetunes.ftcldstr.routines.webdav.properties.Properties.FileProperties;
+import net.finetunes.ftcldstr.routines.xml.XMLService;
 import net.finetunes.ftcldstr.serialization.DBPropertiesOperations;
 import net.finetunes.ftcldstr.wrappers.FileOperationsWrapper;
 
@@ -476,53 +484,82 @@ public class GetActionHandler extends AbstractActionHandler {
         
         content += "<table style=\"width: 100%; table-layout:fixed;\">";
         
-/*
-// * TODO: finish when properties are implemented        
-        HashMap<String, String> namespaceElements = new HashMap<String, String>(ConfigService.NAMESPACEELEMENTS);
-        List dbprops = DBPropertiesOperations.db_getProperties(fn);
+        
+        HashMap<String, Integer> namespaceElements = new HashMap<String, Integer>(ConfigService.NAMESPACEELEMENTS);
+        // TODO: this was marked as local(%NAMESPACEELEMENTS); 
+        // but is not used for reading
+        // what for?
+        
+        FileProperties dbprops = ConfigService.properties.getProperties(fn);
         ArrayList<String> bgcolors = new ArrayList<String>(Arrays.asList("#ffffff", "#eeeeee"));
-        HashMap<?> visited = new HashMap<?>();
+        ArrayList<String> visited = new ArrayList<String>();
         String bgcolor;
         
-        my $dbprops = db_getProperties($fn);
-        my @bgcolors = ( '#ffffff', '#eeeeee' );
-        my (%visited);
-        my $bgcolor;
-*/
-  
         content += "<tr style=\"background-color:#dddddd;text-align:left\">";
         content += "<th style=\"width:25%\">" + ConfigService.stringMessages.get("propertyname") + "</th>";
         content += "<th style=\"width:75%\">" + ConfigService.stringMessages.get("propertyvalue") + "</th>";
         content += "</tr>";
-
+        
+        ArrayList<String> allprops = new ArrayList<String>();
+        allprops.addAll(dbprops.getKeys());
+        allprops.addAll(ConfigService.KNOWN_FILE_PROPS);
+        Collections.sort(allprops, new PropertyComparator());
+        
+        Iterator<String> it = allprops.iterator();
+        while (it.hasNext()) {
+            String prop = it.next();
+            
+            StatusResponse r200 = new StatusResponse();
+            
+            if (visited.contains(prop) || visited.contains("{" + NamespaceService.getNameSpaceUri(prop) + "}" + prop)) {
+                continue;
+            }
+            
+            // was if exists $visited{$prop}
+            if (dbprops.getProperty(prop) != null) {
+                if (r200.prop == null) {
+                    r200.prop = new HashMap<String, Object>();
+                }
+                
+                r200.prop.put(prop, dbprops.getProperty(prop));
+            }
+            else {
+                PropertiesActions.getProperty(requestParams, fn, requestParams.getRequestURI(), 
+                        prop, null, r200, null);
+            }
+            
+            visited.add(prop);
+            
+            ConfigService.NAMESPACEELEMENTS.put(NamespaceService.nonamespace(prop), 1); // TODO: see namespaceElements above
+            
+            String title = XMLService.createXML(r200.prop, true);
+            String value = XMLService.createXML((HashMap<String, Object>)r200.prop.get(prop), true);
+            String namespace = NamespaceService.getNameSpaceUri(prop);
+            
+            Pattern p = Pattern.compile("^\\{([^\\}]*)\\}");
+            Matcher m = p.matcher(prop);
+            if (m.find()) {
+                namespace = m.group(1);
+            }
+            
+            // original perl code:
+            // push @bgcolors, $bgcolor = shift @bgcolors;
+            if (bgcolors.size() > 0) {
+                bgcolor = bgcolors.get(0);
+                bgcolors.remove(0);
+                bgcolors.add(bgcolor);
+            }
+            
 /*
- * TODO
- *         
-        foreach my $prop (sort {nonamespace(lc($a)) cmp nonamespace(lc($b)) } keys %{$dbprops},-d $fn ? @KNOWN_COLL_PROPS : @KNOWN_FILE_PROPS ) {
-            my (%r200);
-            next if exists $visited{$prop} || exists $visited{'{'.getNameSpaceUri($prop).'}'.$prop};
-            if (exists $$dbprops{$prop}) {
-                $r200{prop}{$prop}=$$dbprops{$prop};
-            } else {
-                getProperty($fn, $REQUEST_URI, $prop, undef, \%r200, \my %r404);
-            }
-            $visited{$prop}=1;
-            $NAMESPACEELEMENTS{nonamespace($prop)}=1;
-            my $title = createXML($r200{prop},1);
-            my $value = createXML($r200{prop}{$prop},1);
-            my $namespace = getNameSpaceUri($prop);
-            if ($prop =~ /^\{([^\}]*)\}/) {
-                $namespace = $1;
-            }
-            push @bgcolors, $bgcolor = shift @bgcolors;
             $content.= $cgi->Tr( {-style=>"background-color:$bgcolor; text-align:left" },
                  $cgi->th({-title=>$namespace, -style=>'vertical-align:top;'},nonamespace($prop))
                 .$cgi->td({-title=>$title, -style=>'vertical-align:bottom;' }, 
                         $cgi->pre({style=>'margin:0px; overflow:auto;'},$cgi->escapeHTML($value)))
                 );
+  
             
+*/            
         }
-*/
         
         content += "</table>";
         if (ConfigService.SIGNATURE != null) {
@@ -548,6 +585,14 @@ public class GetActionHandler extends AbstractActionHandler {
 //          }
 //          close(F);
 //      }             
+    }
+    
+    public class PropertyComparator implements Comparator<String> {
+        
+        public int compare(String a, String b) {
+            
+            return NamespaceService.nonamespace(a.toLowerCase()).compareTo(NamespaceService.nonamespace(b.toLowerCase()));
+        }
     }
     
 }

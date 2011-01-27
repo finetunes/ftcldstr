@@ -166,7 +166,7 @@ public class LockingService {
 	// TODO: parameters and return type
 	public static Object lockResource() {
         // TODO: implement
-	    throw new RuntimeException("Not Implemented");
+	    throw new RuntimeException("Not Implemented. TODO: implement");
 		// return null;
 	}
 	
@@ -306,7 +306,7 @@ public class LockingService {
             while (it.hasNext()) {
                 String f = it.next();
                 
-                if (f.matches("^(\\.|\\.\\.)$")) {
+                if (f.matches("(\\.|\\.\\.)")) {
                     continue;
                 }
                 

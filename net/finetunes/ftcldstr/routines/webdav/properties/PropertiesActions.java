@@ -35,7 +35,7 @@ public class PropertiesActions {
 	    resp_200.propstat.status = "HTTP/1.1 200 OK";
 	    
 	    if (resp_200.propstat.prop != null) {
-	        resp_200.propstat.prop.remove(propname);
+	        resp_200.propstat.prop.put(propname, null);
 	    }
 	}
 	
@@ -191,6 +191,10 @@ public class PropertiesActions {
 	    if (resp_200.prop == null) {
 	        resp_200.prop = new HashMap<String, Object>();
 	    }
+
+        if (resp_404 == null) {
+            resp_404 = new StatusResponse();
+        }
 	    
 	    if (prop.equals("creationdate")) {
 	        resp_200.prop.put("creationdate", String.format("%Y-%m-%dT%H:%M:%SZ", stat.getCtimeDate()));

@@ -95,7 +95,7 @@ public class PropfindActionHandler extends AbstractActionHandler {
             depth = "0";
         }
         else if (ConfigService.CURRENT_USER_PRINCIPAL != null && ConfigService.CURRENT_USER_PRINCIPAL.length() > 1 &&
-                ru.matches(".*" + Pattern.quote(ConfigService.CURRENT_USER_PRINCIPAL) + "/?$")) {
+                ru.matches(".*" + Pattern.quote(ConfigService.CURRENT_USER_PRINCIPAL) + "/?")) {
             fn = fn.replaceAll(Pattern.quote(ConfigService.CURRENT_USER_PRINCIPAL) + "/?$", "");
             depth = "0";
         }
