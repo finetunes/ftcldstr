@@ -2,6 +2,9 @@ package net.finetunes.ftcldstr.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import net.finetunes.ftcldstr.helper.Logger;
 
 
 public class ReadDirectoryContentWrapper extends AbstractWrapper {
@@ -39,6 +42,22 @@ public class ReadDirectoryContentWrapper extends AbstractWrapper {
         }
         
         return result;
+    }
+    
+    
+    public static ArrayList<String> getFileList(String fn) {
+        ArrayList<String> files = new ArrayList<String>();
+        ReadDirectoryContentWrapper rdw = new ReadDirectoryContentWrapper();
+        ReadDirectoryResult d = rdw.readDirectory(fn);
+        if (d.getExitCode() != 0) {
+            Logger.log("Error reading directory content. Dir: " + fn + "; Error: " + d.getErrorMessage());
+            return null;
+        }
+        else {
+            files = d.getContent();
+        }
+        
+        return files;
     }
     
 

@@ -1,17 +1,17 @@
 package net.finetunes.ftcldstr.wrappers;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ReadDirectoryResult extends AbstractWrapperResult {
     
     // list of objects in a directory
-    private List<String> content = null;
+    private ArrayList<String> content = null;
 
-    public List<String> getContent() {
+    public ArrayList<String> getContent() {
         return content;
     }
 
-    public void setContent(List<String> content) {
+    public void setContent(ArrayList<String> content) {
         this.content = content;
     }
 

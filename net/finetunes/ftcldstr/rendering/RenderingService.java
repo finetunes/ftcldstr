@@ -162,6 +162,12 @@ public class RenderingService {
 	    return content;
 	}
 	
+	
+    public static String getQuickNavPath(String ru) {
+        
+        return getQuickNavPath(ru, null);
+    }
+    
 	public static String createMsgQuery(String msg, String msgparam,
 				String errmsg, String errmsgparam) {
 	

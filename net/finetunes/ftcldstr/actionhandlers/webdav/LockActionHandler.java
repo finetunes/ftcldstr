@@ -6,6 +6,7 @@ import javax.annotation.processing.FilerException;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.GeneratorService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
@@ -65,7 +66,7 @@ public class LockActionHandler extends AbstractActionHandler {
                 status = "200 OK";
                 // LockingService.lockResource();
                 // lockResource($fn, $ru, $xmldata, $depth, $timeout, $token); // TODO
-                content = XMLService.createXML(/* {prop=>{lockdiscovery => getLockDiscovery($fn)}}  */ null); // TODO 
+                content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, /* {prop=>{lockdiscovery => getLockDiscovery($fn)}}  */ null); // TODO 
             }
             else {
                 status = "423 Locked";

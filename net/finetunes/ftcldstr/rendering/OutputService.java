@@ -1,6 +1,8 @@
 package net.finetunes.ftcldstr.rendering;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -73,13 +75,11 @@ public class OutputService {
     
     public static void printContent(RequestParams requestParams, String content) {
         
+        PrintWriter pw = null;
         try {
             OutputStream outStream = requestParams.getResponse().getOutputStream();
-            PrintWriter pw = new PrintWriter(new OutputStreamWriter(outStream, ConfigService.CHARSET));
+            pw = new PrintWriter(new OutputStreamWriter(outStream, ConfigService.CHARSET));
             pw.println(content);
-
-            pw.flush();
-            pw.close();        
         }
         catch (UnsupportedEncodingException e) {
             System.err.println("Unsupported charset encoding: " + ConfigService.CHARSET);
@@ -88,9 +88,51 @@ public class OutputService {
         catch (IOException e) {
             System.err.println("Unable to get output stream for writing.");
             e.printStackTrace();
-        }       
+        }
+        finally {
+            if (pw != null) {
+                pw.flush();
+                pw.close();
+            }
+        }
     }
 	
+    public static void printContentStream(RequestParams requestParams, InputStream contentStream) {
+        
+        if (contentStream != null) {
+        
+            BufferedInputStream buf = null;
+            try {
+                OutputStream outStream = requestParams.getResponse().getOutputStream();
+                
+                buf = new BufferedInputStream(contentStream);
+                int readBytes = 0;
+                
+                while ((readBytes = buf.read()) != -1) {
+                    outStream.write(readBytes);            
+                }
+            }
+            catch (UnsupportedEncodingException e) {
+                System.err.println("Unsupported charset encoding: " + ConfigService.CHARSET);
+                e.printStackTrace();
+            }
+            catch (IOException e) {
+                System.err.println("Unable to get output stream for writing.");
+                e.printStackTrace();
+            }
+            finally {
+                if (buf != null) {
+                    try {
+                        buf.close();
+                    }
+                    catch (IOException e) {
+                        // do nothing
+                    }
+                }
+            }
+        }
+    }
+
 	
     /**
      * Sends the header and the content directly to the out

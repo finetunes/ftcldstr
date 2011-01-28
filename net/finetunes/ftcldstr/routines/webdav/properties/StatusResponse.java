@@ -1,14 +1,123 @@
 package net.finetunes.ftcldstr.routines.webdav.properties;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class StatusResponse {
     
     // FIXME: create access methods if required
-    public String status = null;
-    public String href = null;
-    public HashMap<String, Object> prop = null;
-    public StatusResponse propstat = null;
+    private String status = null;
+    private String href = null;
+    private HashMap<String, Object> prop = null;
+    private StatusResponse propstat = null;
+    
+    public Object putProp(String key, Object value) {
+        
+        if (prop == null) {
+            prop = new HashMap<String, Object>();
+        }
+        
+        return prop.put(key, value);
+    }
+    
+    public Object getProp(String key) {
+        
+        if (prop != null) {
+            return prop.get(key);
+        }
+        
+        return null;
+    }    
+    
+    public boolean propsExist() {
+        
+        return prop != null;
+    }
+    
+//    public StatusResponse getPropStat() {
+//        return propstat;
+//    }
+    
+    public boolean propstatExists() {
+        return propstat != null;
+    }
+
+    public boolean propstatPropsExist() {
+        return (propstat != null) && (propstat.prop != null);
+    }
+    
+    public Object putPropstatProp(String key, Object value) {
+        
+        if (propstat == null) {
+            propstat = new StatusResponse();
+        }
+        
+        if (propstat.prop == null) {
+            propstat.prop = new HashMap<String, Object>();
+        }
+        
+        return propstat.prop.put(key, value);
+    }    
+    
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getHref() {
+        return href;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }    
+    
+
+    public String getPropstatStatus() {
+        if (propstat != null) {
+            return propstat.status;
+        }
+        
+        return null;
+    }
+
+    public void setPropstatStatus(String status) {
+        if (propstat == null) {
+            propstat = new StatusResponse();
+        }
+        
+        propstat.status = status;
+    }
+
+    public String getPropstatHref() {
+        
+        if (propstat != null) {
+            return propstat.href;
+        }
+        
+        return null;
+    }
+
+    public void setPropstatHref(String href) {
+        
+        if (propstat == null) {
+            propstat = new StatusResponse();
+        }
+        
+        propstat.href = href;
+    }
+    
+    public HashMap<String, Object> getProps() {
+        return prop;
+    }
+    
+    public void setPropstat(StatusResponse propstat) {
+        this.propstat = propstat;
+    }
+    
     
 //    public StatusResponse() {
 //        

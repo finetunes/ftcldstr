@@ -23,20 +23,52 @@ import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.rendering.RenderingService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
+import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
+import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryResult;
 
 public class DirectoryOperationsService {
 	
-	// TODO: hrefs array of strings (filenames) recursively passed by reference
-	public static void readDirBySuffix(String filename, 
-			String baseName, 
-			// $hrefs, 
-			String suffix, 
-			int depth, 
-			HashMap visited) {
-		
-		// TODO: implement
+	public static void readDirBySuffix(String fn, String base, 
+			ArrayList<String> hrefs, String suffix, 
+			int depth, ArrayList<String> visited) {
+	    
+	    Logger.debug("readDirBySuffix(" + fn + ", ..., " + suffix + ", " + depth + ")");
+	    
+	    String nfn = FileOperationsService.full_resolve(fn);
+	    
+	    // was "if exists $$visited{$nfn} && ($depth eq 'infinity' || $depth < 0)"
+	    if (visited.contains(nfn) && (depth < 0)) {
+	        return;
+	    }
+	    
+	    visited.add(nfn);
+	    
+        List<String> files = ReadDirectoryContentWrapper.getFileList(fn);
+        if (files != null) {
+    	    Iterator<String> it = files.iterator();
+    	    while (it.hasNext()) {
+    	        String sf = it.next();
+    	        
+    	        if (!sf.matches("(\\.|\\.\\.)")) {
+    	            if (FileOperationsService.is_directory(fn + sf)) {
+    	                sf += "/";
+    	            }
+    	            
+    	            String nbase = base + sf;
+    	            if (FileOperationsService.is_plain_file(fn + sf) && sf.matches(".*\\." + Pattern.quote(suffix) + ".*")) {
+    	                hrefs.add(nbase);
+    	            }
+    	            
+    	            if (depth != 0 && FileOperationsService.is_directory(fn + sf)) {
+    	                readDirBySuffix(fn + sf, nbase, hrefs, suffix, depth - 1, visited);
+    	            }
+    	            // ## add only files with requested components 
+    	            // ## filter (comp-filter > comp-filter >)	            
+    	        }
+    	    }
+        }
 	}
 	
 	public static Object[] getFolderList(RequestParams requestParams, String fn, String ru, String filter) {
@@ -143,16 +175,10 @@ public class DirectoryOperationsService {
             list += FileHelper.getfancyfilename(requestParams, FileOperationsService.splitFilename(ru)[0] + "/", "..", "< .. >", FileOperationsService.splitFilename(fn)[0]) + "\n";
 	    }
 	    
-        List<String> files = new ArrayList<String>();
-        ReadDirectoryContentWrapper rdw = new ReadDirectoryContentWrapper();
-        ReadDirectoryResult d = rdw.readDirectory(fn);
-        if (d.getExitCode() != 0) {
-            Logger.log("Error reading directory content. Dir: " + fn + "; Error: " + d.getErrorMessage());
+        List<String> files = ReadDirectoryContentWrapper.getFileList(fn);
+        if (files == null) {
+            files = new ArrayList<String>();
         }
-        else {
-            files = d.getContent();
-        }
-        
         Collections.sort(files, new FilenameComparator(requestParams.getPathTranslated(), order));
         
 	    String pagenum = requestParams.getRequest().getParameter("page");
@@ -233,8 +259,6 @@ public class DirectoryOperationsService {
                 continue;
             }
             
-            // TODO
-            // my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($full);
             StatData stat = FileOperationsService.stat(full);
             int mode = stat.getMode(); 
 
@@ -307,19 +331,136 @@ public class DirectoryOperationsService {
         return getFolderList(requestParams, fn, ru, null);
     }	
 	
-	public static int getDirInfo(String filename, String propertyName) {
-		
-		// TODO: implement
-		return -1;
-		
+    // PZ: original perl code cached values and returned them
+    // later from cache
+    // though such an approach seems not to take into account
+    // the situation when the directory contents is changed;
+    // implemented without the cache here
+	public static int getDirInfo(String fn, String prop) {
+	    
+        int childcount = 0;
+        int visiblecount = 0;
+        int objectcount = 0;
+        int hassubs = 0;
+        int realchildcount = 0;
+	    
+        List<String> files = ReadDirectoryContentWrapper.getFileList(fn);
+        if (files != null) {
+            Iterator<String> it = files.iterator();
+            while (it.hasNext()) {
+                String f = it.next();
+                
+                if (!f.matches("(\\.|\\.\\.)")) {
+                    realchildcount++;
+                    if (!FileOperationsService.is_hidden(fn + "/" + f)) {
+                        childcount++;
+                        if (!FileOperationsService.is_directory(fn + "/" + f) && !f.startsWith(".")) {
+                            visiblecount++;
+                        }
+                        
+                        if (!FileOperationsService.is_directory(fn + "/" + f)) {
+                            objectcount++;
+                        }
+                    }
+                }
+            }	
+        }
+        if (childcount - objectcount > 0) {
+            hassubs = 1;
+        }
+        
+        HashMap<String, Integer> counter = new HashMap<String, Integer>();
+        counter.put("childcount", childcount);
+        counter.put("visiblecount", visiblecount);
+        counter.put("objectcount", objectcount);
+        counter.put("hassubs", hassubs);
+        counter.put("realchildcount", realchildcount);
+        
+        return counter.get(prop);
 	}
 	
-	// TODO: params:
-	// $fn, $ru, $respsRef, $props, $all, $noval, $depth, $noroot, $visited
-	public static void readDirRecursive() {
-		
-		// TODO: implement
-		
+	public static void readDirRecursive(RequestParams requestParams,
+	        String fn, String ru,
+	        ArrayList<StatusResponse> respsRef,
+	        ArrayList<String> props,
+	        boolean all, boolean noval, int depth,
+	        boolean noroot, ArrayList<String> visited) {
+	    
+	    if (FileOperationsService.is_hidden(fn)) {
+	        return;
+	    }
+	    
+	    if (visited == null) {
+	        visited = new ArrayList<String>();
+	    }
+	    
+	    String nfn = FileOperationsService.full_resolve(fn);
+	    if (!noroot) {
+	        StatusResponse response = new StatusResponse();
+	        response.setHref(ru);
+	        
+	        // original perl code is dealing with two returned objects of StatusResponse
+	        // here, but it seems there is no need in the second object
+	        
+	        ArrayList<StatusResponse> r = PropertiesHelper.getPropStat(requestParams, nfn, ru, props, all, noval);
+	        if (r.size() == 0) {
+	            response.setStatus("HTTP/1.1 200 OK");
+	            response.setPropstat(null);
+	        }
+	        else {
+	            if (ConfigService.ENABLE_BIND && depth < 0 && visited.contains(nfn)) {
+	                response.setPropstatStatus("HTTP/1.1 208 Already Reported");
+	            }
+	        }
+	        
+	        respsRef.add(response);
+	    }
+	    
+	    if (visited.contains(nfn) && !noroot && (depth < 0)) {
+	        return;
+	    }
+	    
+	    visited.add(nfn);
+	    if (depth != 0 && FileOperationsService.is_directory(nfn)) {
+	        List<String> files = ReadDirectoryContentWrapper.getFileList(nfn);
+	        if (files != null) {
+    	        String order = requestParams.getRequest().getParameter("order");
+    	        if (order == null || order.isEmpty()) {
+    	            order = "name";
+    	        }
+    	        
+    	        Collections.sort(files, new FilenameComparator(requestParams.getPathTranslated(), order));
+                Iterator<String> it = files.iterator();
+                
+                while (it.hasNext()) {
+                    String f = it.next();
+                    if (FileOperationsService.is_hidden(nfn + "/" + f)) {
+                        continue;
+                    }
+                    
+                    String fru = ru + RenderingHelper.uri_escape(f);
+                    if (FileOperationsService.is_directory(nfn + "/" + f) && !fru.endsWith("/")) {
+                        fru += "/";
+                    }
+                    
+                    String nnfn = FileOperationsService.full_resolve(nfn + "/" + f);
+                    int nd = depth; 
+                    if (depth > 0) {
+                        nd = depth - 1;
+                    }
+                    readDirRecursive(requestParams, nnfn, fru, respsRef, props, all, noval, nd, false, visited);
+                }
+	        }
+	    }
 	}
-
+	
+    public static void readDirRecursive(RequestParams requestParams,
+            String fn, String ru,
+            ArrayList<StatusResponse> respsRef,
+            ArrayList<String> props,
+            boolean all, boolean noval, int depth,
+            boolean noroot) {
+        
+        readDirRecursive(requestParams, fn, ru, respsRef, props, all, noval, depth, noroot, null);
+    }
 }

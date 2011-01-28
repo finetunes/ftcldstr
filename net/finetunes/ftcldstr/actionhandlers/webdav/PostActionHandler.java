@@ -83,7 +83,7 @@ public class PostActionHandler extends AbstractActionHandler {
                         Logger.debug("POST: delete " + fn + file);
                         
                         if (ConfigService.ENABLE_TRASH) {
-                            FileHelper.moveToTrash(fn + file); // TODO: implement
+                            FileHelper.moveToTrash(requestParams, fn + file); // TODO: implement
                         }
                         else {
                             // $count += deltree($PATH_TRANSLATED.$file, \my @err);
@@ -307,13 +307,11 @@ public class PostActionHandler extends AbstractActionHandler {
 */
         }
         else if (ConfigService.ENABLE_CALDAV_SCHEDULE && FileOperationsService.is_directory(fn)) {
-            // ## NOT IMPLEMENTED YET // PZ: that was original perl code; TODO?
+            // ## NOT IMPLEMENTED YET // was original perl code;
         }
         else {
-/*            
-            debug("_POST: forbidden POST to $PATH_TRANSLATED");
-            printHeaderAndContent('403 Forbidden','text/plain','403 Forbidden');
-*/            
+            Logger.debug("_POST: forbidden POST to " + fn);
+            OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
         }
     }
     

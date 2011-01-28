@@ -64,7 +64,7 @@ public class DeleteActionHandler extends AbstractActionHandler {
         }
         else {
             if (ConfigService.ENABLE_TRASH) {
-                if (!FileHelper.moveToTrash(fn)) {
+                if (!FileHelper.moveToTrash(requestParams, fn)) {
                     status = "403 Forbidden";
                     
                     // PZ: original message was 404 Forbidden
@@ -74,7 +74,7 @@ public class DeleteActionHandler extends AbstractActionHandler {
             else {
                 
                 ArrayList<String[]> err = new ArrayList<String[]>();
-                FileHelper.deltree(fn, err);
+                FileHelper.deltree(requestParams, fn, err);
                 Logger.log("DELETE(" + fn + ")");
                 
                 Iterator<String[]> it = err.iterator();
@@ -93,7 +93,6 @@ public class DeleteActionHandler extends AbstractActionHandler {
                 }
             }
         }
-        
         
         String content = "";
         if (resps.size() > 0) {

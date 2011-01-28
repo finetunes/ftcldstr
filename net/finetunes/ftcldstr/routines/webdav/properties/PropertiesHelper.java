@@ -33,7 +33,7 @@ public class PropertiesHelper {
         
         if (propval == null) {
             PropertiesActions.getProperty(requestParams, fn, uri, propname, null, r200, r404);
-            propval = (String)r200.prop.get("propname");
+            propval = (String)r200.getProp("propname");
         }
 	    
         if (propval == null) {
@@ -56,8 +56,8 @@ public class PropertiesHelper {
 	    StatusResponse resp_200 = new StatusResponse();
 	    StatusResponse resp_404 = new StatusResponse();
 	    
-	    resp_200.status = "HTTP/1.1 200 OK";
-	    resp_404.status = "HTTP/1.1 404 Not Found";
+	    resp_200.setStatus("HTTP/1.1 200 OK");
+	    resp_404.setStatus("HTTP/1.1 404 Not Found");
 	    
 	    Iterator<String> it = props.iterator();
 	    
@@ -92,8 +92,7 @@ public class PropertiesHelper {
             
             if (ConfigService.UNSUPPORTED_PROPS.contains(propname)) {
                 Logger.debug("getPropStat: UNSUPPORTED: " + propname);
-                resp_404.prop = new HashMap<String, Object>();
-                resp_404.prop.put(prop, null);
+                resp_404.putProp(prop, null);
                 continue;
             }
             else if ((ConfigService.NAMESPACES.get(xmlnsuri) == null || liveSource.contains(propname)) && !ConfigService.PROTECTED_PROPS.contains(propname)) {
@@ -111,12 +110,13 @@ public class PropertiesHelper {
                     if (!noval) {
                         pv = dbval;
                     }
-                    resp_200.prop.put(prop, pv);
+                    
+                    resp_200.putProp(prop, pv);
                     continue;
                 }
                 else if (!liveSourceN.contains(propname)) {
                     Logger.debug("getPropStat: #1 NOT FOUND: " + prop + " (" + propname + ", " + xmlnsuri + ")");
-                    resp_404.prop.put(prop, null);
+                    resp_404.putProp(prop, null);
                 }
             }
             
@@ -130,7 +130,7 @@ public class PropertiesHelper {
             
             if (liveSourceNP.contains(propname)) {
                 if (noval) {
-                    resp_200.prop.put(prop, null);
+                    resp_200.putProp(prop, null);
                 }
                 else {
                     PropertiesActions.getProperty(requestParams, fn, uri, prop, stat, resp_200, resp_404);
@@ -138,15 +138,15 @@ public class PropertiesHelper {
             }
             else if (!all) {
                 Logger.debug("getPropStat: #2 NOT FOUND: " + prop + " (" + propname + ", " + xmlnsuri + ")");
-                resp_404.prop.put(prop, null);
+                resp_404.putProp(prop, null);
             }
 	    }
 	    
-	    if (resp_200.prop != null) {
+	    if (resp_200.propsExist()) {
 	        propstat.add(resp_200);
 	    }
 	    
-        if (resp_404.prop != null) {
+        if (resp_404.propsExist()) {
             propstat.add(resp_404);
         }
         

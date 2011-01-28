@@ -1,11 +1,13 @@
 package net.finetunes.ftcldstr.routines.fileoperations;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryResult;
 
@@ -115,12 +117,28 @@ public class FileOperationsService {
 	
 	// additional methods
 	
+    public static InputStream getFileContentStream(String filename) {
+
+    //  if (open(F,"<$fn")) {
+//      binmode(STDOUT);
+//      while (read(F,my $buffer, $BUFSIZE)>0) {
+//          print $buffer;
+//      }
+//      close(F);
+//  }             
+        
+        // TODO: implement
+        return null;
+        
+    }
+	
     public static boolean is_directory(String filename) {
         
         File file = new File(filename);
         return file.isDirectory();
     }	
     
+    // TODO: check whether works on dirs as well, not only files 
     public static boolean file_exits(String filename) {
         
         File file = new File(filename);
@@ -368,10 +386,24 @@ public class FileOperationsService {
     
     public static boolean unlink(String filename) {
         
+        // TODO: write errors in log if any
+        // as there is no way to get the error code
+        // without passing errRef param in this method
+        
         // TODO: implement
         return false;
     }
     
+    public static boolean rmdir(String dirname) {
+        
+        // TODO: write errors in log if any
+        // as there is no way to get the error code
+        // without passing errRef param in this method
+        
+        // TODO: implement
+        return false;
+    }
+
     
     public class StatData {
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,9 +14,13 @@ import net.finetunes.ftcldstr.helper.ConfigService;
 public class XMLService {
 	
     // TODO: check parameter types
-    public static void createXMLData(XMLData w, Object dd, HashMap<String, String> xmlns) {
+    public static void createXMLData(Map<String, Integer> namespaceElements, XMLData w, Object dd, HashMap<String, String> xmlns) {
         
         Matcher m;
+        
+        if (namespaceElements == null) {
+            namespaceElements = new HashMap<String, Integer>();
+        }
         
         if (dd instanceof HashMap<?, ?>) {
             
@@ -99,9 +104,9 @@ public class XMLService {
                         Object e1 = Array.get(d.get(e), l);
                         XMLData tmpw = new XMLData();
                         tmpw.setData("");
-                        createXMLData(tmpw, e1, xmlns);
-                        if (ConfigService.NAMESPACEELEMENTS.containsKey(el) &&
-                                ConfigService.NAMESPACEELEMENTS.get(el) != null) {
+                        createXMLData(namespaceElements, tmpw, e1, xmlns);
+                        if (namespaceElements.containsKey(el) &&
+                                namespaceElements.get(el) != null) {
                             
                             
                             ArrayList<String> keys2 = new ArrayList<String>(xmlns.keySet()); 
@@ -118,14 +123,14 @@ public class XMLService {
                 } else {
                     if (uns != null && !uns.equals("")) {
                         w.setData(w.getData().concat("<" + euns + " xmlns=\"" + uns + "\">"));
-                        createXMLData(w, d.get(e), xmlns);
+                        createXMLData(namespaceElements, w, d.get(e), xmlns);
                         w.setData(w.getData().concat("</" + euns_end + ">"));
                     } else {
                         XMLData tmpw2 = new XMLData(); 
                         tmpw2.setData("");
-                        createXMLData(tmpw2, d.get(e), xmlns);
-                        if (ConfigService.NAMESPACEELEMENTS.containsKey(el) &&
-                                ConfigService.NAMESPACEELEMENTS.get(el) != null) {
+                        createXMLData(namespaceElements, tmpw2, d.get(e), xmlns);
+                        if (namespaceElements.containsKey(el) &&
+                                namespaceElements.get(el) != null) {
                             
                             ArrayList<String> keys3 = new ArrayList<String>(xmlns.keySet()); 
                             for (int k = 0; k < keys3.size(); k++) {
@@ -142,7 +147,7 @@ public class XMLService {
             }
         } else if (dd.getClass().isArray()) {
             for (int i = 0; i < Array.getLength(dd); i++) {
-                createXMLData(w, Array.get(dd, i), xmlns);
+                createXMLData(namespaceElements, w, Array.get(dd, i), xmlns);
             }
         } else if (dd.getClass().isPrimitive()) {
             w.setData(w.getData().concat((String)dd));
@@ -152,20 +157,20 @@ public class XMLService {
         
     }
 
-    public static void createXMLData(XMLData w, HashMap<String, Object> d) {
-        createXMLData(w, d, null);
+    public static void createXMLData(Map<String, Integer> namespaceElements, XMLData w, HashMap<String, Object> d) {
+        createXMLData(namespaceElements, w, d, null);
     }
     
-    public static String createXML(HashMap<String, Object> dataRef, boolean withoutp) {
+    public static String createXML(Map<String, Integer> namespaceElements, HashMap<String, Object> dataRef, boolean withoutp) {
         XMLData data = new XMLData();
         data.setData("<?xml version=\"1.0\" encoding=\"" + ConfigService.CHARSET + "\"?>");
-        createXMLData(data, dataRef);
+        createXMLData(namespaceElements, data, dataRef);
         return data.getData();
     }    
 	
-    public static String createXML(HashMap<String, Object> dataRef) {
+    public static String createXML(Map<String, Integer> namespaceElements, HashMap<String, Object> dataRef) {
         
-        return createXML(dataRef, false);
+        return createXML(namespaceElements, dataRef, false);
     }
     
     // additional

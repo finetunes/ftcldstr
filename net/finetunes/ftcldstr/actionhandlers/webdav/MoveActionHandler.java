@@ -69,8 +69,8 @@ public class MoveActionHandler extends AbstractActionHandler {
             }
             
             if (FileOperationsService.rmove(fn, destination)) {
-                DBPropertiesOperations.db_moveProperties(fn, destination);
-                BasicRoutines.db_delete(fn);
+                ConfigService.properties.moveProperties(fn, destination);
+                ConfigService.locks.deleteLock(fn);
                 LockingService.inheritLock(requestParams, destination, true);
                 Logger.log("MOVE(" + fn + ", " + destination + ")");
             }

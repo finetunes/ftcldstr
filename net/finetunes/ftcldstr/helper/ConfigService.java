@@ -175,7 +175,7 @@ public class ConfigService {
      * enables file management with a web browser
      * ATTENTATION: locks will be ignored
      */
-    public static final boolean ALLOW_FILE_MANAGEMENT = true;
+    public static volatile boolean ALLOW_FILE_MANAGEMENT = true;
 
     /*
      * -- ALLOW_SEARCH
@@ -442,15 +442,13 @@ public class ConfigService {
      */
     public static final boolean ENABLE_TRASH = false;
 
-/*
- * PZ: the variable must have the trailing slash if a directory
- * 
-    ## -- TRASH_FOLDER
-    ## neccessary if you enable trash 
-    ## it should be writable by your users (chmod a+rwxt <trash folder>)
-    ## EXAMPLE: $TRASH_FOLDER = '/tmp/trash';
-    $TRASH_FOLDER = '/usr/local/www/var/trash';
-*/
+    /*
+     * -- TRASH_FOLDER
+     * neccessary if you enable trash
+     * it should be writable by your users (chmod a+rwxt <trash folder>)
+     * EXAMPLE: $TRASH_FOLDER = '/tmp/trash';
+     */
+    public static final String TRASH_FOLDER = "/usr/local/www/var/trash";
     
     /*
      * -- ENABLE_GROUPDAV
@@ -747,8 +745,8 @@ public class ConfigService {
 //	}
     
     public static String DAV = null;
-    public static Properties properties = null;
-    public static WebDAVLocks locks = null;
+    public static volatile Properties properties = null;
+    public static volatile WebDAVLocks locks = null;
     
     // phrases
     public static HashMap<String, String> stringMessages = null;

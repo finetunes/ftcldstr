@@ -1,5 +1,7 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.util.HashMap;
+
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.helper.Logger;
@@ -41,7 +43,7 @@ public class MkcolActionHandler extends AbstractActionHandler {
         Logger.debug("MKCOL: " + fn);
         
         String body = requestParams.getRequestBody();
-        String dataRef = null; // TODO: datatype
+        HashMap<String, Object> dataRef = null;
         
         if (!body.isEmpty()) {
             String requestContentType = requestParams.getRequest().getContentType();
@@ -102,7 +104,7 @@ public class MkcolActionHandler extends AbstractActionHandler {
                 StatusResponse resp_200 = null;
                 StatusResponse resp_403 = null;
                 
-                PropertyRequestHandler.handlePropertyRequest(body, dataRef, resp_200, resp_403); // TODO: implement
+                PropertyRequestHandler.handlePropertyRequest(requestParams, body, dataRef, resp_200, resp_403); // TODO: implement
                 // ignore errors from property request
                 LockingService.inheritLock(requestParams);
                 Logger.log("MKCOL(" + fn + ")");

@@ -28,15 +28,9 @@ public class PropertiesActions {
 	    
 	    ConfigService.properties.removeProperty(fn, propname);
 	    
-	    resp_200.href = requestParams.getRequestURI();
-	    if (resp_200.propstat == null) {
-	        resp_200.propstat = new StatusResponse();
-	    }
-	    resp_200.propstat.status = "HTTP/1.1 200 OK";
-	    
-	    if (resp_200.propstat.prop != null) {
-	        resp_200.propstat.prop.put(propname, null);
-	    }
+	    resp_200.setHref(requestParams.getRequestURI());
+	    resp_200.setPropstatStatus("HTTP/1.1 200 OK");
+        resp_200.putPropstatProp(propname, null);
 	}
 	
 	public static Object[] handlePropFindElement(RequestParams requestParams, HashMap<String, Object> xmldata) {
@@ -187,29 +181,29 @@ public class PropertiesActions {
 	    if (stat == null) {
 	        stat = FileOperationsService.stat(fn);
 	    }
-	    
-	    if (resp_200.prop == null) {
-	        resp_200.prop = new HashMap<String, Object>();
-	    }
 
+        if (resp_200 == null) {
+            resp_200 = new StatusResponse();
+        }
+        
         if (resp_404 == null) {
             resp_404 = new StatusResponse();
         }
 	    
 	    if (prop.equals("creationdate")) {
-	        resp_200.prop.put("creationdate", String.format("%Y-%m-%dT%H:%M:%SZ", stat.getCtimeDate()));
+	        resp_200.putProp("creationdate", String.format("%Y-%m-%dT%H:%M:%SZ", stat.getCtimeDate()));
 	    }
 	    
-	    if (prop.equals("displayname") && resp_200.prop.get("displayname") == null) {
-	        resp_200.prop.put("displayname", RenderingHelper.uri_escape(FileOperationsService.basename(uri)));
+	    if (prop.equals("displayname") && resp_200.getProp("displayname") == null) {
+	        resp_200.putProp("displayname", RenderingHelper.uri_escape(FileOperationsService.basename(uri)));
 	    }
 	    
 	    if (prop.equals("getcontentlanguage")) {
-	        resp_200.prop.put("getcontentlanguage", "en");
+	        resp_200.putProp("getcontentlanguage", "en");
 	    }
 	    
 	    if (prop.equals("getcontentlength")) {
-            resp_200.prop.put("getcontentlength", stat.getSize());
+            resp_200.putProp("getcontentlength", stat.getSize());
 	    }
 	    
 	    if (prop.equals("getcontenttype")) {
@@ -220,19 +214,19 @@ public class PropertiesActions {
 	        else {
 	            contentType = MIMETypesHelper.getMIMEType(fn);
 	        }
-            resp_200.prop.put("getcontenttype", contentType);
+            resp_200.putProp("getcontenttype", contentType);
 	    }
 	    
         if (prop.equals("getetag")) {
-            resp_200.prop.put("getetag", PropertiesHelper.getETag(requestParams, fn));
+            resp_200.putProp("getetag", PropertiesHelper.getETag(requestParams, fn));
         }	    
 
         if (prop.equals("getlastmodified")) {
-            resp_200.prop.put("getlastmodified", String.format("%a, %d %b %Y %T GMT", stat.getMtimeDate()));
+            resp_200.putProp("getlastmodified", String.format("%a, %d %b %Y %T GMT", stat.getMtimeDate()));
         }       
         
         if (prop.equals("lockdiscovery")) {
-            resp_200.prop.put("lockdiscovery", LockingService.getLockDiscovery(fn));
+            resp_200.putProp("lockdiscovery", LockingService.getLockDiscovery(fn));
         }       
 	    
 /*

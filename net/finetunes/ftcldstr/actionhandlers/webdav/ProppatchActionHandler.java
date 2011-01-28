@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
@@ -44,10 +45,9 @@ public class ProppatchActionHandler extends AbstractActionHandler {
             
             Logger.debug("PROPPATCH: REQUEST: " + xml);
   
-            String dataRef = null; // TODO: datatype? 
+            HashMap<String, Object> dataRef = null; 
 /*
  * TODO
-        my $dataRef;
         eval { $dataRef = simpleXMLParser($xml) };  
         if ($@) {
             debug("_PROPPATCH: invalid XML request: $@");
@@ -60,7 +60,7 @@ public class ProppatchActionHandler extends AbstractActionHandler {
             StatusResponse resp_200 = null;
             StatusResponse resp_403 = null;
             
-            PropertyRequestHandler.handlePropertyRequest(xml, dataRef, resp_200, resp_403); // TODO: implement
+            PropertyRequestHandler.handlePropertyRequest(requestParams, xml, dataRef, resp_200, resp_403); // TODO: implement
 
             // TODO: datatypes?
             // push @resps, \%resp_200 if defined $resp_200{href};
@@ -68,7 +68,7 @@ public class ProppatchActionHandler extends AbstractActionHandler {
             
             status = "207 Multi-Status";
             type = "text/xml";
-            content = XMLService.createXML(null, false); // TODO: implement
+            content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, null, false); // TODO: implement
             // TODO: ^^ // $content = createXML( { multistatus => { response => \@resps} });  
         }
         else {

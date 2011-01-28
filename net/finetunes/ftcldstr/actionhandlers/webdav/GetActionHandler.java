@@ -4,16 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.MissingFormatArgumentException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
@@ -26,14 +21,13 @@ import net.finetunes.ftcldstr.rendering.RenderingService;
 import net.finetunes.ftcldstr.routines.NamespaceService;
 import net.finetunes.ftcldstr.routines.fileoperations.DirectoryOperationsService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.routines.webdav.SearchService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesActions;
 import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties.FileProperties;
 import net.finetunes.ftcldstr.routines.xml.XMLService;
-import net.finetunes.ftcldstr.serialization.DBPropertiesOperations;
-import net.finetunes.ftcldstr.wrappers.FileOperationsWrapper;
 
 /**
  * The GET method means retrieve whatever information (in the form of an
@@ -101,7 +95,7 @@ public class GetActionHandler extends AbstractActionHandler {
         }
     }
     
-    // TODO: check
+    // FIXME: check
     private void doDavmountRequest(RequestParams requestParams, String fn) {
         
         // my $su = $ENV{REDIRECT_SCRIPT_URI} || $ENV{SCRIPT_URI};
@@ -136,11 +130,13 @@ public class GetActionHandler extends AbstractActionHandler {
             
             String cachefile = ConfigService.THUMBNAIL_CACHEDIR + "/" + uniqname + ".thumb";
             if (!FileOperationsService.file_exits(ConfigService.THUMBNAIL_CACHEDIR)) {
-                // create directory using wrapper (THUMBNAIL_CACHEDIR) // TODO
+                FileOperationsService.mkdir(ConfigService.THUMBNAIL_CACHEDIR);
             }
             
-            if (!FileOperationsService.file_exits(cachefile) ||
-                    FileOperationsWrapper.getFileModificationDate(fn).after(FileOperationsWrapper.getFileModificationDate(cachefile))) {
+            StatData statfn = FileOperationsService.stat(fn);
+            StatData statcf = FileOperationsService.stat(cachefile);
+            if (!FileOperationsService.file_exits(cachefile) || statfn.getMtimeDate().after(statcf.getMtimeDate())) {
+                // TODO: finish
 //              $image->Read($fn);
 //              $image->Resize(geometry=>$width,filter=>'Gaussian');
 //              $image->Write($cachefile);
@@ -179,7 +175,7 @@ public class GetActionHandler extends AbstractActionHandler {
             String search = requestParams.getRequest().getParameter("search");
             
             String form = "";
-            form += "<form method=\"get\">"; // PZ: TODO: form action missing?
+            form += "<form method=\"get\">"; // PZ: FIXME: form action missing?
 
             form += "<div style=\"text-align:right;font-size:0.8em;padding:2px 0 0 0;border:0;margin:0;\">";
             form += ConfigService.stringMessages.get("search");
@@ -240,8 +236,8 @@ public class GetActionHandler extends AbstractActionHandler {
         if (requestParams.getRequest().getParameter("search") != null &&
                 !requestParams.getRequest().getParameter("search").isEmpty()) {
             
-            content += SearchService.getSearchResult(requestParams.getRequest().getParameter("search"), 
-                    fn, ru);
+            content += SearchService.getSearchResult(requestParams, 
+                    requestParams.getRequest().getParameter("search"), fn, ru);
         }
         else {
             
@@ -434,7 +430,6 @@ public class GetActionHandler extends AbstractActionHandler {
         
     }
   
-    // TODO
     private void doFilePropertiesRequest(RequestParams requestParams, String fn) {
         
         String content = "";
@@ -484,16 +479,14 @@ public class GetActionHandler extends AbstractActionHandler {
         
         content += "<table style=\"width: 100%; table-layout:fixed;\">";
         
-        
-        HashMap<String, Integer> namespaceElements = new HashMap<String, Integer>(ConfigService.NAMESPACEELEMENTS);
-        // TODO: this was marked as local(%NAMESPACEELEMENTS); 
-        // but is not used for reading
-        // what for?
+
+        // original code: local(%NAMESPACEELEMENTS);
+        HashMap<String, Integer> namespaceElements = new HashMap<String, Integer>();
         
         FileProperties dbprops = ConfigService.properties.getProperties(fn);
         ArrayList<String> bgcolors = new ArrayList<String>(Arrays.asList("#ffffff", "#eeeeee"));
         ArrayList<String> visited = new ArrayList<String>();
-        String bgcolor;
+        String bgcolor = "";
         
         content += "<tr style=\"background-color:#dddddd;text-align:left\">";
         content += "<th style=\"width:25%\">" + ConfigService.stringMessages.get("propertyname") + "</th>";
@@ -517,11 +510,7 @@ public class GetActionHandler extends AbstractActionHandler {
             
             // was if exists $visited{$prop}
             if (dbprops.getProperty(prop) != null) {
-                if (r200.prop == null) {
-                    r200.prop = new HashMap<String, Object>();
-                }
-                
-                r200.prop.put(prop, dbprops.getProperty(prop));
+                r200.putProp(prop, dbprops.getProperty(prop));
             }
             else {
                 PropertiesActions.getProperty(requestParams, fn, requestParams.getRequestURI(), 
@@ -530,10 +519,10 @@ public class GetActionHandler extends AbstractActionHandler {
             
             visited.add(prop);
             
-            ConfigService.NAMESPACEELEMENTS.put(NamespaceService.nonamespace(prop), 1); // TODO: see namespaceElements above
+            namespaceElements.put(NamespaceService.nonamespace(prop), 1);
             
-            String title = XMLService.createXML(r200.prop, true);
-            String value = XMLService.createXML((HashMap<String, Object>)r200.prop.get(prop), true);
+            String title = XMLService.createXML(namespaceElements, r200.getProps(), true);
+            String value = XMLService.createXML(namespaceElements, (HashMap<String, Object>)r200.getProp(prop), true);
             String namespace = NamespaceService.getNameSpaceUri(prop);
             
             Pattern p = Pattern.compile("^\\{([^\\}]*)\\}");
@@ -550,15 +539,14 @@ public class GetActionHandler extends AbstractActionHandler {
                 bgcolors.add(bgcolor);
             }
             
-/*
-            $content.= $cgi->Tr( {-style=>"background-color:$bgcolor; text-align:left" },
-                 $cgi->th({-title=>$namespace, -style=>'vertical-align:top;'},nonamespace($prop))
-                .$cgi->td({-title=>$title, -style=>'vertical-align:bottom;' }, 
-                        $cgi->pre({style=>'margin:0px; overflow:auto;'},$cgi->escapeHTML($value)))
-                );
-  
-            
-*/            
+            content += "<tr style=\"background-color: + " + bgcolor + "; text-align:left\">";
+            content += "<th title=\"" + namespace + "\" style=\"vertical-align:top;\">" + NamespaceService.nonamespace(prop) + "</th>";
+            content += "<td title=\"" + title + "\" style=\"vertical-align:bottom;\">";
+            content += "<pre style=\"margin:0px; overflow:auto;\">";
+            content += RenderingHelper.HTMLEncode(value);
+            content += "</pre>";
+            content += "</td>";
+            content += "</tr>";
         }
         
         content += "</table>";
@@ -573,18 +561,10 @@ public class GetActionHandler extends AbstractActionHandler {
         OutputService.printHeaderAndContent(requestParams, "200 OK", "text/html", content, params);
     }
     
-
-    // TODO
     private void doFileExists(RequestParams requestParams, String fn) {
         Logger.debug("GET: DOWNLOAD");
         OutputService.printFileHeader(requestParams, fn);
-//      if (open(F,"<$fn")) {
-//          binmode(STDOUT);
-//          while (read(F,my $buffer, $BUFSIZE)>0) {
-//              print $buffer;
-//          }
-//          close(F);
-//      }             
+        OutputService.printContentStream(requestParams, FileOperationsService.getFileContentStream(fn));
     }
     
     public class PropertyComparator implements Comparator<String> {

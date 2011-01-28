@@ -2,18 +2,22 @@ package net.finetunes.ftcldstr.routines.fileoperations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.routines.webdav.LockingService;
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
+import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
 
 
 public class FileHelper {
 	
-	// TODO: find out what all these filename parameters mean
+	// FIXME: find out what all these filename parameters mean
 	public static String getfancyfilename(
 	        RequestParams requestParams,
 			String full, String s,
@@ -131,19 +135,112 @@ public class FileHelper {
 	    return ret;
 	}
 	
-	public static boolean moveToTrash(String filename) {
-		
-		// TODO: implement
-		return false;
-		
+	public static boolean moveToTrash(RequestParams requestParams, String fn) {
+	    
+	    boolean ret = false;
+	    String etag = PropertiesHelper.getETag(requestParams, fn);
+	    etag = etag.replaceAll("\"", "");
+	    String trash = ConfigService.TRASH_FOLDER + etag + "/";
+	    
+	    if (fn.startsWith(ConfigService.TRASH_FOLDER)) {
+	        // delete within trash
+	        ArrayList<String[]> err = new ArrayList<String[]>();
+	        FileHelper.deltree(requestParams, fn, err);
+	        if (err.size() == 0) {
+	            ret = true;
+	        }
+	        
+	        Logger.debug("moveToTrash(" + fn + ")->/dev/null = " + ret);
+	    }
+	    else if (FileOperationsService.file_exits(ConfigService.TRASH_FOLDER) || FileOperationsService.mkdir(ConfigService.TRASH_FOLDER)) {
+	        if (FileOperationsService.file_exits(trash)) {
+	            int i = 0;
+	            while (FileOperationsService.file_exits(trash)) {
+	                // find unused trash folder
+	                trash = ConfigService.TRASH_FOLDER + etag + (i++) + "/"; 
+	            }
+	        }
+	        
+	        if (FileOperationsService.mkdir(trash) && FileOperationsService.rmove(fn, trash + FileOperationsService.basename(fn))) {
+	            ret = true;
+	        }
+	        Logger.debug("moveToTrash(" + fn + ")->" + trash + " = " + ret);
+	    }
+	    
+	    return ret;
 	}
 	
-	// TODO: parameters (seems ok)
-	public static int deltree(String f, ArrayList<String[]> err) {
-		
-		// TODO: implement
-		return -1;
-
+	public static int deltree(RequestParams requestParams, String f, ArrayList<String[]> errRef) {
+	    
+	    if (errRef == null) {
+	        errRef = new ArrayList<String[]>();
+	    }
+	    
+	    int count = 0;
+	    String nf = new String(f);
+	    nf = nf.replaceAll("/$", "");
+	    
+	    if (LockingService.isAllowed(requestParams, f, true)) {
+	        Logger.debug("Cannot delete '" + f + "': not allowed");
+	        errRef.add(new String[] {f, "Cannot delete " + f});
+	    }
+	    else if (FileOperationsService.is_symbolic_link(nf)) {
+	        if (FileOperationsService.unlink(nf)) {
+	            count++;
+	            ConfigService.properties.deleteProperties(f);
+	            ConfigService.locks.deleteLock(f);
+	        }
+	        else {
+	            errRef.add(new String[] {f, "Cannot delete '" + f + "': see log for details"});
+	        }
+	    }
+	    else if (FileOperationsService.is_directory(f)) {
+	        ArrayList<String> files = ReadDirectoryContentWrapper.getFileList(f);
+	        if (files != null) {
+    	        Iterator<String> it = files.iterator();
+    	        while (it.hasNext()) {
+    	            String sf = it.next();
+    	            if (!sf.matches("(\\.|\\.\\.)")) {
+    	                String full = f + sf;
+    	                if (FileOperationsService.is_directory(full) && !full.endsWith("/")) {
+    	                    full += "/";
+    	                }
+    	                count += FileHelper.deltree(requestParams, full, errRef);
+    	            }
+    	        }
+    	        
+    	        if (FileOperationsService.rmdir(f)) {
+    	            count++;
+    	            if (!f.endsWith("/")) {
+    	                f += "/";
+    	            }
+    
+    	            ConfigService.properties.deleteProperties(f);
+    	            ConfigService.locks.deleteLock(f);
+    	        }
+    	        else {
+    	            errRef.add(new String[] {f, "Cannot delete '" + f + "': see log for details"});
+    	        }
+	        }
+	        else {
+	            errRef.add(new String[] {f, "Cannot open '" + f + "': see log for details"});
+	        }
+	    }
+	    else if (FileOperationsService.file_exits(f)) {
+	        if (FileOperationsService.unlink(f)) {
+	            count++;
+	            ConfigService.properties.deleteProperties(f);
+	            ConfigService.locks.deleteLock(f);
+	        }
+	        else {
+	            errRef.add(new String[] {f, "Cannot delete '" + f + "': see log for details"});
+	        }
+	    }
+	    else {
+            errRef.add(new String[] {f, "File/Folder '" + f + "' not found"});
+	    }
+	    
+	    return count;
 	}
 	
 	public static Object[] getQuota() {

@@ -8,6 +8,7 @@ import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.DirectoryOperationsService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesActions;
+import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
 import net.finetunes.ftcldstr.routines.xml.XMLParser;
 import net.finetunes.ftcldstr.routines.xml.XMLService;
 
@@ -39,24 +40,32 @@ public class PropfindActionHandler extends AbstractActionHandler {
         String fn = requestParams.getPathTranslated();
         String status = "207 Multi-Status";
         String type = "text/xml";
-        int noroot = 0;
+        boolean noroot = false;
         
-        String depth = requestParams.getRequest().getHeader("Depth");
-        if (depth == null) {
-            depth = "-1";
+        String depthstr = requestParams.getRequest().getHeader("Depth");
+        if (depthstr == null) {
+            depthstr = "-1";
         }
         
-        depth = depth.replaceFirst(",noroot", ""); // $noroot=1 if $depth =~ s/,noroot//;
-        if (!depth.isEmpty()) {
-            noroot = 1;
+        depthstr = depthstr.replaceFirst(",noroot", ""); // $noroot=1 if $depth =~ s/,noroot//;
+        if (!depthstr.isEmpty()) {
+            noroot = true;
         }
         
-        if (depth.matches("(?i).*infinity.*")) {
-            depth = "-1";
+        if (depthstr.matches("(?i).*infinity.*")) {
+            depthstr = "-1";
         }
         
-        if (depth.equals("-1") && !ConfigService.ALLOW_INFINITE_PROPFIND) {
-            depth = "0";
+        if (depthstr.equals("-1") && !ConfigService.ALLOW_INFINITE_PROPFIND) {
+            depthstr = "0";
+        }
+        
+        int depth = 0;
+        try {
+            depth = Integer.valueOf(depthstr).intValue();
+        }
+        catch (NumberFormatException e) {
+            Logger.log("Exception: invalid depth value: " + depthstr);
         }
         
         String xml = requestParams.getRequestBody();
@@ -83,21 +92,20 @@ public class PropfindActionHandler extends AbstractActionHandler {
         
         String ru = requestParams.getRequestURI();
         ru = ru.replaceAll(" ", "%20");
-        Logger.debug("PROPFIND: depth=" + depth + ", fn=" + fn + ", ru=" + ru + "");
+        Logger.debug("PROPFIND: depth=" + depthstr + ", fn=" + fn + ", ru=" + ru + "");
 
-        // --> my @resps = (); // TODO: ArrayList? of which type then?
-        ArrayList<String> resps = new ArrayList<String>(); 
+        ArrayList<StatusResponse> resps = new ArrayList<StatusResponse>(); 
 
         // ACL, CalDAV, CardDAV, ...:
         if (ConfigService.PRINCIPAL_COLLECTION_SET != null && ConfigService.PRINCIPAL_COLLECTION_SET.length() > 1 &&
                 ru.endsWith(ConfigService.PRINCIPAL_COLLECTION_SET)) {
             fn = fn.replaceAll(Pattern.quote(ConfigService.PRINCIPAL_COLLECTION_SET) + "$", "");
-            depth = "0";
+            depthstr = "0";
         }
         else if (ConfigService.CURRENT_USER_PRINCIPAL != null && ConfigService.CURRENT_USER_PRINCIPAL.length() > 1 &&
                 ru.matches(".*" + Pattern.quote(ConfigService.CURRENT_USER_PRINCIPAL) + "/?")) {
             fn = fn.replaceAll(Pattern.quote(ConfigService.CURRENT_USER_PRINCIPAL) + "/?$", "");
-            depth = "0";
+            depthstr = "0";
         }
         
         if (FileOperationsService.is_hidden(fn)) {
@@ -105,12 +113,14 @@ public class PropfindActionHandler extends AbstractActionHandler {
         }
         else if (FileOperationsService.file_exits(fn)) {
             Object[] propFindElement = PropertiesActions.handlePropFindElement(requestParams, xmldata);
-            String props = (String)propFindElement[0];
-            String all = (String)propFindElement[1];
-            String noval = (String)propFindElement[2];
+            ArrayList<String> props = (ArrayList<String>)propFindElement[0];
+            boolean all = ((Boolean)propFindElement[1]).booleanValue();
+            boolean noval = ((Boolean)propFindElement[2]).booleanValue();
             
             if (props != null) {
-                DirectoryOperationsService.readDirRecursive(/* $fn, $ru, \@resps, $props, $all, $noval, $depth, $noroot */); // TODO: implement
+                DirectoryOperationsService.readDirRecursive(
+                        requestParams,
+                        fn, ru, resps, props, all, noval, depth, noroot);
             }
             else {
                 status = "400 Bad Request";
@@ -124,7 +134,7 @@ public class PropfindActionHandler extends AbstractActionHandler {
         
         String content = "";
         if (resps.size() > 0) {
-            content = XMLService.createXML(null /* { 'multistatus' => { 'response'=>\@resps} } */, false); // TODO: implement, params
+            content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, null /* { 'multistatus' => { 'response'=>\@resps} } */, false); // TODO: implement, params
         }
         // my $content = ($#resps>-1) ? createXML({ 'multistatus' => { 'response'=>\@resps} }) : "" ;
         

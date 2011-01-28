@@ -63,7 +63,9 @@ public class WebDAVLocks implements Serializable {
         return false;
     }
     
-    // db_get
+    /**
+     * db_get
+     */
     public ArrayList<WebDAVLock> getLocks(String fn, String token) {
 
         // PZ: TODO: check this for multi-threading, as the method
@@ -159,7 +161,9 @@ public class WebDAVLocks implements Serializable {
         return ref;   
     }
 
-    // db_insert
+    /**
+     * db_insert
+     */
     public boolean insertLock(String basefn, String fn, 
             String type, String scope, String token, 
             String depth, String timeout, 
@@ -180,7 +184,9 @@ public class WebDAVLocks implements Serializable {
         return locks.add(lock);
     }    
 
-    // db_update
+    /**
+     * db_update
+     */
     public boolean updateLock(String basefn, String fn, String timeout) {
         
         Logger.debug("updateLock(" + basefn + "," + fn + "," + timeout + ")");
@@ -194,7 +200,9 @@ public class WebDAVLocks implements Serializable {
         return false;
     }      
     
-    // db_delete
+    /**
+     * db_delete
+     */
     public boolean deleteLock(String fn, String token) {
         
         Logger.debug("deleteLock(" + fn + "," + token + ")");
@@ -229,6 +237,9 @@ public class WebDAVLocks implements Serializable {
         return true;
     }     
     
+    /**
+     * db_delete
+     */    
     public boolean deleteLock(String fn) {
         return deleteLock(fn, null);
     }
