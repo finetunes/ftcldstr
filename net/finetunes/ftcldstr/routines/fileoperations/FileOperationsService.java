@@ -404,6 +404,35 @@ public class FileOperationsService {
         return false;
     }
 
+    public static boolean rename(String src, String dst) {
+        
+        // TODO: write errors in log if any
+        // as there is no way to get the error code
+        // without passing errRef param in this method        
+        
+        // TODO: implement
+        return false;
+    }    
+    
+    public static String readlink(String fn) {
+        
+        // TODO: write errors in log if any
+        // as there is no way to get the error code
+        // without passing errRef param in this method        
+        
+        // TODO: implement
+        return "";
+    }      
+    
+    public static boolean symlink(String src, String dst) {
+        
+        // TODO: write errors in log if any
+        // as there is no way to get the error code
+        // without passing errRef param in this method        
+        
+        // TODO: implement
+        return false;
+    }          
     
     public class StatData {
 

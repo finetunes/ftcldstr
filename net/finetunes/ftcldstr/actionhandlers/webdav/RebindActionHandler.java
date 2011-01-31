@@ -1,54 +1,86 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.rendering.OutputService;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.xml.XMLParser;
 
 public class RebindActionHandler extends AbstractActionHandler {
 
     public void handle(final RequestParams requestParams) {
-        // TODO: implement
-/*        
-    my ($status,$type,$content) = ('200 OK', undef, undef);
-    my $overwrite = defined $cgi->http('Overwrite')?$cgi->http('Overwrite') : "T";
-    my $xml = join("",<>);
-    my $xmldata = "";
-    my $host = $cgi->http('Host');
-    eval { $xmldata = simpleXMLParser($xml,0); };
-    if ($@) {
-        $status='400 Bad Request';
-        $type='text/plain';
-        $content='400 Bad Request';
-    } else {
-        my $segment = $$xmldata{'{DAV:}segment'};
-        my $href = $$xmldata{'{DAV:}href'};
-        $href=~s/^https?:\/\/\Q$host\E+$VIRTUAL_BASE//;
-        $href=uri_unescape(uri_unescape($href));
-        my $src = $DOCUMENT_ROOT.$href;
-        my $dst = $PATH_TRANSLATED.$segment;
-
-        my $nsrc = $src; $nsrc =~ s/\/$//;
-        my $ndst = $dst; $ndst =~ s/\/$//;
-
-        if (!-e $src) {
-            $status = '404 Not Found';
-        } elsif (!-l $nsrc) { 
-            $status = '403 Forbidden';
-        } elsif (-e $dst && $overwrite ne 'T') {
-            $status = '403 Forbidden';
-        } elsif (-e $dst && !-l $ndst) {
-            $status = '403 Forbidden';
-        } else {
-            $status = -l $ndst ? '204 No Content' : '201 Created';
-            unlink($ndst) if -l $ndst;
-            if (!rename($nsrc, $ndst)) {
-                my $orig = readlink($nsrc);
-                $status = '403 Forbidden' unless symlink($orig, $dst) && unlink($nsrc);
+        
+        String status = "200 OK";
+        String type = "";
+        String content = "";
+        
+        String overwrite = "T";
+        if (requestParams.headerExists("Overwrite")) {
+            overwrite = requestParams.getHeader("Overwrite"); 
+        }
+        
+        String xml = requestParams.getRequestBody();
+        String host = requestParams.getHeader("Host");
+        
+        XMLParser xmlParser = new XMLParser();
+        HashMap<String, Object> xmldata = xmlParser.simpleXMLParser(xml, ConfigService.CHARSET, false);
+        if (xmldata == null || xmldata.size() == 0) {
+            status = "400 Bad Request";
+            type = "text/plain";
+            content = "400 Bad Request";
+        }
+        else {
+            String segment = (String)xmldata.get("{DAV:}segment");
+            String href = (String)xmldata.get("{DAV:}href");
+            
+            href = href.replaceFirst("^https?://" + Pattern.quote(host) + "+" + ConfigService.VIRTUAL_BASE, "");
+            href = RenderingHelper.uri_unescape(RenderingHelper.uri_unescape(href));
+            String src = ConfigService.DOCUMENT_ROOT + href;
+            String dst = requestParams.getPathTranslated() + segment;
+            
+            String nsrc = new String(src).replaceFirst("/$", "");
+            String ndst = new String(dst).replaceFirst("/$", "");
+            
+            if (!FileOperationsService.file_exits(src)) {
+                status = "404 Not Found";
+            }
+            else if (!FileOperationsService.is_symbolic_link(nsrc)) {
+                status = "403 Forbidden";
+            }
+            else if (FileOperationsService.file_exits(dst) && !overwrite.equals("T")) {
+                status = "403 Forbidden";
+            }
+            else if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_symbolic_link(ndst)) {
+                status = "403 Forbidden";
+            }
+            else {
+                if (FileOperationsService.is_symbolic_link(ndst)) {
+                    status = "204 No Content";
+                }
+                else {
+                    status = "201 Created";
+                }
+                
+                if (FileOperationsService.is_symbolic_link(ndst)) {
+                    FileOperationsService.unlink(ndst);
+                }
+                
+                if (!FileOperationsService.rename(nsrc, ndst)) {
+                    String orig = FileOperationsService.readlink(nsrc);
+                    if (!(FileOperationsService.symlink(orig, dst) && FileOperationsService.unlink(nsrc))) {
+                        status = "403 Forbidden";
+                    }
+                }
+                 
             }
         }
-    }
-    printHeaderAndContent($status, $type, $content);
         
-*/        
+        OutputService.printHeaderAndContent(requestParams, status, type, content);
     }
     
 }

@@ -23,6 +23,10 @@ public class XMLParser {
 	
 	// TODO: XML object should be returned here
     // requestParams.getRequest().getCharacterEncoding()
+    
+    // error control: returned null means some parsing error occured or input text was null
+    // empty hashmap if input text was empty
+    // hashmap with data if everything was ok
 	public HashMap<String, Object> simpleXMLParser(String text, String encoding, boolean keepRoot) {
 		
 	    if (text != null) {
@@ -31,38 +35,43 @@ public class XMLParser {
 	            encoding = ConfigService.CHARSET;
 	        }
 	        
-	        try {
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                InputStream is = new ByteArrayInputStream(text.getBytes(encoding));
-                Document doc = db.parse(is);
-                doc.getDocumentElement().normalize();
-                
-                HashMap<String, Object> outXml = new HashMap<String, Object>();
-                NodeList nodes = doc.getChildNodes();
-                XMLIn in = new XMLIn();
-                in.addXml(outXml, nodes.item(0));
-                
-                return outXml;
+            HashMap<String, Object> outXml = new HashMap<String, Object>();
+	        if (!text.isEmpty()) {
+	            try {
+	                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	                DocumentBuilder db = dbf.newDocumentBuilder();
+	                InputStream is = new ByteArrayInputStream(text.getBytes(encoding));
+	                Document doc = db.parse(is);
+	                doc.getDocumentElement().normalize();
+	                
+	                NodeList nodes = doc.getChildNodes();
+	                XMLIn in = new XMLIn();
+	                in.addXml(outXml, nodes.item(0));
+	            }
+	            catch (ParserConfigurationException e) {
+	                Logger.log("Exception on xml parsing: " + e.getMessage());
+	                return null;
+	            }
+	            catch (UnsupportedEncodingException e) {
+	                Logger.log("Exception on xml parsing: " + e.getMessage());
+	                return null;
+	            }
+	            catch (SAXException e) {
+	                Logger.log("Exception on xml parsing: " + e.getMessage());
+	                return null;
+	            }
+	            catch (IOException e) {
+	                Logger.log("Exception on xml parsing: " + e.getMessage());
+	                return null;
+	            }	            
 	        }
-	        catch (ParserConfigurationException e) {
-	            Logger.log("Exception on xml parsing: " + e.getMessage());
-	            return null;
-	        }
-	        catch (UnsupportedEncodingException e) {
-                Logger.log("Exception on xml parsing: " + e.getMessage());
-	            return null;
-	        }
-	        catch (SAXException e) {
-                Logger.log("Exception on xml parsing: " + e.getMessage());
-                return null;
-	        }
-	        catch (IOException e) {
-                Logger.log("Exception on xml parsing: " + e.getMessage());
-                return null;
-	        }
+            return outXml;
 	    }
 	    return null;
+	}
+	
+	public HashMap<String, Object> simpleXMLParser(String text, String encoding) {
+	    return simpleXMLParser(text, encoding, false);
 	}
 
     public class XMLIn{

@@ -40,6 +40,7 @@ import net.finetunes.ftcldstr.helper.GeneratorService;
 import net.finetunes.ftcldstr.helper.InitializationService;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
+import net.finetunes.ftcldstr.routines.xml.XMLParser;
 
 
 public class ActionServlet extends MServlet {

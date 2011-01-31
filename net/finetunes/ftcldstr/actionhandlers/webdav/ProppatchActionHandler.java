@@ -12,6 +12,7 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.handlers.PropertyRequestHandler;
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
 import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
+import net.finetunes.ftcldstr.routines.xml.XMLParser;
 import net.finetunes.ftcldstr.routines.xml.XMLService;
 
 /**
@@ -36,7 +37,7 @@ public class ProppatchActionHandler extends AbstractActionHandler {
         String type = "text/plain";
         String content = "";
         
-        if (FileOperationsService.file_exits(fn) && !LockingService.isAllowed(requestParams, fn)) { // TODO: implement isAllowed method
+        if (FileOperationsService.file_exits(fn) && !LockingService.isAllowed(requestParams, fn)) {
             status = "423 Locked";
         }
         else if (FileOperationsService.file_exits(fn)) {
@@ -45,26 +46,27 @@ public class ProppatchActionHandler extends AbstractActionHandler {
             
             Logger.debug("PROPPATCH: REQUEST: " + xml);
   
-            HashMap<String, Object> dataRef = null; 
-/*
- * TODO
-        eval { $dataRef = simpleXMLParser($xml) };  
-        if ($@) {
-            debug("_PROPPATCH: invalid XML request: $@");
-            printHeaderAndContent('400 Bad Request');
-            return;
-        }
-*/        
+            XMLParser xmlParser = new XMLParser();
+            HashMap<String, Object> dataRef = xmlParser.simpleXMLParser(xml, ConfigService.CHARSET);
+            if (dataRef == null || dataRef.size() == 0) {
+                Logger.debug("PROPPATCH: invalid XML request: " + xml);
+                OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
+                return;
+            }
             
-            // TODO: set types
+            ArrayList<StatusResponse> resps = new ArrayList<StatusResponse>();
             StatusResponse resp_200 = null;
             StatusResponse resp_403 = null;
             
-            PropertyRequestHandler.handlePropertyRequest(requestParams, xml, dataRef, resp_200, resp_403); // TODO: implement
+            PropertyRequestHandler.handlePropertyRequest(requestParams, xml, dataRef, resp_200, resp_403);
 
-            // TODO: datatypes?
-            // push @resps, \%resp_200 if defined $resp_200{href};
-            // push @resps, \%resp_403 if defined $resp_403{href};
+            if (resp_200 != null && resp_200.getHref() != null) {
+                resps.add(resp_200);
+            }
+            
+            if (resp_200 != null && resp_200.getHref() != null) {
+                resps.add(resp_200);
+            }
             
             status = "207 Multi-Status";
             type = "text/xml";

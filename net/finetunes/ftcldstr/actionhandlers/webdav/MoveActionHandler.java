@@ -8,8 +8,6 @@ import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
-import net.finetunes.ftcldstr.serialization.BasicRoutines;
-import net.finetunes.ftcldstr.serialization.DBPropertiesOperations;
 
 /**
  * The MOVE operation on a non-collection resource is the logical

@@ -9,7 +9,6 @@ import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
-import net.finetunes.ftcldstr.rendering.RenderingService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.handlers.SupportedMethodsHandler;
 

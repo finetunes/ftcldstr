@@ -1,6 +1,5 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
-import sun.awt.SunGraphicsCallback.PrintHeavyweightComponentsCallback;
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.helper.Logger;

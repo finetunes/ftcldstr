@@ -1,14 +1,20 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.rendering.OutputService;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.xml.XMLParser;
 
 public class BindActionHandler extends AbstractActionHandler {
 
     public void handle(final RequestParams requestParams) {
         
-        String fn = requestParams.getPathTranslated();
         String status = "200 OK";
         String type = null;
         String content = null;
@@ -19,43 +25,55 @@ public class BindActionHandler extends AbstractActionHandler {
         }
         
         String xml = requestParams.getRequestBody();
-        String xmldata = "";
         String host = requestParams.getHeader("Host");
         
-/*
- * TODO: try/except, etc.        
-        eval { $xmldata = simpleXMLParser($xml,0); };
-        if ($@) {
-            $status='400 Bad Request';
-            $type='text/plain';
-            $content='400 Bad Request';
-        } else {
-            my $segment = $$xmldata{'{DAV:}segment'};
-            my $href = $$xmldata{'{DAV:}href'};
-            $href=~s/^https?:\/\/\Q$host\E+$VIRTUAL_BASE//;
-            $href=uri_unescape(uri_unescape($href));
-            my $src = $DOCUMENT_ROOT.$href;
-            my $dst = $PATH_TRANSLATED.$segment;
+        XMLParser xmlParser = new XMLParser();
+        HashMap<String, Object> xmldata = xmlParser.simpleXMLParser(xml, ConfigService.CHARSET, false);
+        if (xmldata == null || xmldata.size() == 0) {
+            status = "400 Bad Request";
+            type = "text/plain";
+            content = "400 Bad Request";
+        }
+        else {
 
-            my $ndst = $dst;
-            $ndst=~s /\/$//;
-
-            if (!-e $src) { 
-                $status ='404 Not Found';
-            } elsif ( -e $dst && ! -l $ndst) {
-                $status = '403 Forbidden';
-            } elsif (-e $dst && -l $ndst && $overwrite eq "F") {
-                $status = '403 Forbidden';
-            } else {
-                $status = -l $ndst ? '204 No Content' : '201 Created';
-                unlink($ndst) if -l $ndst;
-                $status = '403 Forbidden' if (!symlink($src, $dst));
+            String segment = (String)xmldata.get("{DAV:}segment");
+            String href = (String)xmldata.get("{DAV:}href");
+            
+            href = href.replaceFirst("^https?://" + Pattern.quote(host) + "+" + ConfigService.VIRTUAL_BASE, "");
+            href = RenderingHelper.uri_unescape(RenderingHelper.uri_unescape(href));
+            String src = ConfigService.DOCUMENT_ROOT + href;
+            String dst = requestParams.getPathTranslated() + segment;
+            
+            String ndst = new String(dst).replaceFirst("/$", "");
+            
+            if (!FileOperationsService.file_exits(src)) {
+                status = "404 Not Found";
+            }
+            else if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_symbolic_link(ndst)) {
+                status = "403 Forbidden";
+            }
+            else if (FileOperationsService.file_exits(dst) && FileOperationsService.is_symbolic_link(ndst) &&
+                    overwrite.equals("F")) {
+                status = "403 Forbidden";
+            }
+            else {
+                if (FileOperationsService.is_symbolic_link(ndst)) {
+                    status = "204 No Content";
+                }
+                else {
+                    status = "201 Created";
+                }
+                
+                if (FileOperationsService.is_symbolic_link(ndst)) {
+                    FileOperationsService.unlink(ndst);
+                }
+                
+                if (!FileOperationsService.symlink(src, dst)) {
+                    status = "403 Forbidden";
+                }
             }
         }
-*/
         
         OutputService.printHeaderAndContent(requestParams, status, type, content);
-        
     }    
-    
 }
