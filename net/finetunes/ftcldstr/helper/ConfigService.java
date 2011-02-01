@@ -341,12 +341,18 @@ public class ConfigService {
         'CREATE INDEX IF NOT EXISTS webdav_props_idx1 ON webdav_props (fn)',
         'CREATE INDEX IF NOT EXISTS webdav_props_idx2 ON webdav_props (fn,propname)',
         );
-
-    ## -- DEFAULT_LOCK_OWNER
-    ## lock owner if not given by client
-    ## EXAMPLE: $DEFAULT_LOCK_OWNER=$ENV{REMOTE_USER}.'@'.$ENV{REMOTE_ADDR}; ## loggin user @ ip
-    $DEFAULT_LOCK_OWNER= { href=> ($ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}).'@'.$ENV{REMOTE_ADDR} };
 */
+    /*
+     * -- DEFAULT_LOCK_OWNER
+     * lock owner if not given by client
+     * EXAMPLE: $DEFAULT_LOCK_OWNER=$ENV{REMOTE_USER}.'@'.$ENV{REMOTE_ADDR}; ## loggin user @ ip
+     */
+    public static final Map<String, Object> DEFAULT_LOCK_OWNER =
+        Collections.unmodifiableMap(new HashMap<String, Object>() {{
+            // TODO: put proper value instead of "user@host"
+            // { href=> ($ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}).'@'.$ENV{REMOTE_ADDR} }
+            put("href", "user@host");
+        }});              
     
     /*
      * -- CHARSET

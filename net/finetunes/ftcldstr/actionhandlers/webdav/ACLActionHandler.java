@@ -13,6 +13,7 @@ import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
 import net.finetunes.ftcldstr.routines.xml.XMLParser;
 
@@ -39,7 +40,7 @@ public class ACLActionHandler extends AbstractActionHandler {
         else if (!FileOperationsService.file_exits(fn)) {
             status = "404 Not Found";
             type = "text/plain";
-            content = "404 Not Found";            
+            content = "404 Not Found";
         }
         else if (!LockingService.isAllowed(requestParams, fn)) {
             status = "423 Locked";
@@ -72,22 +73,21 @@ public class ACLActionHandler extends AbstractActionHandler {
             while (it.hasNext()) {
                 HashMap<String, Object> ac = it.next();
 
-                // my $p; // TODO: type
                 HashMap<String, Object> p;
-                int user = 0;
-                int group = 0;
-                int other = 0;
+                boolean user = false;
+                boolean group = false;
+                boolean other = false;
                 
                 p = (HashMap<String, Object>)ac.get("{DAV:}principal");
                 if (p != null) {
                     if (p.get("{DAV:}property") instanceof HashMap<?, ?> && ((HashMap<String, Object>)p.get("{DAV:}property")).containsKey("{DAV:}owner")) {
-                        user = 1;
+                        user = true;
                     }
                     else if (p.get("{DAV:}property") instanceof HashMap<?, ?> && ((HashMap<String, Object>)p.get("{DAV:}property")).containsKey("{DAV:}group")) {
-                        group = 1;
+                        group = true;
                     }
                     else if (p.containsKey("{DAV:}all")) {
-                        other = 1;
+                        other = true;
                     }
                     else {
                         OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
@@ -102,49 +102,87 @@ public class ACLActionHandler extends AbstractActionHandler {
                 int read = 0;
                 int write = 0;
                 
-                /*        
-                 * TODO:
-                     my ($read,$write) = (0,0);
-                    if (exists $$ace{'{DAV:}grant'}) {
-                        $read=1 if exists $$ace{'{DAV:}grant'}{'{DAV:}privilege'}{'{DAV:}read'};
-                        $write=1 if exists $$ace{'{DAV:}grant'}{'{DAV:}privilege'}{'{DAV:}write'};
-                    } elsif (exists $$ace{'{DAV:}deny'}) {
-                        $read=-1 if exists $$ace{'{DAV:}deny'}{'{DAV:}privilege'}{'{DAV:}read'};
-                        $write=-1 if exists $$ace{'{DAV:}deny'}{'{DAV:}privilege'}{'{DAV:}write'};
-                    } else {
-                        printHeaderAndContent('400 Bad Request');
-                        return;
-                        
+                if (ac.containsKey("{DAV:}grant")) {
+                    if (ac.get("{DAV:}grant") != null &&
+                            ((HashMap<String, Object>)ac.get("{DAV:}grant")).get("{DAV:}privilege") != null &&
+                            ((HashMap<String, Object>)((HashMap<String, Object>)ac.get("{DAV:}grant")).get("{DAV:}privilege")).containsKey("{DAV:}read")) {
+                        read = 1;
                     }
-                    if ($read==0 && $write==0) {
-                        printHeaderAndContent('400 Bad Request');
-                        return;
+                    if (ac.get("{DAV:}grant") != null &&
+                            ((HashMap<String, Object>)ac.get("{DAV:}grant")).get("{DAV:}privilege") != null &&
+                            ((HashMap<String, Object>)((HashMap<String, Object>)ac.get("{DAV:}grant")).get("{DAV:}privilege")).containsKey("{DAV:}write")) {
+                        write = 1;
                     }
-                    my @stat = stat($fn);
-                    my $mode = $stat[2];
-                    $mode = $mode & 07777;
-                    
-                    my $newperm = $mode;
-                    if ($read!=0) {
-                        my $mask = $user? 0400 : $group ? 0040 : 0004;
-                        $newperm = ($read>0) ? $newperm | $mask : $newperm & ~$mask
-                    } 
-                    if ($write!=0) {
-                        my $mask = $user? 0200 : $group ? 0020 : 0002;
-                        $newperm = ($write>0) ? $newperm | $mask : $newperm & ~$mask;
+                }
+                else if (ac.containsKey("{DAV:}deny")) {
+                    if (ac.get("{DAV:}deny") != null &&
+                            ((HashMap<String, Object>)ac.get("{DAV:}deny")).get("{DAV:}privilege") != null &&
+                            ((HashMap<String, Object>)((HashMap<String, Object>)ac.get("{DAV:}deny")).get("{DAV:}privilege")).containsKey("{DAV:}read")) {
+                        read = -1;
                     }
-                    debug("_ACL: old perm=".sprintf('%4o',$mode).", new perm=".sprintf('%4o',$newperm));
-                    if (!chmod($newperm, $fn)) {
-                        $status='403 Forbidden';
-                        $type='text/plain';
-                        $content='403 Forbidden';
+                    if (ac.get("{DAV:}deny") != null &&
+                            ((HashMap<String, Object>)ac.get("{DAV:}deny")).get("{DAV:}privilege") != null &&
+                            ((HashMap<String, Object>)((HashMap<String, Object>)ac.get("{DAV:}deny")).get("{DAV:}privilege")).containsKey("{DAV:}write")) {
+                        write = -1;
                     }
-        */                     
+                }
+                else {
+                    OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
+                    return;
+                }
                 
+                StatData stat = FileOperationsService.stat(fn);
+                int mode = stat.getMode();
+                mode = mode & 07777;
+                
+                int newperm = mode;
+                if (read != 0) {
+                    int mask;
+                    if (user) {
+                        mask = 0400;
+                    }
+                    else if (group) {
+                        mask = 0040;
+                    }
+                    else {
+                        mask = 0004;
+                    }
+                    if (read > 0) {
+                        newperm = newperm | mask;
+                    }
+                    else {
+                        newperm = newperm & ~mask;
+                    }
+                }
+                if (write != 0) {
+                    int mask;
+                    if (user) {
+                        mask = 0200;
+                    }
+                    else if (group) {
+                        mask = 0020;
+                    }
+                    else {
+                        mask = 0002;
+                    }
+                    if (write > 0) {
+                        newperm = newperm | mask;
+                    }
+                    else {
+                        newperm = newperm & ~mask;
+                    }
+                }
+                
+                Logger.debug("ACL: old perm=" + String.format("%4o", mode) + ", new perm=" + String.format("%4o", newperm));
+                
+                if (!FileOperationsService.chmod(newperm, fn)) {
+                    status = "403 Forbidden";
+                    type = "text/plain";
+                    content = "403 Forbidden";
+                }
             }
         }
    
-        // TODO: implement
         OutputService.printHeaderAndContent(requestParams, status, type, content);
     }
     

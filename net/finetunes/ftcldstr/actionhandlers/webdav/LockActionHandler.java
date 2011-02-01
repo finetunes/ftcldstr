@@ -12,6 +12,7 @@ import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
+import net.finetunes.ftcldstr.routines.xml.XMLParser;
 import net.finetunes.ftcldstr.routines.xml.XMLService;
 
 /**
@@ -52,8 +53,15 @@ public class LockActionHandler extends AbstractActionHandler {
         HashMap<String, String> addheader = new HashMap<String, String>();
         
         String xml = requestParams.getRequestBody();
-        // my $xmldata = $xml ne "" ? simpleXMLParser($xml) : { }; // TODO
-        Object xmldata = null;
+        HashMap<String, Object> xmldata = null;
+        if (xml != null && !xml.isEmpty()) {
+            XMLParser xmlParser = new XMLParser();
+            xmldata = xmlParser.simpleXMLParser(xml, ConfigService.CHARSET);
+        }
+        else {
+            xmldata = new HashMap<String, Object>();
+        }
+        
         
         String token = "opaquelocktoken:" + GeneratorService.getuuid(fn);
         if (!FileOperationsService.file_exits(fn) && !FileOperationsService.file_exits(FileOperationsService.dirname(fn))) {
@@ -64,7 +72,7 @@ public class LockActionHandler extends AbstractActionHandler {
             Logger.debug("LOCK: not lockable ... but...");
             if (LockingService.isAllowed(requestParams, fn)) {
                 status = "200 OK";
-                // LockingService.lockResource();
+                // LockingService.lockResource(); // TODO
                 // lockResource($fn, $ru, $xmldata, $depth, $timeout, $token); // TODO
                 content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, /* {prop=>{lockdiscovery => getLockDiscovery($fn)}}  */ null); // TODO 
             }

@@ -181,6 +181,10 @@ public class WebDAVLocks implements Serializable {
         lock.setTimeout(timeout);
         lock.setOwner(owner);
         
+        if (locks.contains(lock)) {
+            return false;
+        }
+        
         return locks.add(lock);
     }    
 

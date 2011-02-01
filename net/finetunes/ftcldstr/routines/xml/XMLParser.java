@@ -27,6 +27,8 @@ public class XMLParser {
     // error control: returned null means some parsing error occured or input text was null
     // empty hashmap if input text was empty
     // hashmap with data if everything was ok
+    
+    // TODO: update arrays to array lists
 	public HashMap<String, Object> simpleXMLParser(String text, String encoding, boolean keepRoot) {
 		
 	    if (text != null) {

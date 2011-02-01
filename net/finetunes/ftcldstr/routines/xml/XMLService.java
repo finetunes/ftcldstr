@@ -99,9 +99,9 @@ public class XMLService {
                         w.setData(w.getData().concat("<" + ns + ":" + el + nsd + attr + "/>"));
                     }
                 } 
-                else if (d.get(e).getClass().isArray()) {
-                    for (int l = 0; l < Array.getLength(d.get(e)); l++) {
-                        Object e1 = Array.get(d.get(e), l);
+                else if (d.get(e) instanceof ArrayList<?>) {
+                    for (int l = 0; l < ((ArrayList<Object>)d.get(e)).size(); l++) {
+                        Object e1 = ((ArrayList<Object>)d.get(e)).get(l); 
                         XMLData tmpw = new XMLData();
                         tmpw.setData("");
                         createXMLData(namespaceElements, tmpw, e1, xmlns);
@@ -145,9 +145,9 @@ public class XMLService {
                     }
                 }
             }
-        } else if (dd.getClass().isArray()) {
-            for (int i = 0; i < Array.getLength(dd); i++) {
-                createXMLData(namespaceElements, w, Array.get(dd, i), xmlns);
+        } else if (dd instanceof ArrayList<?>) {
+            for (int i = 0; i < ((ArrayList<Object>)dd).size(); i++) {
+                createXMLData(namespaceElements, w, ((ArrayList<Object>)dd).get(i), xmlns);
             }
         } else if (dd.getClass().isPrimitive()) {
             w.setData(w.getData().concat((String)dd));

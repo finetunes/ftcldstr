@@ -11,6 +11,7 @@ import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks.WebDAVLock;
+import net.finetunes.ftcldstr.routines.xml.XMLService;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryResult;
 
@@ -164,10 +165,155 @@ public class LockingService {
 	}
 	
 	// TODO: parameters and return type
-	public static Object lockResource() {
+	public static HashMap<String, Object> lockResource(String fn, String ru, HashMap<String, Object> xmldata, 
+	        int depth, int timeout, String token, String base, ArrayList<String> visited) {
+	    
+	    HashMap<String, Object> resp = new HashMap<String, Object>();
+        HashMap<String, Object> prop = new HashMap<String, Object>();
+	    
+	    Logger.debug("lockResource(fn=" + fn + ",ru=" + ru + ",depth=" + depth + ",timeout=" + timeout + ",token=" + token + ",base=" + base + ")");
+
+	    HashMap<String, Object> activelock = new HashMap<String, Object>();
+	    
+        Set<String> locktypes = null;
+	    if (xmldata.get("{DAV:}locktype") != null && xmldata.get("{DAV:}locktype") instanceof HashMap<?, ?>) {
+	        locktypes = ((HashMap<String, Object>)xmldata.get("{DAV:}locktype")).keySet();
+	    }
+             
+        Set<String> lockscopes = null;
+        if (xmldata.get("{DAV:}lockscope") != null && xmldata.get("{DAV:}lockscope") instanceof HashMap<?, ?>) {
+            lockscopes = ((HashMap<String, Object>)xmldata.get("{DAV:}lockscope")).keySet();
+        }
+        
+        String locktype = null;
+        if (locktypes != null && locktypes.size() > 0) {
+            locktype = (String)locktypes.toArray()[0];
+        }
+        
+        String lockscope = null;
+        if (lockscopes != null && lockscopes.size() > 0) {
+            lockscope = (String)lockscopes.toArray()[0];
+        }
+        
+        HashMap<String, Object> dataRef = new HashMap<String, Object>();
+        if (xmldata.containsKey("{DAV:}owner")) {
+            dataRef = (HashMap<String, Object>)xmldata.get("{DAV:}owner");
+        }
+        else {
+            dataRef = new HashMap<String, Object>(ConfigService.DEFAULT_LOCK_OWNER); 
+        }
+        
+        String owner = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, dataRef, false);
+        
+        locktype = locktype.replaceFirst("{[^}]+}", "");
+        lockscope = lockscope.replaceFirst("{[^}]+}", "");
+        
+        HashMap<String, Object> locktypekey = new HashMap<String, Object>();
+        locktypekey.put(locktype, null);
+        HashMap<String, Object> lockscopekey = new HashMap<String, Object>();
+        lockscopekey.put(lockscope, null);
+        HashMap<String, Object> locktokenkey = new HashMap<String, Object>();
+        locktokenkey.put("href", token);
+        activelock.put("locktype", locktypekey);
+        activelock.put("lockscope", lockscopekey);
+        activelock.put("locktoken", locktokenkey);
+        activelock.put("depth", depth);
+        activelock.put("lockroot", ru);
+        
+        String basefn = fn;
+        if (base != null) {
+            basefn = base;
+        }
+        if (ConfigService.locks.insertLock(basefn, fn, locktype, lockscope, token, String.valueOf(depth), String.valueOf(timeout), owner)) {
+            prop.put("activelock", activelock);
+        }
+        else if (ConfigService.locks.updateLock(basefn, fn, String.valueOf(timeout))) {
+            prop.put("activelock", activelock);
+        }
+        else {
+            int n = 0;
+            
+            HashMap<String, Object> multistatus = null; 
+            if (!resp.containsKey("multistatus")) {
+                multistatus = new HashMap<String, Object>();
+                resp.put("multistatus", multistatus);
+            }
+            else {
+                multistatus = (HashMap<String, Object>)resp.get("multistatus");
+            }
+            
+            ArrayList<Object> response = null;
+            if (!multistatus.containsKey("response") && multistatus.get("response") != null) {
+                 response = new ArrayList<Object>();
+                 multistatus.put("response", response);
+            }
+            else {
+                response = (ArrayList<Object>)multistatus.get("response");
+            }
+            
+            HashMap<String, Object> r = new HashMap<String, Object>();
+            r.put("href", ru);
+            r.put("status", "HTTP/1.1 403 Forbidden");
+            response.add(r);
+        }
+        
+        String nfn = FileOperationsService.full_resolve(fn);
+        
+        if (visited == null) {
+            visited = new ArrayList<String>();
+        }
+        
+        if (visited.contains(nfn)) {
+            return resp;
+        }
+        
+        visited.add(nfn);
+        
+        if (FileOperationsService.is_directory(fn) && (depth == Integer.MAX_VALUE || depth > 0)) {
+            Logger.debug("lockResource: depth=" + depth);
+/*            
+ * // TODO
+ * 
+            if (opendir(DIR,$fn)) {
+
+            foreach my $f ( grep { !/^(\.|\.\.)$/ } readdir(DIR)) {
+                my $nru = $ru.$f;
+                my $nfn = $fn.$f;
+                $nru.='/' if -d $nfn;
+                $nfn.='/' if -d $nfn;
+                debug("lockResource: $nfn, $nru");
+                my $subreqresp = lockResource($nfn, $nru, $xmldata, lc($depth) eq 'infinity'?$depth:$depth-1, $timeout, $token, defined $base?$base:$fn, $visited);
+                if (defined $$subreqresp{multistatus}) {
+                    push @{$resp{multistatus}{response}}, @{$$subreqresp{multistatus}{response}};
+                } else {
+                    push @prop, @{$$subreqresp{prop}{lockdiscovery}} if exists $$subreqresp{prop};
+                }
+            }
+            closedir(DIR);
+        } else {
+            my $n = $#{$resp{multistatus}{response}} +1;
+            $resp{multistatus}{response}[$n]{href}=$ru;
+            $resp{multistatus}{response}[$n]{status}='HTTP/1.1 403 Forbidden';
+        }
+*/            
+        }
+        
+/*
+ *         
+
+// TODO
+    $resp{multistatus}{response}[$#{$resp{multistatus}{response}} +1]{propstat}{prop}{lockdiscovery}=\@prop if defined $resp{multistatus} && $#prop>-1;
+    $resp{prop}{lockdiscovery}=\@prop unless defined $resp{multistatus};
+    
+    return \%resp;	 
+	    
+	    */
+	    
         // TODO: implement
-	    throw new RuntimeException("Not Implemented. TODO: implement");
-		// return null;
+        // throw new RuntimeException("Not Implemented. TODO: implement");
+        // return null;
+
+	    return null;
 	}
 	
 	
