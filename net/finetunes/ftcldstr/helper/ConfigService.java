@@ -436,11 +436,15 @@ public class ConfigService {
      */
     public static final boolean ENABLE_CARDDAV = true;
 
-/*
-    ## -- ADDRESSBOOK_HOME_SET
-    ## maps UID numbers or remote users to addressbook folders 
-    %ADDRESSBOOK_HOME_SET = ( default=> '/',  1000 => '/carddav/'  );
-*/
+    /*
+     * -- ADDRESSBOOK_HOME_SET
+     * maps UID numbers or remote users to addressbook folders
+     */  
+    public static final Map<String, String> ADDRESSBOOK_HOME_SET = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{
+            put("default", "/");
+            put("1000", "/carddav/");
+        }});       
     
     /*
      * -- ENABLE_TRASH

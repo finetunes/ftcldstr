@@ -1,22 +1,22 @@
 package net.finetunes.ftcldstr.routines.xml;
 
-import org.w3c.dom.Element;
+import java.util.HashMap;
+
+import net.finetunes.ftcldstr.helper.ConfigService;
 
 public class XMLHelper {
 	
-	public static String convXML2Str(Element xml) {
+	public static String convXML2Str(HashMap<String, Object> xml) {
 		
-		// TODO: implement
-		return null;
-		
+	    if (xml != null) {
+	        String x = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, xml, true);
+	        if (x != null) {
+	            return x.toLowerCase();
+	        }
+	        
+	        return x;
+	    }
+	    
+	    return null;
 	}
-	
-	// sorting comparator
-	public static int cmp_elements() {
-		
-		// TODO: implement
-		return 0;
-		
-	}
-
 }

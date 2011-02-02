@@ -17,6 +17,20 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.Stat
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
 import net.finetunes.ftcldstr.routines.xml.XMLParser;
 
+/**
+ * The ACL method modifies the access control list (which can be read
+ * via the DAV:acl property) of a resource.  Specifically, the ACL
+ * method only permits modification to ACEs that are not inherited, and
+ * are not protected.  An ACL method invocation modifies all non-
+ * inherited and non-protected ACEs in a resource's access control list
+ * to exactly match the ACEs contained within in the DAV:acl XML element
+ * of the request body.
+ * 
+ * Description from RFC 3744 (C) The Internet Society (2004).
+ * http://www.ietf.org/rfc/rfc3744.txt
+ * 
+ */
+
 public class ACLActionHandler extends AbstractActionHandler {
 
     public void handle(final RequestParams requestParams) {

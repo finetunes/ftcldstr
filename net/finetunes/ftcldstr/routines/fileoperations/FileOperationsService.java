@@ -434,6 +434,21 @@ public class FileOperationsService {
         return false;
     }          
     
+    // creates a new file (or rewrites exising and writes content into it)
+    // e. g.:
+    // open(F,">$fn")
+    // print F '';
+    // close(F);
+    public static boolean create_file(String fn, String content) {
+        
+        // TODO: write errors in log if any
+        // as there is no way to get the error code
+        // without passing errRef param in this method        
+        
+        // TODO: implement
+        return false;
+    }          
+    
     public class StatData {
 
         // $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks

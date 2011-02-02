@@ -8,11 +8,16 @@ import net.finetunes.ftcldstr.routines.webdav.LockingService;
 
 /**
  * The UNLOCK method removes the lock identified by the lock token in
- * the Lock-Token request header.  The Request-URI MUST identify a
- * resource within the scope of the lock.
+ * the Lock-Token request header from the Request-URI, and all other
+ * resources included in the lock.  If all resources which have been
+ * locked under the submitted lock token can not be unlocked then the
+ * UNLOCK request MUST fail.
  * 
- * Description from RF4918 (c) The IETF Trust (2007).
- * http://www.ietf.org/rfc/rfc4918.txt
+ * Any DAV compliant resource which supports the LOCK method MUST
+ * support the UNLOCK method.
+ * 
+ * Description from RFC2518 (c) The Internet Society (1999).
+ * http://www.ietf.org/rfc/rfc2518.txt
  * 
  */
 

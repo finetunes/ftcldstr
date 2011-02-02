@@ -11,6 +11,20 @@ import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.xml.XMLParser;
 
+/**
+ * The BIND method modifies the collection identified by the Request-
+ * URI, by adding a new binding from the segment specified in the BIND
+ * body to the resource identified in the BIND body.
+ * 
+ * If a server cannot guarantee the integrity of the binding, the BIND
+ * request MUST fail.
+ * 
+ * Description from RFC5842 (c) 2010 IETF Trust and the persons identified 
+ * as the document authors
+ * http://www.ietf.org/rfc/rfc5842.txt
+ * 
+ */
+
 public class BindActionHandler extends AbstractActionHandler {
 
     public void handle(final RequestParams requestParams) {

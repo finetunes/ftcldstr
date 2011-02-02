@@ -11,6 +11,20 @@ import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.xml.XMLParser;
 
+/**
+ * The REBIND method removes a binding to a resource from a collection,
+ * and adds a binding to that resource into the collection identified by
+ * the Request-URI.  The request body specifies the binding to be added
+ * (segment) and the old binding to be removed (href).  It is
+ * effectively an atomic form of a MOVE request, and MUST be treated the
+ * same way as MOVE for the purpose of determining access permissions.
+ * 
+ * Description from RFC5842 (c) 2010 IETF Trust and the persons identified 
+ * as the document authors
+ * http://www.ietf.org/rfc/rfc5842.txt
+ * 
+ */
+
 public class RebindActionHandler extends AbstractActionHandler {
 
     public void handle(final RequestParams requestParams) {

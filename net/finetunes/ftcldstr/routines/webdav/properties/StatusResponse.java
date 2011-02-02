@@ -2,6 +2,7 @@ package net.finetunes.ftcldstr.routines.webdav.properties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class StatusResponse {
     
@@ -118,6 +119,9 @@ public class StatusResponse {
         this.propstat = propstat;
     }
     
+    public StatusResponse getPropstat() {
+        return propstat;
+    }    
     
 //    public StatusResponse() {
 //        
@@ -158,6 +162,43 @@ public class StatusResponse {
     $$resp_200{prop}{supportedlock}{lockentry}[1]{locktype}{write}=undef;
 */    
     
+
+    public static ArrayList<HashMap<String, Object>> statusResponseListToHashMap(ArrayList<StatusResponse> list) {
+        
+        if (list != null) {
+            ArrayList<HashMap<String, Object>> r = new ArrayList<HashMap<String,Object>>();
+            Iterator<StatusResponse> it = list.iterator();
+            
+            while (it.hasNext()) {
+                StatusResponse s = it.next();
+                HashMap<String, Object> h = statusResponseToHashMap(s);
+                r.add(h);
+            }
+            
+            return r;
+        }
+        
+        return null;
+    }
     
+    public static HashMap<String, Object> statusResponseToHashMap(StatusResponse statusResponse) {
+        
+        if (statusResponse != null) {
+            HashMap<String, Object> propstatMap = statusResponseToHashMap(statusResponse.getPropstat());
+            
+            HashMap<String, Object> h = new HashMap<String, Object>();
+            h.put("status", statusResponse.getStatus());
+            h.put("href", statusResponse.getHref());
+            h.put("prop", statusResponse.getProps());
+            
+            if (propstatMap != null) {
+                h.put("propstat", propstatMap);
+            }
+            
+            return h;
+        }
+        
+        return null;
+    }
 
 }

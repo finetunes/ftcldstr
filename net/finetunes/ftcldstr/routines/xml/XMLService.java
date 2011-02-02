@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.Logger;
 
 public class XMLService {
 	
@@ -149,9 +150,10 @@ public class XMLService {
             for (int i = 0; i < ((ArrayList<Object>)dd).size(); i++) {
                 createXMLData(namespaceElements, w, ((ArrayList<Object>)dd).get(i), xmlns);
             }
-        } else if (dd.getClass().isPrimitive()) {
+        } else if (dd.getClass().isPrimitive() || dd instanceof String) {
             w.setData(w.getData().concat((String)dd));
         } else {
+            Logger.log("XMLService: unknown data type:" + dd.getClass().toString());
             w.setData(w.getData().concat((String)dd));
         }
         
@@ -166,7 +168,7 @@ public class XMLService {
         data.setData("<?xml version=\"1.0\" encoding=\"" + ConfigService.CHARSET + "\"?>");
         createXMLData(namespaceElements, data, dataRef);
         return data.getData();
-    }    
+    }
 	
     public static String createXML(Map<String, Integer> namespaceElements, HashMap<String, Object> dataRef) {
         

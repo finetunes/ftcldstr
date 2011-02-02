@@ -3,6 +3,18 @@ package net.finetunes.ftcldstr.actionhandlers.webdav;
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 
+/**
+ * A REPORT request is an extensible mechanism for obtaining information
+ * about a resource.  Unlike a resource property, which has a single
+ * value, the value of a report can depend on additional information
+ * specified in the REPORT request body and in the REPORT request
+ * headers.
+ * 
+ * Description from RFC 3253 (C) The Internet Society (2002).
+ * http://www.ietf.org/rfc/rfc3253.txt
+ * 
+ */
+
 public class ReportActionHandler extends AbstractActionHandler {
 
     public void handle(final RequestParams requestParams) {

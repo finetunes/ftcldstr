@@ -1,8 +1,7 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-
-import javax.annotation.processing.FilerException;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
@@ -41,10 +40,31 @@ public class LockActionHandler extends AbstractActionHandler {
         String fn = requestParams.getPathTranslated();
         Logger.debug("LOCK: " + fn);
         String ru = requestParams.getRequestURI();
-        String depth = requestParams.getHeader("Depth");
+        String depths = requestParams.getHeader("Depth");
+        int depth = 0;
         
-        if (depth == null) {
-            depth = "infinity";
+        if (depths == null) {
+            depth = Integer.MAX_VALUE;
+        }
+        else {
+            try {
+                depth = Integer.valueOf(depths);
+            }
+            catch (NumberFormatException e) {
+                depth = 0;
+                Logger.log("Exception: Invalid depth value: " + depths);
+            }
+        }
+        
+        String timeouts = requestParams.getHeader("Timeout");
+        int timeout = 0;
+        if (timeouts != null && !timeouts.isEmpty()) {
+            try {
+                timeout = Integer.valueOf(timeouts);
+            }
+            catch (NumberFormatException e) {
+                Logger.log("Exception: Invalid timeout value: " + timeouts);
+            }
         }
         
         String status = "200 OK";
@@ -62,7 +82,6 @@ public class LockActionHandler extends AbstractActionHandler {
             xmldata = new HashMap<String, Object>();
         }
         
-        
         String token = "opaquelocktoken:" + GeneratorService.getuuid(fn);
         if (!FileOperationsService.file_exits(fn) && !FileOperationsService.file_exits(FileOperationsService.dirname(fn))) {
             status = "409 Conflict";
@@ -72,9 +91,11 @@ public class LockActionHandler extends AbstractActionHandler {
             Logger.debug("LOCK: not lockable ... but...");
             if (LockingService.isAllowed(requestParams, fn)) {
                 status = "200 OK";
-                // LockingService.lockResource(); // TODO
-                // lockResource($fn, $ru, $xmldata, $depth, $timeout, $token); // TODO
-                content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, /* {prop=>{lockdiscovery => getLockDiscovery($fn)}}  */ null); // TODO 
+                LockingService.lockResource(fn, ru, xmldata, depth, timeout, token);
+                HashMap<String, Object> prop = new HashMap<String, Object>();
+                ArrayList<HashMap<String, Object>> lockdiscovery = LockingService.getLockDiscovery(fn);
+                prop.put("lockdiscovery", lockdiscovery);
+                content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, prop); 
             }
             else {
                 status = "423 Locked";
@@ -82,37 +103,28 @@ public class LockActionHandler extends AbstractActionHandler {
             }
         }
         else if (!FileOperationsService.file_exits(fn)) {
-/*       
- TODO: implement     
-  
-        if (open(F,">$fn")) {
-            print F '';
-            close(F);
-            my $resp = lockResource($fn, $ru, $xmldata, $depth, $timeout,$token);
-            if (defined $$resp{multistatus}) {
-                $status = '207 Multi-Status'; 
-            } else {
-                $addheader="Lock-Token: $token";
-                $status='201 Created';
+            if (FileOperationsService.create_file(fn, "")) {
+                HashMap<String, Object> resp = LockingService.lockResource(fn, ru, xmldata, depth, timeout, token);
+                if (resp != null && resp.get("multistatus") != null) {
+                    status = "207 Multi-Status";
+                }
+                else {
+                    addheader.put("Lock-Token", token);
+                    status = "201 Created";
+                }
+                content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, resp);
             }
-            $content=createXML($resp);
-        } else {
-            $status='403 Forbidden';
-            $type='text/plain';
-        }            
-            
-*/            
+            else {
+                status = "403 Forbidden";
+                type = "text/plain";
+            }
         }
         else {
-            Object resp = LockingService.lockResource(/* $fn, $ru, $xmldata, $depth, $timeout, $token */); // TODO: params and return type
-            
-            addheader.put("Lock-Token", token);
-            
-            /*
-             * TODO: implement
-            $content=createXML($resp);
-            $status = '207 Multi-Status' if defined $$resp{multistatus};
-            */
+            HashMap<String, Object> resp = LockingService.lockResource(fn, ru, xmldata, depth, timeout, token);
+            content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, resp);
+            if (resp != null && resp.containsKey("multistatus") && resp.get("multistatus") != null) {
+                status = "207 Multi-Status";
+            }
         }
         
         Logger.debug("LOCK: REQUEST: " + xml);

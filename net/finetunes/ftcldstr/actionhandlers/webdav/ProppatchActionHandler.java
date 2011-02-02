@@ -25,7 +25,6 @@ import net.finetunes.ftcldstr.routines.xml.XMLService;
  * 
  */
 
-
 public class ProppatchActionHandler extends AbstractActionHandler {
 
     public void handle(final RequestParams requestParams) {
@@ -70,8 +69,12 @@ public class ProppatchActionHandler extends AbstractActionHandler {
             
             status = "207 Multi-Status";
             type = "text/xml";
-            content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, null, false); // TODO: implement
-            // TODO: ^^ // $content = createXML( { multistatus => { response => \@resps} });  
+            
+            HashMap<String, Object> multistatus = new HashMap<String, Object>();
+            multistatus.put("response", StatusResponse.statusResponseListToHashMap(resps));
+            HashMap<String, Object> proppatch = new HashMap<String, Object>();
+            proppatch.put("multistatus", multistatus);
+            content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, proppatch, false);            
         }
         else {
             status = "404 Not Found";

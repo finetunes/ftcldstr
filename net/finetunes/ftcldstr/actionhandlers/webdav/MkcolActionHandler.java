@@ -104,7 +104,7 @@ public class MkcolActionHandler extends AbstractActionHandler {
                 StatusResponse resp_200 = null;
                 StatusResponse resp_403 = null;
                 
-                PropertyRequestHandler.handlePropertyRequest(requestParams, body, dataRef, resp_200, resp_403); // TODO: implement
+                PropertyRequestHandler.handlePropertyRequest(requestParams, body, dataRef, resp_200, resp_403);
                 // ignore errors from property request
                 LockingService.inheritLock(requestParams);
                 Logger.log("MKCOL(" + fn + ")");

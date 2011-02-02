@@ -38,11 +38,10 @@ public class LockingService {
 		return false;
 	}
 	
-	// TODO: second parameter should be an XML structure array
-	public static boolean isLockable(String fn, Object xmldata) {
+	public static boolean isLockable(String fn, HashMap<String, Object> xmldata) {
 	    // check lock and exclusive
 	    
-	    // TODO: check types and data
+	    // FIXME: check types and data
 	    HashMap<String, Object> data = (HashMap<String, Object>)xmldata;
 	    HashMap<String, Object> lockdata = (HashMap<String, Object>)data.get("{DAV:}lockscope");
 	    Set<String> lockscopes = lockdata.keySet();
@@ -127,9 +126,9 @@ public class LockingService {
                 HashMap<String, Object> scope = new HashMap<String, Object>();
                 HashMap<String, Object> href = new HashMap<String, Object>();
                 
-                type.put(row.getType(), null); // TODO: check whether null is a valid value; otherwise use "" 
-                scope.put(row.getScope(), null); // TODO: check whether null is a valid value; otherwise use "" 
-                href.put("href", row.getToken()); // TODO: check whether null is a valid value; otherwise use ""
+                type.put(row.getType(), null); 
+                scope.put(row.getScope(), null); 
+                href.put("href", row.getToken());
                 
                 String timeout = "Infinite";
                 if (row.getTimeout() != null) {
@@ -163,6 +162,12 @@ public class LockingService {
 	    
 	    return null;
 	}
+
+    public static HashMap<String, Object> lockResource(String fn, String ru, HashMap<String, Object> xmldata, 
+            int depth, int timeout, String token) {
+        return lockResource(fn, ru, xmldata, depth, timeout, token, null, null);
+    }
+	
 	
 	// TODO: parameters and return type
 	public static HashMap<String, Object> lockResource(String fn, String ru, HashMap<String, Object> xmldata, 
@@ -231,8 +236,6 @@ public class LockingService {
             prop.put("activelock", activelock);
         }
         else {
-            int n = 0;
-            
             HashMap<String, Object> multistatus = null; 
             if (!resp.containsKey("multistatus")) {
                 multistatus = new HashMap<String, Object>();
@@ -271,49 +274,134 @@ public class LockingService {
         
         if (FileOperationsService.is_directory(fn) && (depth == Integer.MAX_VALUE || depth > 0)) {
             Logger.debug("lockResource: depth=" + depth);
-/*            
- * // TODO
- * 
-            if (opendir(DIR,$fn)) {
-
-            foreach my $f ( grep { !/^(\.|\.\.)$/ } readdir(DIR)) {
-                my $nru = $ru.$f;
-                my $nfn = $fn.$f;
-                $nru.='/' if -d $nfn;
-                $nfn.='/' if -d $nfn;
-                debug("lockResource: $nfn, $nru");
-                my $subreqresp = lockResource($nfn, $nru, $xmldata, lc($depth) eq 'infinity'?$depth:$depth-1, $timeout, $token, defined $base?$base:$fn, $visited);
-                if (defined $$subreqresp{multistatus}) {
-                    push @{$resp{multistatus}{response}}, @{$$subreqresp{multistatus}{response}};
-                } else {
-                    push @prop, @{$$subreqresp{prop}{lockdiscovery}} if exists $$subreqresp{prop};
+            
+            ArrayList<String> files = ReadDirectoryContentWrapper.getFileList(fn);
+            if (files != null && !files.isEmpty()) {
+                Iterator<String> it = files.iterator();
+                
+                while (it.hasNext()) {
+                    String f = it.next();
+                    if (!f.matches("(\\.|\\.\\.)")) {
+                        String nru = ru + f;
+                        String nfnn = fn + f;
+                        
+                        if (FileOperationsService.is_directory(nfnn)) {
+                            nru += "/";
+                            nfnn += "/";
+                        }
+                        
+                        Logger.debug("lockResource: " + nfnn + ", " + nru);
+                        
+                        int d = depth;
+                        if (depth != Integer.MAX_VALUE) {
+                            d = depth - 1;
+                        }
+                        HashMap<String, Object> subreqresp = lockResource(nfnn, nru, xmldata, d,
+                                timeout, token, basefn, visited);
+                        
+                        if (subreqresp != null && subreqresp.containsKey("multistatus")) {
+                            HashMap<String, Object> ms = null;
+                            if (resp.containsKey("multistatus") && resp.get("multistatus") != null) { 
+                                ms = (HashMap<String, Object>)resp.get("multistatus");
+                            }
+                            if (ms == null) {
+                                ms = new HashMap<String, Object>();
+                                resp.put("multistatus", ms);
+                            }
+                            
+                            ArrayList<HashMap<String, Object>> response = null;
+                            if (ms.containsKey("response")) {
+                                response = (ArrayList<HashMap<String, Object>>)ms.get("response");
+                            }
+                            if (response == null) {
+                                response = new ArrayList<HashMap<String,Object>>();
+                                ms.put("response", response);
+                            }
+                            
+                            HashMap<String, Object> submultistatus = null;
+                            ArrayList<HashMap<String, Object>> subresponse = null;
+                            if (subreqresp.get("multistatus") != null) {
+                                submultistatus = (HashMap<String, Object>)subreqresp.get("multistatus"); 
+                            }
+                            
+                            if (submultistatus.containsKey("response") && submultistatus.get("response") != null) {
+                                subresponse = (ArrayList<HashMap<String, Object>>)submultistatus.get("response");
+                            }
+                            
+                            if (subresponse != null) {
+                                response.addAll(subresponse);
+                            }
+                        }
+                        else {
+                            if (subreqresp != null && subreqresp.containsKey("prop") && subreqresp.get("prop") != null) {
+                                prop.putAll(((HashMap<String, Object>)((HashMap<String, Object>)subreqresp.get("prop")).get("lockdiscovery")));
+                            }
+                        }
+                        
+                    }
                 }
             }
-            closedir(DIR);
-        } else {
-            my $n = $#{$resp{multistatus}{response}} +1;
-            $resp{multistatus}{response}[$n]{href}=$ru;
-            $resp{multistatus}{response}[$n]{status}='HTTP/1.1 403 Forbidden';
-        }
-*/            
+            else {
+                HashMap<String, Object> multistatus = null; 
+                if (!resp.containsKey("multistatus")) {
+                    multistatus = new HashMap<String, Object>();
+                    resp.put("multistatus", multistatus);
+                }
+                else {
+                    multistatus = (HashMap<String, Object>)resp.get("multistatus");
+                }
+                
+                ArrayList<Object> response = null;
+                if (!multistatus.containsKey("response") && multistatus.get("response") != null) {
+                     response = new ArrayList<Object>();
+                     multistatus.put("response", response);
+                }
+                else {
+                    response = (ArrayList<Object>)multistatus.get("response");
+                }
+                
+                HashMap<String, Object> r = new HashMap<String, Object>();
+                r.put("href", ru);
+                r.put("status", "HTTP/1.1 403 Forbidden");
+                response.add(r);
+            }
+            
         }
         
-/*
- *         
-
-// TODO
-    $resp{multistatus}{response}[$#{$resp{multistatus}{response}} +1]{propstat}{prop}{lockdiscovery}=\@prop if defined $resp{multistatus} && $#prop>-1;
-    $resp{prop}{lockdiscovery}=\@prop unless defined $resp{multistatus};
-    
-    return \%resp;	 
-	    
-	    */
-	    
-        // TODO: implement
-        // throw new RuntimeException("Not Implemented. TODO: implement");
-        // return null;
-
-	    return null;
+        if (resp.containsKey("multistatus") && prop.size() > 0) {
+            HashMap<String, Object> multistatus = (HashMap<String, Object>)resp.get("multistatus"); 
+            ArrayList<Object> response = null;
+            if (!multistatus.containsKey("response") && multistatus.get("response") != null) {
+                 response = new ArrayList<Object>();
+                 multistatus.put("response", response);
+            }
+            else {
+                response = (ArrayList<Object>)multistatus.get("response");
+            }
+            
+            HashMap<String, Object> propp = new HashMap<String, Object>();
+            propp.put("lockdiscovery", prop);
+            HashMap<String, Object> propstatp = new HashMap<String, Object>();
+            propstatp.put("prop", propp);
+            HashMap<String, Object> responsep = new HashMap<String, Object>();
+            responsep.put("propstat", propstatp);
+            response.add(responsep);
+            
+            if (resp.get("multistatus") == null) {
+                HashMap<String, Object> propr = null;
+                if (resp.get("prop") != null) {
+                    propr = (HashMap<String, Object>)resp.get("prop");
+                }
+                else {
+                    propr = new HashMap<String, Object>();
+                    resp.put("prop", propr);
+                }
+                
+                propr.put("lockdiscovery", prop);
+            }
+        }
+        
+        return resp;
 	}
 	
 	

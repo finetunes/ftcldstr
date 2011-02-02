@@ -74,28 +74,21 @@ public class PropfindActionHandler extends AbstractActionHandler {
             xml = "<?xml version=\"1.0\" encoding=\"" + ConfigService.CHARSET + "\" ?>\n<D:propfind xmlns:D=\"DAV:\"><D:allprop/></D:propfind>";
         }
 
-        // TODO
-        // String xmldata = "";
-        HashMap<String, Object> xmldata = new HashMap<String, Object>();
-//        xmldata = (String)XMLParser.simpleXMLParser(xml);
-//        try / except
-/*        
 
-        my $xmldata = "";
-        eval { $xmldata = simpleXMLParser($xml); };
-        if ($@) {
-            debug("_PROPFIND: invalid XML request: $@");
-            printHeaderAndContent('400 Bad Request');
+        XMLParser xmlParser = new XMLParser();
+        HashMap<String, Object> xmldata = xmlParser.simpleXMLParser(xml, ConfigService.CHARSET);
+        if (xmldata == null || xmldata.size() == 0) {
+            Logger.debug("PROPFIND: invalid XML request: " + xml);
+            OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
             return;
         }
-*/
         
         String ru = requestParams.getRequestURI();
         ru = ru.replaceAll(" ", "%20");
         Logger.debug("PROPFIND: depth=" + depthstr + ", fn=" + fn + ", ru=" + ru + "");
 
-        ArrayList<StatusResponse> resps = new ArrayList<StatusResponse>(); 
-
+        ArrayList<StatusResponse> resps = new ArrayList<StatusResponse>();
+        
         // ACL, CalDAV, CardDAV, ...:
         if (ConfigService.PRINCIPAL_COLLECTION_SET != null && ConfigService.PRINCIPAL_COLLECTION_SET.length() > 1 &&
                 ru.endsWith(ConfigService.PRINCIPAL_COLLECTION_SET)) {
@@ -134,10 +127,13 @@ public class PropfindActionHandler extends AbstractActionHandler {
         
         String content = "";
         if (resps.size() > 0) {
-            content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, null /* { 'multistatus' => { 'response'=>\@resps} } */, false); // TODO: implement, params
+            HashMap<String, Object> response = new HashMap<String, Object>();
+            response.put("response", StatusResponse.statusResponseListToHashMap(resps));
+            HashMap<String, Object> propfind = new HashMap<String, Object>();
+            propfind.put("multistatus", response);
+            content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, propfind, false);
         }
-        // my $content = ($#resps>-1) ? createXML({ 'multistatus' => { 'response'=>\@resps} }) : "" ;
-        
+
         Logger.debug("PROPFIND: status=" + status + ", type=" + type + "");
         Logger.debug("PROPFIND: REQUEST:\n" + xml + "\nEND-REQUEST");
         Logger.debug("PROPFIND: RESPONSE:\n" + content + "\nEND-RESPONSE");

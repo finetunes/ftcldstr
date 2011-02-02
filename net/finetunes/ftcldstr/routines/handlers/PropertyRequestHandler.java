@@ -27,6 +27,7 @@ public class PropertyRequestHandler {
 	        }
 	        
 /*
+ * original code:
 	        foreach my $remove (@{$$dataRef{'{DAV:}remove'}}) {
             foreach my $propname (keys %{$$remove{'{DAV:}prop'}}) {
                 removeProperty($propname, $$remove{'{DAV:}prop'}, $resp_200, $resp_403);
@@ -46,6 +47,7 @@ public class PropertyRequestHandler {
 	        
 	        
 /*
+ * original code:
 	        foreach my $propname (keys %{$$dataRef{'{DAV:}remove'}{'{DAV:}prop'}}) {
             removeProperty($propname, $$dataRef{'{DAV:}remove'}{'{DAV:}prop'}, $resp_200, $resp_403);
         }        

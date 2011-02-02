@@ -1,9 +1,15 @@
 package net.finetunes.ftcldstr.routines.webdav;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.finetunes.ftcldstr.RequestParams;
+import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
 
 
 public class QueryService {
@@ -46,10 +52,24 @@ public class QueryService {
 	    return null;
 	}
 	
-	public static String getQueryParams() {
-		
-		// TODO: implement 
-		return "";
+	public static String getQueryParams(RequestParams requestParams) {
+	    
+	    // preserve query parameters
+	    ArrayList<String> query = new ArrayList<String>();
+	    ArrayList<String> params = new ArrayList<String>(Arrays.asList("order", "showall"));
+	    Iterator<String> it = params.iterator();
+	    while (it.hasNext()) {
+	        String param = it.next();
+	        
+	        if (requestParams.requestParamExists(param)) {
+	            query.add(param + "=" + requestParams.getRequestParam(param));
+	        }
+	    }
+	    
+	    if (query.size() > 0) {
+	        return RenderingHelper.joinArray(query.toArray(new String[]{}), ConfigService.URL_PARAM_SEPARATOR);
+	    }
+	    
+	    return null;
 	}
-
 }

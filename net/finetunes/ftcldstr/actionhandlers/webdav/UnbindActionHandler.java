@@ -9,6 +9,23 @@ import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.xml.XMLParser;
 
+/**
+ * The UNBIND method modifies the collection identified by the Request-
+ * URI by removing the binding identified by the segment specified in
+ * the UNBIND body.
+ * 
+ * Once a resource is unreachable by any URI mapping, the server MAY
+ * reclaim system resources associated with that resource.  If UNBIND
+ * removes a binding to a resource, but there remain URI mappings to
+ * that resource, the server MUST NOT reclaim system resources
+ * associated with the resource.
+ * 
+ * Description from RFC5842 (c) 2010 IETF Trust and the persons identified 
+ * as the document authors
+ * http://www.ietf.org/rfc/rfc5842.txt
+ * 
+ */
+
 public class UnbindActionHandler extends AbstractActionHandler {
 
     public void handle(final RequestParams requestParams) {

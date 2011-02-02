@@ -4,7 +4,7 @@ public class CalendarAction {
 	
 	public static String getCalendarHomeSet(String uri) {
 		
-		// TODO: implement
+		// TODO: implement after AddressbookAction.getAddressbookHomeSet() is ready
 		return null;
 	}
 
