@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.routines.NamespaceService;
 
 public class XMLService {
 	
@@ -35,7 +36,7 @@ public class XMLService {
                 String el = e;
                 String euns = "";
                 String uns = "";
-                String ns = getNameSpace(e);
+                String ns = NamespaceService.getNameSpace(e);
                 String attr = "";
                 
                 if (ConfigService.DATATYPES.containsKey(e) && ConfigService.DATATYPES.get(e) != null){
@@ -175,20 +176,24 @@ public class XMLService {
         return createXML(namespaceElements, dataRef, false);
     }
     
-    // additional
-    public static String getNameSpace(Object prop) {
-        if (ConfigService.ELEMENTS.containsKey(prop) &&
-                ConfigService.ELEMENTS.get(prop) != null) {
-            return ConfigService.ELEMENTS.get(prop);
-        } else {
-            return ConfigService.ELEMENTS.get("default");
-        }
-    }
-    
     private static Matcher checkCondition (String regExp, String input) {
         Pattern pattern = Pattern.compile(regExp);
         Matcher m = pattern.matcher(input);
         return m.find()? m : null;
+    }
+    
+    public static String convXML2Str(HashMap<String, Object> xml) {
+        
+        if (xml != null) {
+            String x = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, xml, true);
+            if (x != null) {
+                return x.toLowerCase();
+            }
+            
+            return x;
+        }
+        
+        return null;
     }    
     
 // usage    

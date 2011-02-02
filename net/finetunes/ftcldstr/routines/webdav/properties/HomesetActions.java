@@ -2,16 +2,16 @@ package net.finetunes.ftcldstr.routines.webdav.properties;
 
 import net.finetunes.ftcldstr.helper.ConfigService;
 
-public class AddressbookAction {
-	
-	public static String getAddressbookHomeSet(String uri) {
-	
-	    if (ConfigService.ADDRESSBOOK_HOME_SET == null) {
-	        return uri;
-	    }
-	    
+public class HomesetActions {
+
+    public static String getAddressbookHomeSet(String uri) {
+        
+        if (ConfigService.ADDRESSBOOK_HOME_SET == null) {
+            return uri;
+        }
+        
         String rmuser = "";
-	    // TODO: my $rmuser = $ENV{REDIRECT_REMOTE_USER} || $ENV{REMOTE_USER};
+        // TODO: my $rmuser = $ENV{REDIRECT_REMOTE_USER} || $ENV{REMOTE_USER};
         
         if (!ConfigService.ADDRESSBOOK_HOME_SET.containsKey(rmuser)) {
             rmuser = ""; // TODO: $rmuser = $< --- real uid of the current process
@@ -23,6 +23,13 @@ public class AddressbookAction {
         else {
             return ConfigService.ADDRESSBOOK_HOME_SET.get("default");
         }
-	}
-
+    }
+    
+    public static String getCalendarHomeSet(String uri) {
+        
+        // TODO: implement after HomesetActions.getAddressbookHomeSet() is ready
+        return null;
+    }
+    
+    
 }
