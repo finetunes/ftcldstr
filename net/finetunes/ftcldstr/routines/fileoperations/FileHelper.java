@@ -28,7 +28,7 @@ public class FileHelper {
 	    }
 	    
 	    String ret = s;
-	    String q = QueryService.getQueryParams();
+	    String q = QueryService.getQueryParams(requestParams);
 	    
 	    // fixes root folder navigation bug
 	    if (full.equals("//")) {

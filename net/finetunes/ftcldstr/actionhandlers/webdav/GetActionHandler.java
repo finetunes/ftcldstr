@@ -454,10 +454,10 @@ public class GetActionHandler extends AbstractActionHandler {
         
         content += "<h1>";
         if (FileOperationsService.is_directory(fn)) {
-            content += RenderingService.getQuickNavPath(ru, QueryService.getQueryParams());
+            content += RenderingService.getQuickNavPath(ru, QueryService.getQueryParams(requestParams));
         }
         else {
-            content += RenderingService.getQuickNavPath(fullparent, QueryService.getQueryParams());
+            content += RenderingService.getQuickNavPath(fullparent, QueryService.getQueryParams(requestParams));
             content += " ";
             content += "<a href=\"" + ru + "\">" + basename + "</a>";
             content += ConfigService.stringMessages.get("properties");

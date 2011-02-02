@@ -95,7 +95,7 @@ public class DirectoryOperationsService {
         content += ConfigService.stringMessages.get("mount");
         content += "</a>";
         content += " ";
-        content += RenderingService.getQuickNavPath(ru, QueryService.getQueryParams());
+        content += RenderingService.getQuickNavPath(ru, QueryService.getQueryParams(requestParams));
         content += "</h2>";
         
         if (ConfigService.SHOW_QUOTA) {
