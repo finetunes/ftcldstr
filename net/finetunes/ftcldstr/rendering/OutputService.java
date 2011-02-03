@@ -196,7 +196,7 @@ public class OutputService {
         
         Date lastModified = stat.getMtimeDate(); 
         
-        requestParams.getResponse().addHeader("Last-Modified", String.format("%a, %d %b %Y %T GMT", lastModified));
+        requestParams.getResponse().addHeader("Last-Modified", String.format("%ta, %td %tb %tY %tT GMT", lastModified, lastModified, lastModified, lastModified, lastModified));
         requestParams.getResponse().addHeader("charset", ConfigService.CHARSET);
         
         requestParams.getResponse().addHeader("MS-Author-Via", "DAV");

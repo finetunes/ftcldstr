@@ -24,7 +24,7 @@ public class PropertiesHelper {
         StatusResponse r404 = new StatusResponse();
         
         String propname = new String(prop);
-        propname = propname.replaceFirst("^{[^}]*}", "");
+        propname = propname.replaceFirst("^\\{[^\\}]*\\}", "");
         
         String propval = null;
         if (!ConfigService.PROTECTED_PROPS.contains(propname)) {
@@ -66,7 +66,7 @@ public class PropertiesHelper {
 	        String xmlnsuri = "DAV:";
 	        String propname = new String(prop);
 	        
-            Pattern p = Pattern.compile("^{([^}]*)}(.*)$");
+            Pattern p = Pattern.compile("^\\{([^\\}]*)\\}(.*)$");
             Matcher m = p.matcher(prop);
             if (m.find()) {
                 xmlnsuri = m.group(1);
@@ -152,6 +152,11 @@ public class PropertiesHelper {
         
 	    return propstat;
 	}
+	
+    public static ArrayList<StatusResponse> getPropStat(RequestParams requestParams, 
+            String fn, String uri, ArrayList<String> props) {
+        return getPropStat(requestParams, fn, uri, props, false, false);
+    }
 	
 	public static String getETag(RequestParams requestParams, String file) {
 		

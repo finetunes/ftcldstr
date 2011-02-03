@@ -2,6 +2,7 @@ package net.finetunes.ftcldstr.routines.fileoperations;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -383,6 +384,12 @@ public class FileOperationsService {
         return false;
         
     }
+    
+    // TODO: returns stream to write the file contents to
+    public static OutputStream getFileWriteStream(String fn) {
+        return null;
+    }
+    
     
     public static boolean unlink(String filename) {
         

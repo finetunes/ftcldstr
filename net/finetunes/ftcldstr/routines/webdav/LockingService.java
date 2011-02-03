@@ -109,7 +109,7 @@ public class LockingService {
 		
 	}
 	
-	// TODO: note return type
+	// note return type
 	public static ArrayList<HashMap<String, Object>> getLockDiscovery(String fn) {
 		
 	    List<WebDAVLock> rowsRef = ConfigService.locks.getLocks(fn);
@@ -169,7 +169,6 @@ public class LockingService {
     }
 	
 	
-	// TODO: parameters and return type
 	public static HashMap<String, Object> lockResource(String fn, String ru, HashMap<String, Object> xmldata, 
 	        int depth, int timeout, String token, String base, ArrayList<String> visited) {
 	    
@@ -210,8 +209,8 @@ public class LockingService {
         
         String owner = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, dataRef, false);
         
-        locktype = locktype.replaceFirst("{[^}]+}", "");
-        lockscope = lockscope.replaceFirst("{[^}]+}", "");
+        locktype = locktype.replaceFirst("\\{[^\\}]+}", "");
+        lockscope = lockscope.replaceFirst("\\{[^\\}]+}", "");
         
         HashMap<String, Object> locktypekey = new HashMap<String, Object>();
         locktypekey.put(locktype, null);

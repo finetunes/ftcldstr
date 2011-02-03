@@ -48,9 +48,9 @@ public class PropertiesActions {
 	        String ns = "";
 	        String nonsv = new String(nons);
 	        
-            nons = nons.replaceFirst("{([^}]*)}", "");
+            nons = nons.replaceFirst("\\{([^\\}]*)\\}", "");
             if (!nons.isEmpty()) {
-                Pattern p = Pattern.compile("{([^}]*)}");
+                Pattern p = Pattern.compile("\\{([^\\}]*)\\}");
                 Matcher m = p.matcher(nonsv);
                 if (m.find()) {
                     ns = m.group(1);
@@ -99,7 +99,7 @@ public class PropertiesActions {
                     Logger.debug("Unknown element " + propfind + " (" + nons + ") in PROPFIND request");
                     Logger.debug(ConfigService.NAMESPACES.get(xmldata.get(propfind)));
                     OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
-                    return null; // FIXME: was "exit;"--check behavious
+                    return null; // TODO: was "exit;"--check behaviour
                 }
             }
 	    }
@@ -118,9 +118,9 @@ public class PropertiesActions {
 	        String ns = "";
 	        String nonsv = new String(nons);
 	        
-	        nons = nons.replaceFirst("{([^}]*)}", "");
+	        nons = nons.replaceFirst("\\{([^}]*)\\}", "");
 	        if (!nons.isEmpty()) {
-    	        Pattern p = Pattern.compile("{([^}]*)}");
+    	        Pattern p = Pattern.compile("\\{([^}]*)\\}");
     	        Matcher m = p.matcher(nonsv);
     	        if (m.find()) {
     	            ns = m.group(1);
@@ -136,7 +136,7 @@ public class PropertiesActions {
 	        else if (ns.equals("") && (!(ref instanceof HashMap<?, ?> && ((HashMap<String, Object>)ref).get("xmlns") != null))) {
 	            OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
 	            return;
-                // FIXME: was "exit;" -- check behaviour
+                // TODO: was "exit;" -- check behaviour
 	        }
 	        else {
 	            boolean contains = false;
@@ -157,6 +157,10 @@ public class PropertiesActions {
                         contains = true;
                         break;
                     }
+                }
+                
+                if (props == null) {
+                    props = new ArrayList<String>();
                 }
                 
                 if (contains) {
@@ -191,7 +195,8 @@ public class PropertiesActions {
         }
 	    
 	    if (prop.equals("creationdate")) {
-	        resp_200.putProp("creationdate", String.format("%Y-%m-%dT%H:%M:%SZ", stat.getCtimeDate()));
+	        resp_200.putProp("creationdate", String.format("%tY-%tm-%tdT%tT%tz", stat.getCtimeDate(),
+	                stat.getCtimeDate(), stat.getCtimeDate(), stat.getCtimeDate(), stat.getCtimeDate()));
 	    }
 	    
 	    if (prop.equals("displayname") && resp_200.getProp("displayname") == null) {
@@ -222,7 +227,8 @@ public class PropertiesActions {
         }	    
 
         if (prop.equals("getlastmodified")) {
-            resp_200.putProp("getlastmodified", String.format("%a, %d %b %Y %T GMT", stat.getMtimeDate()));
+            resp_200.putProp("getlastmodified", String.format("%ta, %td %tb %tY %tT GMT", stat.getMtimeDate(), stat.getMtimeDate(), 
+                    stat.getMtimeDate(), stat.getMtimeDate(), stat.getMtimeDate()));
         }       
         
         if (prop.equals("lockdiscovery")) {

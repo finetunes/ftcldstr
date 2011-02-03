@@ -1,15 +1,18 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
+import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.handlers.PropertyRequestHandler;
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
 import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
+import net.finetunes.ftcldstr.routines.xml.XMLParser;
 
 /**
  * MKCOL creates a new collection resource at the location specified by
@@ -51,27 +54,20 @@ public class MkcolActionHandler extends AbstractActionHandler {
             // maybe extended mkcol (RFC5689)
             if (requestContentType.matches(".*/xml.*")) {
                 
-                // original code:
-                // eval { $dataRef = simpleXMLParser($body) }; 
-                // if ($@) { ...
+                XMLParser xmlParser = new XMLParser();
+                dataRef = xmlParser.simpleXMLParser(body, ConfigService.CHARSET);
                 
-                // TODO: simpleXMLParser should throw exceptions if something goes wrong
-                // dataRef = simpleXMLParser(body);
+                if (dataRef == null || dataRef.isEmpty()) {
+                    Logger.debug("MKCOL: invalid XML request: " + body);
+                    OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
+                    return;
+                }
                 
-/*
- * TODO
-            eval { $dataRef = simpleXMLParser($body) }; 
-            if ($@) {
-                debug("_MKCOL: invalid XML request: $@");
-                printHeaderAndContent('400 Bad Request');
-                return;
-            }
-            if (ref($$dataRef{'{DAV:}set'}) !~ /(ARRAY|HASH)/) {
-                printHeaderAndContent('400 Bad Request');
-                return;
-            }                
-                
-*/                
+                Object set = dataRef.get("{DAV:}set"); 
+                if (set instanceof HashMap<?, ?> || set instanceof ArrayList<?>) {
+                    OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
+                    return;
+                }
             }
             else {
                 status = "415 Unsupported Media Type";
@@ -108,13 +104,10 @@ public class MkcolActionHandler extends AbstractActionHandler {
                 // ignore errors from property request
                 LockingService.inheritLock(requestParams);
                 Logger.log("MKCOL(" + fn + ")");
-                
-                
             }
             else {
                 status = "403 Forbidden";
             }
-            
         }
         else {
             Logger.debug("MKCOL: parent directory does not exist");

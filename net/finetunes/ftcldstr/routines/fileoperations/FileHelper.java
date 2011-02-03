@@ -116,7 +116,7 @@ public class FileHelper {
 	        }
 	    }
 	    
-	    if (q.matches(".*\\?.*")) {
+	    if (q != null && q.matches(".*\\?.*")) {
 	        full += ConfigService.URL_PARAM_SEPARATOR + "action=props";
 	    }
 	    else {

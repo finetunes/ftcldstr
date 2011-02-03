@@ -38,8 +38,17 @@ public class DirectoryOperationsService {
 	    
 	    String nfn = FileOperationsService.full_resolve(fn);
 	    
+	    if (visited == null) {
+	        visited = new ArrayList<String>();
+	    }
+	    
+	    if (hrefs == null) {
+	        hrefs = new ArrayList<String>();
+	    }
+	    
+	    
 	    // was "if exists $$visited{$nfn} && ($depth eq 'infinity' || $depth < 0)"
-	    if (visited.contains(nfn) && (depth < 0)) {
+	    if (visited.contains(nfn) && (depth == Integer.MAX_VALUE || depth < 0)) {
 	        return;
 	    }
 	    
@@ -70,6 +79,11 @@ public class DirectoryOperationsService {
     	    }
         }
 	}
+	
+    public static void readDirBySuffix(String fn, String base, 
+            ArrayList<String> hrefs, String suffix, int depth) {
+        readDirBySuffix(fn, base, hrefs, suffix, depth, null);
+    }
 	
 	public static Object[] getFolderList(RequestParams requestParams, String fn, String ru, String filter) {
 	    
@@ -238,17 +252,8 @@ public class DirectoryOperationsService {
                 mimetype = MIMETypesHelper.getMIMEType(filename);
             }
             
-            System.out.println("MIMETYPE: " + mimetype + " (" + filename + ")");
-            
-            
             String nru = "";
-            try {
-                nru = ru + URLEncoder.encode(filename, ConfigService.CHARSET);
-            }
-            catch (UnsupportedEncodingException e) {
-                Logger.log("Exception: " + e.getMessage());
-                nru = ru + filename;
-            }
+            nru = ru + RenderingHelper.HTMLEncode(filename);
             
             if (FileOperationsService.is_directory(full)) {
                 filename += "/";
@@ -318,7 +323,7 @@ public class DirectoryOperationsService {
                     ConfigService.stringMessages.get("statfiles"), filecount,
                     ConfigService.stringMessages.get("statfolders"), foldercount,
                     ConfigService.stringMessages.get("statsum"), count,
-                    ConfigService.stringMessages.get("confstatsizeirm"), filesizes, ((float)filesizes)/1024, ((float)filesizes)/1048576, ((float)filesizes)/1073741824);
+                    ConfigService.stringMessages.get("statsize"), filesizes, ((float)filesizes)/1024, ((float)filesizes)/1048576, ((float)filesizes)/1073741824);
             content += "</div>";
         }
         
@@ -416,7 +421,7 @@ public class DirectoryOperationsService {
 	        respsRef.add(response);
 	    }
 	    
-	    if (visited.contains(nfn) && !noroot && (depth < 0)) {
+	    if (visited.contains(nfn) && !noroot && (depth == Integer.MAX_VALUE || depth < 0)) {
 	        return;
 	    }
 	    

@@ -12,6 +12,7 @@ import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
+import net.finetunes.ftcldstr.routines.xml.XMLService;
 
 /**
  * The DELETE method requests that the origin server delete the resource
@@ -96,7 +97,11 @@ public class DeleteActionHandler extends AbstractActionHandler {
         
         String content = "";
         if (resps.size() > 0) {
-            content = ""; // TODO! /* content = createXML({ 'multistatus' => { 'response'=>\@resps} }); */
+            HashMap<String, Object> response = new HashMap<String, Object>();
+            response.put("response", resps);
+            HashMap<String, Object> multistatus = new HashMap<String, Object>();
+            multistatus.put("multistatus", response);
+            content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, multistatus);
         }
         
         String type = null;

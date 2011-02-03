@@ -24,138 +24,140 @@ public class XMLService {
             namespaceElements = new HashMap<String, Integer>();
         }
         
-        if (dd instanceof HashMap<?, ?>) {
-            
-            HashMap<String, Object> d = (HashMap<String, Object>)dd;
-            
-            ArrayList<String> keys = new ArrayList<String>(d.keySet());
-            Collections.sort(keys, new KeyComparator());
-            
-            for (int i = 0; i < keys.size(); i++) {
-                String e = keys.get(i);
-                String el = e;
-                String euns = "";
-                String uns = "";
-                String ns = NamespaceService.getNameSpace(e);
-                String attr = "";
+        if (dd != null) {
+            if (dd instanceof HashMap<?, ?>) {
                 
-                if (ConfigService.DATATYPES.containsKey(e) && ConfigService.DATATYPES.get(e) != null){
+                HashMap<String, Object> d = (HashMap<String, Object>)dd;
+                
+                ArrayList<String> keys = new ArrayList<String>(d.keySet());
+                Collections.sort(keys, new KeyComparator());
+                
+                for (int i = 0; i < keys.size(); i++) {
+                    String e = keys.get(i);
+                    String el = e;
+                    String euns = "";
+                    String uns = "";
+                    String ns = NamespaceService.getNameSpace(e);
+                    String attr = "";
                     
-                    attr.concat(" " + ConfigService.DATATYPES.get(e));
-                    
-                    m = checkCondition("(\\w+):dt", ConfigService.DATATYPES.get(e));
+                    if (ConfigService.DATATYPES.containsKey(e) && ConfigService.DATATYPES.get(e) != null){
+                        
+                        attr.concat(" " + ConfigService.DATATYPES.get(e));
+                        
+                        m = checkCondition("(\\w+):dt", ConfigService.DATATYPES.get(e));
+                        
+                        if (m != null) {
+                            if (ConfigService.NAMESPACEABBR.containsKey(m.group(1)) && 
+                                    ConfigService.NAMESPACEABBR.get(m.group(1)) != null) {
+                            xmlns.put(m.group(1), "1");
+                            }
+                        }
+                    }
+                    m = checkCondition("\\{([^\\}]*)\\}", e);
                     
                     if (m != null) {
-                        if (ConfigService.NAMESPACEABBR.containsKey(m.group(1)) && 
-                                ConfigService.NAMESPACEABBR.get(m.group(1)) != null) {
-                        xmlns.put(m.group(1), "1");
+                        ns = m.group(1);
+                        if (ConfigService.NAMESPACES.containsKey(ns) && 
+                                ConfigService.NAMESPACES.get(ns) != null) {
+                            m = checkCondition("\\{[^\\}]*\\}", el);
+                            if (m != null) {
+                                el = m.replaceAll("");
+                            }
+                            ns = ConfigService.NAMESPACES.get(ns);
+                        } else {
+                            uns = ns;
+                            euns = e;
+                            m = checkCondition("\\{[^\\}]*\\}", euns);
+                            if (m != null) {
+                                euns = m.replaceAll("");
+                            }
                         }
                     }
-                }
-                m = checkCondition("\\{([^\\}]*)\\}", e);
-                
-                if (m != null) {
-                    ns = m.group(1);
-                    if (ConfigService.NAMESPACES.containsKey(ns) && 
-                            ConfigService.NAMESPACES.get(ns) != null) {
-                        m = checkCondition("\\{[^\\}]*\\}", el);
-                        if (m != null) {
-                            el = m.replaceAll("");
-                        }
-                        ns = ConfigService.NAMESPACES.get(ns);
-                    } else {
-                        uns = ns;
-                        euns = e;
-                        m = checkCondition("\\{[^\\}]*\\}", euns);
-                        if (m != null) {
-                            euns = m.replaceAll("");
-                        }
-                    }
-                }
-                String el_end = el;
-                m = checkCondition(" .*$", el_end);
-                if (m != null) {
-                    el_end = m.replaceAll("");
-                } 
-                String euns_end = euns;
-                m = checkCondition(" .*$", euns_end);
-                if (m != null) {
-                    euns_end = m.replaceAll("");
-                } 
-                
-                if (uns == null || uns.isEmpty()) {
-                    if (xmlns == null){
-                        xmlns = new HashMap<String, String>();
-                    }
-                    xmlns.put(ns, "1");
-                }
-                String nsd = "";
-                if (e.equals("xmlns")) {
+                    String el_end = el;
+                    m = checkCondition(" .*$", el_end);
+                    if (m != null) {
+                        el_end = m.replaceAll("");
+                    } 
+                    String euns_end = euns;
+                    m = checkCondition(" .*$", euns_end);
+                    if (m != null) {
+                        euns_end = m.replaceAll("");
+                    } 
                     
-                } else if (e.equals("content")){
-                    w.setData(w.getData().concat("" + d.get(e)));
-                } else if (!(d.containsKey(e) && d.get(e) != null)) {
-                    if (uns != null && !uns.equals("")){
-                        w.setData(w.getData().concat("<" + euns + " xmlns=\"" + uns + "\"/>"));
-                    } else {
-                        w.setData(w.getData().concat("<" + ns + ":" + el + nsd + attr + "/>"));
-                    }
-                } 
-                else if (d.get(e) instanceof ArrayList<?>) {
-                    for (int l = 0; l < ((ArrayList<Object>)d.get(e)).size(); l++) {
-                        Object e1 = ((ArrayList<Object>)d.get(e)).get(l); 
-                        XMLData tmpw = new XMLData();
-                        tmpw.setData("");
-                        createXMLData(namespaceElements, tmpw, e1, xmlns);
-                        if (namespaceElements.containsKey(el) &&
-                                namespaceElements.get(el) != null) {
-                            
-                            
-                            ArrayList<String> keys2 = new ArrayList<String>(xmlns.keySet()); 
-                            for (int j = 0; j < keys2.size(); j++) {
-                                String abbr = keys.get(j);
-                                nsd.concat(" xmlns:" + abbr + "=\"" + ConfigService.NAMESPACEABBR.get(abbr) + "\"");
-                                xmlns.remove(keys2.get(j));
-                            }
+                    if (uns == null || uns.isEmpty()) {
+                        if (xmlns == null){
+                            xmlns = new HashMap<String, String>();
                         }
-                        w.setData(w.getData().concat("<" + ns + ":" + el + nsd +attr + ">"));
-                        w.setData(w.getData().concat(tmpw.getData()));
-                        w.setData(w.getData().concat("</" + ns + ":" + el_end + ">"));
+                        xmlns.put(ns, "1");
                     }
-                } else {
-                    if (uns != null && !uns.equals("")) {
-                        w.setData(w.getData().concat("<" + euns + " xmlns=\"" + uns + "\">"));
-                        createXMLData(namespaceElements, w, d.get(e), xmlns);
-                        w.setData(w.getData().concat("</" + euns_end + ">"));
-                    } else {
-                        XMLData tmpw2 = new XMLData(); 
-                        tmpw2.setData("");
-                        createXMLData(namespaceElements, tmpw2, d.get(e), xmlns);
-                        if (namespaceElements.containsKey(el) &&
-                                namespaceElements.get(el) != null) {
-                            
-                            ArrayList<String> keys3 = new ArrayList<String>(xmlns.keySet()); 
-                            for (int k = 0; k < keys3.size(); k++) {
-                                String abbr = keys.get(k);
-                                nsd.concat(" xmlns:" + abbr + "=\"" + ConfigService.NAMESPACEABBR.get(abbr) + "\"");
-                                xmlns.remove(keys3.get(k));
-                            }
+                    String nsd = "";
+                    if (e.equals("xmlns")) {
+                        
+                    } else if (e.equals("content")){
+                        w.setData(w.getData().concat("" + d.get(e)));
+                    } else if (!(d.containsKey(e) && d.get(e) != null)) {
+                        if (uns != null && !uns.equals("")){
+                            w.setData(w.getData().concat("<" + euns + " xmlns=\"" + uns + "\"/>"));
+                        } else {
+                            w.setData(w.getData().concat("<" + ns + ":" + el + nsd + attr + "/>"));
                         }
-                        w.setData(w.getData().concat("<" + ns + ":" + el + nsd + attr + ">"));
-                        w.setData(w.getData().concat(tmpw2.getData()));
-                        w.setData(w.getData().concat("</" + ns + ":" + el_end + ">"));
+                    } 
+                    else if (d.get(e) instanceof ArrayList<?>) {
+                        for (int l = 0; l < ((ArrayList<Object>)d.get(e)).size(); l++) {
+                            Object e1 = ((ArrayList<Object>)d.get(e)).get(l); 
+                            XMLData tmpw = new XMLData();
+                            tmpw.setData("");
+                            createXMLData(namespaceElements, tmpw, e1, xmlns);
+                            if (namespaceElements.containsKey(el) &&
+                                    namespaceElements.get(el) != null) {
+                                
+                                
+                                ArrayList<String> keys2 = new ArrayList<String>(xmlns.keySet()); 
+                                for (int j = 0; j < keys2.size(); j++) {
+                                    String abbr = keys.get(j);
+                                    nsd.concat(" xmlns:" + abbr + "=\"" + ConfigService.NAMESPACEABBR.get(abbr) + "\"");
+                                    xmlns.remove(keys2.get(j));
+                                }
+                            }
+                            w.setData(w.getData().concat("<" + ns + ":" + el + nsd +attr + ">"));
+                            w.setData(w.getData().concat(tmpw.getData()));
+                            w.setData(w.getData().concat("</" + ns + ":" + el_end + ">"));
+                        }
+                    } else {
+                        if (uns != null && !uns.equals("")) {
+                            w.setData(w.getData().concat("<" + euns + " xmlns=\"" + uns + "\">"));
+                            createXMLData(namespaceElements, w, d.get(e), xmlns);
+                            w.setData(w.getData().concat("</" + euns_end + ">"));
+                        } else {
+                            XMLData tmpw2 = new XMLData(); 
+                            tmpw2.setData("");
+                            createXMLData(namespaceElements, tmpw2, d.get(e), xmlns);
+                            if (namespaceElements.containsKey(el) &&
+                                    namespaceElements.get(el) != null) {
+                                
+                                ArrayList<String> keys3 = new ArrayList<String>(xmlns.keySet()); 
+                                for (int k = 0; k < keys3.size(); k++) {
+                                    String abbr = keys.get(k);
+                                    nsd.concat(" xmlns:" + abbr + "=\"" + ConfigService.NAMESPACEABBR.get(abbr) + "\"");
+                                    xmlns.remove(keys3.get(k));
+                                }
+                            }
+                            w.setData(w.getData().concat("<" + ns + ":" + el + nsd + attr + ">"));
+                            w.setData(w.getData().concat(tmpw2.getData()));
+                            w.setData(w.getData().concat("</" + ns + ":" + el_end + ">"));
+                        }
                     }
                 }
+            } else if (dd instanceof ArrayList<?>) {
+                for (int i = 0; i < ((ArrayList<Object>)dd).size(); i++) {
+                    createXMLData(namespaceElements, w, ((ArrayList<Object>)dd).get(i), xmlns);
+                }
+            } else if (dd.getClass().isPrimitive() || dd instanceof String) {
+                w.setData(w.getData().concat((String)dd));
+            } else {
+                Logger.log("XMLService: unknown data type:" + dd.getClass().toString());
+                w.setData(w.getData().concat((String)dd));
             }
-        } else if (dd instanceof ArrayList<?>) {
-            for (int i = 0; i < ((ArrayList<Object>)dd).size(); i++) {
-                createXMLData(namespaceElements, w, ((ArrayList<Object>)dd).get(i), xmlns);
-            }
-        } else if (dd.getClass().isPrimitive() || dd instanceof String) {
-            w.setData(w.getData().concat((String)dd));
-        } else {
-            Logger.log("XMLService: unknown data type:" + dd.getClass().toString());
-            w.setData(w.getData().concat((String)dd));
         }
         
     }

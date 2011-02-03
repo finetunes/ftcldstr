@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 
 public class XMLParser {
 	
-	// TODO: XML object should be returned here
+	// returns map of an xml object
     // requestParams.getRequest().getCharacterEncoding()
     
     // error control: returned null means some parsing error occured or input text was null

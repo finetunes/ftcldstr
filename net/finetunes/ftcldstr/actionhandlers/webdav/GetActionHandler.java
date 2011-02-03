@@ -1,5 +1,13 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,6 +17,8 @@ import java.util.Iterator;
 import java.util.MissingFormatArgumentException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
@@ -25,6 +35,7 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.Stat
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.routines.webdav.SearchService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesActions;
+import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
 import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties.FileProperties;
 import net.finetunes.ftcldstr.routines.xml.XMLService;
@@ -73,7 +84,7 @@ public class GetActionHandler extends AbstractActionHandler {
         else if (ConfigService.ENABLE_THUMBNAIL && FileOperationsService.is_plain_file(fn) &&
                 FileOperationsService.is_file_readable(fn) &&
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("thumb")) {
-            doThumbnailRequest(fn);
+            doThumbnailRequest(requestParams, fn);
         }
         else if (FileOperationsService.file_exits(fn) &&
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("props")) {
@@ -111,10 +122,7 @@ public class GetActionHandler extends AbstractActionHandler {
                 "<dm:mount xmlns:dm=\"http://purl.org/NET/webdav/mount\"><dm:url>" + su +  "</dm:url><dm:open>" + bn + "</dm:open></dm:mount>");
     }
     
-    // TODO
-    private void doThumbnailRequest(String fn) {
-        
-//      my $image = Graphics::Magick->new;
+    private void doThumbnailRequest(RequestParams requestParams, String fn) {
         
         int width = 22;
         if (ConfigService.THUMBNAIL_WIDTH > 0) {
@@ -136,28 +144,83 @@ public class GetActionHandler extends AbstractActionHandler {
             StatData statfn = FileOperationsService.stat(fn);
             StatData statcf = FileOperationsService.stat(cachefile);
             if (!FileOperationsService.file_exits(cachefile) || statfn.getMtimeDate().after(statcf.getMtimeDate())) {
-                // TODO: finish
-//              $image->Read($fn);
-//              $image->Resize(geometry=>$width,filter=>'Gaussian');
-//              $image->Write($cachefile);
+                
+                try {
+                    BufferedImage image = ImageIO.read(FileOperationsService.getFileContentStream(fn));
+                    
+                    int type = image.getType();
+                    if (type == 0) {
+                        type = BufferedImage.TYPE_INT_ARGB;
+                    }
+                    
+                    int height = image.getHeight() * width / image.getWidth(); 
+                    BufferedImage resizedImage = new BufferedImage(width, height, type);
+                    Graphics2D g = resizedImage.createGraphics();
+                    g.drawImage(image, 0, 0, width, height, null);
+                    g.dispose();
+                    g.setComposite(AlphaComposite.Src);
+                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    
+                    ImageIO.write(resizedImage, MIMETypesHelper.getMIMEType(fn), FileOperationsService.getFileWriteStream(cachefile));
+                }
+                catch (IOException e) {
+                    Logger.log("Exception on creating cached thumbnail: " + e.getMessage());
+                }
             }
-//          if (open(my $cf, "<$cachefile")) {
-//              print $cgi->header(-status=>'200 OK',-type=>getMIMEType($fn), -ETag=>getETag($cachefile), -Content-length=>(stat($cachefile))[7]);
-//              binmode $cf;
-//              binmode STDOUT;
-//              print while(<$cf>);
-//              close($cf);
-//          }
+            
+            InputStream fs = FileOperationsService.getFileContentStream(fn);
+            if (fs != null) {
+                StatData stat = FileOperationsService.stat(cachefile);
+                int contentLength = stat.getSize();
+                requestParams.getResponse().setStatus(200);
+                requestParams.getResponse().addHeader("Content-Type", MIMETypesHelper.getMIMEType(fn));
+                requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, cachefile));
+                requestParams.getResponse().addHeader("Content-Length", String.valueOf(contentLength));
+                
+                try {
+                    OutputStream outStream = requestParams.getResponse().getOutputStream();
+                    int val;  
+                    while ((val = fs.read()) != -1) {
+                        outStream.write(val);  
+                    }
+                }
+                catch (IOException e) {
+                    Logger.log("Exception on sending the thumbnail: " + e.getMessage());
+                }                
+            }
         }
-
-//      } else {
-//          print $cgi->header(-status=>'200 OK',-type=>getMIMEType($fn), -ETag=>getETag($fn));
-//          $image->Read($fn);
-//          $image->Resize(geometry=>$width,filter=>'Gaussian');
-//          binmode STDOUT;
-//          $image->Write('-');
-//      }            
-        
+        else {
+            requestParams.getResponse().setStatus(200);
+            requestParams.getResponse().addHeader("Content-Type", MIMETypesHelper.getMIMEType(fn));
+            requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, fn));
+            
+            try {
+                BufferedImage image = ImageIO.read(FileOperationsService.getFileContentStream(fn));
+                
+                int type = image.getType();
+                if (type == 0) {
+                    type = BufferedImage.TYPE_INT_ARGB;
+                }
+                
+                int height = image.getHeight() * width / image.getWidth(); 
+                BufferedImage resizedImage = new BufferedImage(width, height, type);
+                Graphics2D g = resizedImage.createGraphics();
+                g.drawImage(image, 0, 0, width, height, null);
+                g.dispose();
+                g.setComposite(AlphaComposite.Src);
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                OutputStream outStream = requestParams.getResponse().getOutputStream();
+                ImageIO.write(resizedImage, MIMETypesHelper.getMIMEType(fn), outStream);
+            }
+            catch (IOException e) {
+                Logger.log("Exception on creating thumbnail: " + e.getMessage());
+            }            
+        }
     }
     
     private void doFileIsDirectory(RequestParams requestParams, String fn) {
@@ -494,7 +557,10 @@ public class GetActionHandler extends AbstractActionHandler {
         content += "</tr>";
         
         ArrayList<String> allprops = new ArrayList<String>();
-        allprops.addAll(dbprops.getKeys());
+        
+        if (dbprops != null) {
+            allprops.addAll(dbprops.getKeys());
+        }
         allprops.addAll(ConfigService.KNOWN_FILE_PROPS);
         Collections.sort(allprops, new PropertyComparator());
         
@@ -509,7 +575,7 @@ public class GetActionHandler extends AbstractActionHandler {
             }
             
             // was if exists $visited{$prop}
-            if (dbprops.getProperty(prop) != null) {
+            if (dbprops != null && dbprops.getProperty(prop) != null) {
                 r200.putProp(prop, dbprops.getProperty(prop));
             }
             else {

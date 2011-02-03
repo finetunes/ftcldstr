@@ -1,6 +1,8 @@
 package net.finetunes.ftcldstr;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -54,6 +56,19 @@ public class ActionServlet extends MServlet {
         super();
         InitializationService.init();
         initMethods();
+        
+        int filecount = 5;
+        int foldercount = 6;
+        int count = 7;
+        int filesizes = 77293334;
+        
+        
+        
+        System.out.println(String.format("%s %d, %s %d, %s %d, %s %d Bytes (= %.2f KB = %.2f MB = %.2f GB)", 
+                ConfigService.stringMessages.get("statfiles"), filecount,
+                ConfigService.stringMessages.get("statfolders"), foldercount,
+                ConfigService.stringMessages.get("statsum"), count,
+                ConfigService.stringMessages.get("statsize"), filesizes, ((float)filesizes)/1024, ((float)filesizes)/1048576, ((float)filesizes)/1073741824));
     }
     
     public void destroy() {
