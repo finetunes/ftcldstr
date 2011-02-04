@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -196,7 +197,7 @@ public class OutputService {
         
         Date lastModified = stat.getMtimeDate(); 
         
-        requestParams.getResponse().addHeader("Last-Modified", String.format("%ta, %td %tb %tY %tT GMT", lastModified, lastModified, lastModified, lastModified, lastModified));
+        requestParams.getResponse().addHeader("Last-Modified", new SimpleDateFormat("EEE, dd MM yyyy HH:mm:ss z").format(lastModified));
         requestParams.getResponse().addHeader("charset", ConfigService.CHARSET);
         
         requestParams.getResponse().addHeader("MS-Author-Via", "DAV");

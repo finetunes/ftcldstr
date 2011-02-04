@@ -10,7 +10,7 @@ public class SupportedMethodsHandler {
 	
 	// returns methods list
 	// FIXME: try to find a more suitable wrapper for an array of strings 
-	public static Object[] getSupportedMethods(String path) {
+	public static ArrayList<String> getSupportedMethods(String path) {
 		
 	    ArrayList<String> methods = new ArrayList<String>();
 	    
@@ -47,7 +47,7 @@ public class SupportedMethodsHandler {
             methods.addAll(wmethods);
         }
         
-        return methods.toArray();
+        return methods;
 	}
 
 }

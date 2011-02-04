@@ -1,6 +1,7 @@
 package net.finetunes.ftcldstr;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,6 +41,8 @@ import net.finetunes.ftcldstr.actionhandlers.webdav.UnlockActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.GeneratorService;
 import net.finetunes.ftcldstr.helper.InitializationService;
+import net.finetunes.ftcldstr.helper.SystemCalls;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.ACLActions;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
@@ -57,18 +60,21 @@ public class ActionServlet extends MServlet {
         InitializationService.init();
         initMethods();
         
-        int filecount = 5;
-        int foldercount = 6;
-        int count = 7;
-        int filesizes = 77293334;
+//        int filecount = 5;
+//        int foldercount = 6;
+//        int count = 7;
+//        int filesizes = 77293334;
+//        
+//        int mode = 0642;
+//        int uid = 100;
+//        int gid = 250;
+//        
+        int size = 128823;
+        Date mtime = new Date();
+        DateFormat dateFormat = new SimpleDateFormat(ConfigService.stringMessages.get("lastmodifiedformat"));
+        String lmf = dateFormat.format(mtime);        
         
-        
-        
-        System.out.println(String.format("%s %d, %s %d, %s %d, %s %d Bytes (= %.2f KB = %.2f MB = %.2f GB)", 
-                ConfigService.stringMessages.get("statfiles"), filecount,
-                ConfigService.stringMessages.get("statfolders"), foldercount,
-                ConfigService.stringMessages.get("statsum"), count,
-                ConfigService.stringMessages.get("statsize"), filesizes, ((float)filesizes)/1024, ((float)filesizes)/1048576, ((float)filesizes)/1073741824));
+        System.out.println(String.format("%-11s", ConfigService.stringMessages.get("permissions")));
     }
     
     public void destroy() {
