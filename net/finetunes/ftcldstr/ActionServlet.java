@@ -75,6 +75,15 @@ public class ActionServlet extends MServlet {
         String lmf = dateFormat.format(mtime);        
         
         System.out.println(String.format("%-11s", ConfigService.stringMessages.get("permissions")));
+        
+        String[] x = new String[] {};
+        
+        
+        HashMap<String, Object> a = null;
+        Object b = a;
+        String c = (String)b;
+        System.out.println("done");
+        
     }
     
     public void destroy() {

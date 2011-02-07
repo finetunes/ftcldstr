@@ -1,12 +1,17 @@
 package net.finetunes.ftcldstr.routines.fileoperations;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
@@ -149,7 +154,7 @@ public class FileOperationsService {
     // determines whether the file is a plain file (not a link, directory, pipe, etc.)
     public static boolean is_plain_file(String filename) {
         
-        // TODO: implement !
+        // TODO: implement
         // return false;
         // File.isFile() ?
         
@@ -391,6 +396,39 @@ public class FileOperationsService {
     }
     
     
+    public static boolean writeFileFromStream(String fn, FileInputStream fis) {
+        if (fn != null && fis != null) {
+            OutputStream outStream = getFileWriteStream(fn);
+            BufferedInputStream buf = null;
+            try {
+                buf = new BufferedInputStream(fis);
+                int readBytes = 0;
+                
+                while ((readBytes = buf.read()) != -1) {
+                    outStream.write(readBytes);            
+                }
+                
+                return true;
+            }
+            catch (IOException e) {
+                Logger.log("Exception: Unable write the output file." + e.getMessage());
+            }
+            finally {
+                if (buf != null) {
+                    try {
+                        buf.close();
+                    }
+                    catch (IOException e) {
+                        // do nothing
+                    }
+                }
+            }            
+        }
+        
+        return false;
+    }
+        
+    
     public static boolean unlink(String filename) {
         
         // TODO: write errors in log if any
@@ -454,7 +492,14 @@ public class FileOperationsService {
         
         // TODO: implement
         return false;
-    }          
+    }
+    
+    // sets access and modification time of a file
+    public static boolean utime(java.util.Date atime, java.util.Date mtime, String fn) {
+        // TODO: implement
+        // perl code: utime($atime,$mtime,$fn);
+        return false;
+    }
     
     public class StatData {
 

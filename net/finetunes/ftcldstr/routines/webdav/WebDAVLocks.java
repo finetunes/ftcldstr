@@ -68,7 +68,7 @@ public class WebDAVLocks implements Serializable {
      */
     public ArrayList<WebDAVLock> getLocks(String fn, String token) {
 
-        // PZ: TODO: check this for multi-threading, as the method
+        // PZ: FIXME: check this for multi-threading, as the method
         // return references to locks, not new instances
         // otherwise implement cloning
         

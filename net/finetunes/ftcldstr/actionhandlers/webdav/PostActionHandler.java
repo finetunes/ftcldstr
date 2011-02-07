@@ -1,7 +1,11 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.annotation.processing.RoundEnvironment;
 
@@ -39,6 +43,10 @@ import net.finetunes.ftcldstr.routines.webdav.QueryService;
 
 public class PostActionHandler extends AbstractActionHandler {
 
+    // TODO: check all params here,
+    // as perl handles normal params and multipart data in the same way,
+    // but they should be treated differetntly in java
+    // "Content-Type: multipart/form-data"
     public void handle(final RequestParams requestParams) {
 
         String fn = requestParams.getPathTranslated();
@@ -83,11 +91,10 @@ public class PostActionHandler extends AbstractActionHandler {
                         Logger.debug("POST: delete " + fn + file);
                         
                         if (ConfigService.ENABLE_TRASH) {
-                            FileHelper.moveToTrash(requestParams, fn + file); // TODO: implement
+                            FileHelper.moveToTrash(requestParams, fn + file);
                         }
                         else {
-                            // $count += deltree($PATH_TRANSLATED.$file, \my @err);
-                            // TODO: count += FileHelper.deltree(fn + file, err); // param?
+                            count += FileHelper.deltree(requestParams, fn + file, new ArrayList<String[]>());
                         }
                         
                         Logger.log("DELETE(" + fn + ") via POST");
@@ -131,7 +138,7 @@ public class PostActionHandler extends AbstractActionHandler {
                             for (int i = 0; i < files.length; i++) {
                                 String file = files[i];
                                 
-                                if (FileOperationsService.rmove(fn + file, fn + newname)) { // TODO: implement
+                                if (FileOperationsService.rmove(fn + file, fn + newname)) {
                                     Logger.log("MOVE(" + fn + "," + fn + "" + newname + ") via POST");
                                 }
                                 else {
@@ -156,7 +163,7 @@ public class PostActionHandler extends AbstractActionHandler {
                     
                     msgparam = "p1=" + RenderingHelper.uri_escape(colname);
                     ArrayList<String> mkdirErrors = new ArrayList<String>();
-                    if (FileOperationsService.mkdir(fn + colname, mkdirErrors)) { // TODO: implement
+                    if (FileOperationsService.mkdir(fn + colname, mkdirErrors)) {
                         Logger.log("MKCOL(" + fn + colname + ") via POST");
                         msg = "foldercreated";
                     }
@@ -230,39 +237,61 @@ public class PostActionHandler extends AbstractActionHandler {
                 System.err.println("Error: Unable to perform redirect (" + rt + "): " + e.getMessage());
             }
         }
-        else if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_directory(fn) && requestParams.requestParamExists("file_upload")) {
-/*            
-  
-        my @filelist;
-        foreach my $filename ($cgi->param('file_upload')) {
-            next if $filename eq "";
-            my $rfn= $filename;
-            $rfn=~s/\\/\//g; # fix M$ Windows backslashes
-            my $destination = $PATH_TRANSLATED.basename($rfn);
-            debug("_POST: save $filename to $destination.");
-            push(@filelist, basename($rfn));
-            if (open(O,">$destination")) {
-                while (read($filename,my $buffer,$BUFSIZE)>0) {
-                    print O $buffer;
+        else if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_directory(fn) && requestParams.multipartRequestParamExists("file_upload")) {
+
+            ArrayList<String> filelist = new ArrayList<String>();
+            String[] files = requestParams.getMultipartRequestParamValues("file_upload");
+            for (int i = 0; i < files.length; i++) {
+                String filename = files[i];
+                if (filename.isEmpty()) {
+                    continue;
                 }
-                close(O);
-            } else {
-                printHeaderAndContent('403 Forbidden','text/plain','403 Forbidden');
-                last;
+                
+                String rfn = new String(filename);
+                rfn = rfn.replaceAll("\\", "/"); // # fix M$ Windows backslashes
+                String destination = fn + FileOperationsService.basename(rfn);
+                Logger.debug("POST: save " + filename + " to " + destination + ".");
+                filelist.add(FileOperationsService.basename(rfn));
+                File f = requestParams.getFile(filename);
+                FileInputStream is = null;
+                try {
+                    is = new FileInputStream(f);
+                }
+                catch (FileNotFoundException e) {
+                    Logger.log("Exception: Unable to read the file. " + e.getMessage());
+                }
+                
+                if (!(is != null && FileOperationsService.writeFileFromStream(destination, is))) {
+                    OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
+                    break;
+                }
+            }
+            
+            if (filelist.size() > 0) {
+                if (filelist.size() > 1) {
+                    msg = "uploadmulti";
+                }
+                else {
+                    msg = "uploadsingle";
+                }
+                
+                msgparam = "p1=" + filelist.size() + ConfigService.URL_PARAM_SEPARATOR +
+                    "p2=" + RenderingHelper.uri_escape(RenderingHelper.joinArray(filelist.toArray(new String[]{}), ", ").substring(0, 150));
+            }
+            else {
+                errmsg = "uploadnothingerr"; 
+            }
+
+            try {
+                requestParams.getResponse().sendRedirect(redirtarget + RenderingService.createMsgQuery(msg, msgparam, errmsg, msgparam));
+            }
+            catch (IOException e) {
+                Logger.log("Exception: Unable to perform redirect. " + e.getMessage());
             }
         }
-        if ($#filelist>-1) {
-            $msg=($#filelist>0)?'uploadmulti':'uploadsingle';
-            $msgparam='p1='.($#filelist+1).';p2='.$cgi->escape(substr(join(', ',@filelist), 0, 150));
-        } else {
-            $errmsg='uploadnothingerr';
-        }
-        print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam,$errmsg,$msgparam));  
-  
-*/            
-        }
-        else if (ConfigService.ALLOW_ZIP_DOWNLOAD && requestParams.requestParamExists("zip")) {
+        else if (ConfigService.ALLOW_ZIP_DOWNLOAD && requestParams.multipartRequestParamExists("zip")) {
 /*            
+ * TODO
             my $zip =  Archive::Zip->new();     
             foreach my $file ($cgi->param('file')) {
                 if (-d $PATH_TRANSLATED.$file) {
@@ -277,9 +306,9 @@ public class PostActionHandler extends AbstractActionHandler {
             $zip->writeToFileHandle(\*STDOUT,0);
 */            
         }
-        else if (ConfigService.ALLOW_ZIP_UPLOAD && requestParams.requestParamExists("uncompress")) {
+        else if (ConfigService.ALLOW_ZIP_UPLOAD && requestParams.multipartRequestParamExists("uncompress")) {
 /*
-
+// TODO
         my @zipfiles;
         foreach my $fh ($cgi->param('zipfile_upload')) {
             my $rfn= $fh;

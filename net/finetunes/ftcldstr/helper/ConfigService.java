@@ -502,7 +502,7 @@ public class ConfigService {
      * this is neccessary if you enable the thumbnail cache ($ENABLE_THUMBNAIL_CACHE)
      * EXAMPLE: $THUMBNAIL_CACHEDIR=".thumbs";
      */
-    // TODO: PZ: set the proper path here 
+    // FIXME: PZ: set the proper path here 
     // public static final String THUMBNAIL_CACHEDIR = "/usr/local/www/tmp/thumbs";
     public static final String THUMBNAIL_CACHEDIR = "e:\\webdav\\thumbs";
     
@@ -716,6 +716,7 @@ public class ConfigService {
         }});       
     
 /*                
+ * TODO:
     %SEARCH_PROPTYPES = ( default=>'string',
                   '{DAV:}getlastmodified'=> 'dateTime', '{DAV:}lastaccessed'=>'dateTime', '{DAV:}getcontentlength' => 'int', 
                   '{DAV:}creationdate' => 'dateTime','{urn:schemas-microsoft-com:}Win32CreationTime' =>'dateTime', 
@@ -744,15 +745,6 @@ public class ConfigService {
             "xmlns", 
             "CS" 
             ));    
-    
-    
-	
-//	public static String getValue(String parameter) {
-//		
-//		// TODO: implement
-//		return null;
-//		
-//	}
     
     public static String DAV = null;
     public static volatile Properties properties = null;

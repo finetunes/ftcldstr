@@ -2,12 +2,15 @@ package net.finetunes.ftcldstr.routines.webdav.properties;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.sun.xml.internal.ws.encoding.XMLHTTPBindingCodec;
 
 import sun.nio.cs.Surrogate.Generator;
 
@@ -24,6 +27,7 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 import net.finetunes.ftcldstr.routines.handlers.SupportedMethodsHandler;
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
+import net.finetunes.ftcldstr.routines.xml.XMLService;
 
 public class PropertiesActions {
 	
@@ -838,69 +842,98 @@ public class PropertiesActions {
         
         Logger.debug("setProperty: " + propname + " (ns=" + ns + ", pn=" + pn + ")");
         
-//        if (propname.equals("{http://apache.org/dav/props/}executable")) {
-//             ...
-//            
-//        }
-	    
-/*		
-	TODO:
-	
-    if ($propname eq '{http://apache.org/dav/props/}executable') {
-        my $executable = $$elementParentRef{$propname}{'content'};
-        if (defined $executable) {
-            my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($fn);
-            chmod( ($executable=~/F/) ? $mode & 0666 : $mode | 0111, $fn);
-            $$resp_200{href}=$ru;
-            $$resp_200{propstat}{prop}{executable}=$executable;
-            $$resp_200{propstat}{status}='HTTP/1.1 200 OK';
+        if (propname.equals("{http://apache.org/dav/props/}executable")) {
+            if (elementParentRef.get(propname) != null && elementParentRef.get(propname) instanceof HashMap<?, ?>) {
+                String executable = (String)((HashMap<String, Object>)elementParentRef.get(propname)).get("content");
+                if (executable != null) {
+                    StatData stat = FileOperationsService.stat(fn);
+                    int mode;
+                    if (executable.matches(".*F.*")) {
+                        mode = stat.getMode() & 0666;
+                    }
+                    else {
+                        mode = stat.getMode() | 0111;
+                    }
+                    
+                    FileOperationsService.chmod(mode, fn);
+                    resp_200.setHref(ru);
+                    resp_200.putPropstatProp("executable", executable);
+                    resp_200.setPropstatStatus("HTTP/1.1 200 OK");
+                }
+            }
         }
-    } elsif (($propname eq '{DAV:}getlastmodified')||($propname eq '{urn:schemas-microsoft-com:}Win32LastModifiedTime')
-            ||($propname eq '{urn:schemas-microsoft-com:}Win32LastAccessTime')
-            ||($propname eq '{urn:schemas-microsoft-com:}Win32CreationTime')) {
-        my $getlastmodified = $$elementParentRef{'{DAV:}getlastmodified'};
-        $getlastmodified = $$elementParentRef{'{urn:schemas-microsoft-com:}Win32LastModifiedTime'} if !defined $getlastmodified;
-        my $lastaccesstime =$$elementParentRef{'{urn:schemas-microsoft-com:}Win32LastAccessTime'};
-        if (defined $getlastmodified) {
-            my $mtime = str2time($getlastmodified);
-            my $atime = defined $lastaccesstime ? str2time($lastaccesstime) : $mtime;
-            utime($atime,$mtime,$fn);
-            $$resp_200{href}=$ru;
-            $$resp_200{propstat}{prop}{getlastmodified}=$getlastmodified if defined  $$elementParentRef{'{DAV:}getlastmodified'};
-            $$resp_200{propstat}{prop}{Win32LastModifiedTime}=$getlastmodified if $$elementParentRef{'{urn:schemas-microsoft-com:}Win32LastModifiedTime'};
-            $$resp_200{propstat}{prop}{Win32LastAccessTime}=$lastaccesstime if $$elementParentRef{'{urn:schemas-microsoft-com:}Win32LastAccessTime'};
-            $$resp_200{propstat}{prop}{Win32CreationTime}=$$elementParentRef{'{urn:schemas-microsoft-com:}Win32CreationTime'} if defined $$elementParentRef{'{urn:schemas-microsoft-com:}Win32CreationTime'};
-            $$resp_200{propstat}{status}='HTTP/1.1 200 OK';
-        } 
-    } elsif ($propname eq '{urn:schemas-microsoft-com:}Win32FileAttributes') {
-        $$resp_200{href}=$ru;
-        $$resp_200{propstat}{prop}{Win32FileAttributes}=undef;
-        $$resp_200{propstat}{status}='HTTP/1.1 200 OK';
-    } elsif (defined $NAMESPACES{$ns} && grep(/^\Q$pn\E$/,@PROTECTED_PROPS)>0) {
-        $$resp_403{href}=$ru;
-        $$resp_403{propstat}{prop}{$propname}=undef;
-        $$resp_403{propstat}{status}='HTTP/1.1 403 Forbidden';
-    } else {
-        my $n = $propname;
-        $n='{}'.$n if (ref($$elementParentRef{$propname}) eq 'HASH' && $$elementParentRef{$propname}{xmlns} eq "" && $n!~/^{[^}]*}/);
-        my $dbval = db_getProperty($fn, $n);
-        my $value = createXML($$elementParentRef{$propname},0);
-        my $ret = defined $dbval ? db_updateProperty($fn, $n, $value) : db_insertProperty($fn, $n, $value);
-        if ($ret) {
-            $$resp_200{href}=$ru;
-            $$resp_200{propstat}{prop}{$propname}=undef;
-            $$resp_200{propstat}{status}='HTTP/1.1 200 OK';
-        } else {
-            debug("Cannot set property '$propname'");
-            $$resp_403{href}=$ru;
-            $$resp_403{propstat}{prop}{$propname}=undef;
-            $$resp_403{propstat}{status}='HTTP/1.1 403 Forbidden';
+        else if (propname.equals("{DAV:}getlastmodified") || 
+                propname.equals("{urn:schemas-microsoft-com:}Win32LastModifiedTime") || 
+                propname.equals("{urn:schemas-microsoft-com:}Win32LastAccessTime") || 
+                propname.equals("{urn:schemas-microsoft-com:}Win32CreationTime")) {
+            
+            String getlastmodified = (String)elementParentRef.get("{DAV:}getlastmodified");
+            if (getlastmodified == null) {
+                getlastmodified = (String)elementParentRef.get("{urn:schemas-microsoft-com:}Win32LastModifiedTime");
+            }
+            
+            String lastaccesstime = (String)elementParentRef.get("{urn:schemas-microsoft-com:}Win32LastAccessTime");
+            
+            if (getlastmodified != null) {
+                Date mtime = RenderingHelper.parseHTTPDate(getlastmodified);
+                Date atime = (Date)mtime.clone();
+                if (lastaccesstime != null) {
+                    atime = RenderingHelper.parseHTTPDate(lastaccesstime);
+                }
+                
+                FileOperationsService.utime(atime, mtime, fn);
+                resp_200.setHref(ru);
+                if (elementParentRef.containsKey("{DAV:}getlastmodified")) {
+                    resp_200.putPropstatProp("getlastmodified", getlastmodified);
+                }
+                if (elementParentRef.get("{urn:schemas-microsoft-com:}Win32LastModifiedTime") != null) {
+                    resp_200.putPropstatProp("Win32LastModifiedTime", getlastmodified);
+                }
+                if (elementParentRef.get("{urn:schemas-microsoft-com:}Win32LastAccessTime") != null) {
+                    resp_200.putPropstatProp("Win32LastAccessTime", lastaccesstime);
+                }
+                if (elementParentRef.containsKey("{urn:schemas-microsoft-com:}Win32CreationTime")) {
+                    resp_200.putPropstatProp("Win32CreationTime", elementParentRef.get("{urn:schemas-microsoft-com:}Win32CreationTime"));
+                }
+                resp_200.setPropstatStatus("HTTP/1.1 200 OK");
+            }
             
         }
-    }
-	    
-	    
-*/	    
+        else if (propname.equals("{urn:schemas-microsoft-com:}Win32FileAttributes")) {
+            resp_200.setHref(ru);
+            resp_200.putPropstatProp("Win32FileAttributes", null);
+            resp_200.setPropstatStatus("HTTP/1.1 200 OK");            
+        }
+        else if (ConfigService.NAMESPACES.get(ns) != null && ConfigService.PROTECTED_PROPS.contains(pn)) {
+            resp_403.setHref(ru);
+            resp_403.putPropstatProp(propname, null);
+            resp_403.setPropstatStatus("HTTP/1.1 403 Forbidden");             
+        }
+        else {
+            
+            String n = new String(propname);
+            if (elementParentRef.get(propname) instanceof HashMap<?, ?> && 
+                    elementParentRef.get(propname) != null &&
+                    ((HashMap<String, Object>)elementParentRef.get(propname)) != null &&
+                    (((String)((HashMap<String, Object>)elementParentRef.get(propname)).get("xmlns")).isEmpty()) &&
+                            !n.matches("\\{[^\\}]*\\}.*")) {
+                n = "{}" + n;
+            }
+            
+            String value = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, (HashMap<String, Object>)elementParentRef.get(propname), false);
+            boolean ret = ConfigService.properties.setProperty(fn, n, value);
+            
+            if (ret) {
+                resp_200.setHref(ru);
+                resp_200.putPropstatProp(propname, null);
+                resp_200.setPropstatStatus("HTTP/1.1 200 OK");
+            }
+            else {
+                resp_403.setHref(ru);
+                resp_403.putPropstatProp(propname, null);
+                resp_403.setPropstatStatus("HTTP/1.1 403 Forbidden");
+            }
+        }
 	}
 	
 }

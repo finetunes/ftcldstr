@@ -1,5 +1,6 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.finetunes.ftcldstr.RequestParams;
@@ -44,8 +45,8 @@ public class OptionsActionHandler extends AbstractActionHandler {
                 type = MIMETypesHelper.getMIMEType(fn);
             }
             
-            Object[] supportedMethods = SupportedMethodsHandler.getSupportedMethods(fn);
-            methods = RenderingHelper.joinArray(supportedMethods, ", ");
+            ArrayList<String> supportedMethods = SupportedMethodsHandler.getSupportedMethods(fn);
+            methods = RenderingHelper.joinArray(supportedMethods.toArray(new String[] {}), ", ");
         }
         else {
             status = "404 Not Found";

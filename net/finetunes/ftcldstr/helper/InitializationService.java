@@ -305,7 +305,6 @@ public class InitializationService {
         strings.put("size", "Size");
         strings.put("mimetype", "MIME Type");
         
-        // TODO: set java time format here
         // strings.put("lastmodifiedformat", "%d-%b-%Y %H:%M");
         strings.put("lastmodifiedformat", "dd-MM-yyyy HH:mm");
         

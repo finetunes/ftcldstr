@@ -3,7 +3,11 @@ package net.finetunes.ftcldstr.rendering;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
 
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
@@ -125,5 +129,41 @@ public class RenderingHelper {
         }    
         
         return result;
+    }
+    
+    public static Date parseHTTPDate(String s) {
+        
+        // Three formats are possbile:
+        // Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
+        // Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036
+        // Sun Nov  6 08:49:37 1994       ; ANSI C's asctime() format        
+        
+        String[] dateFormats = {
+            "EEE', 'dd-MMM-yyyy HH:mm:ss z",  // RFC 822, updated by RFC 1123
+            "EEE', 'dd-MMM-yyyy HH:mm:ss",    // RFC 822, no timezone
+            "EEEE', 'dd-MMM-yy HH:mm:ss z",   // RFC 850, obsoleted by RFC 1036
+            "EEEE', 'dd-MMM-yy HH:mm:ss",     // RFC 850, no timezone
+            "EEE MMM dd HH:mm:ss yyyy",       // ANSI C's asctime() format 
+        };        
+        
+        Date d = null;
+        if (s != null) {
+            
+            for (int i = 0; i < dateFormats.length; i++) {
+                try {
+                    SimpleDateFormat format = new SimpleDateFormat(dateFormats[i]);
+                    d = format.parse(s);
+                }
+                catch (ParseException e) {
+                    // wrong format                    
+                }
+                
+                if (d != null) {
+                    return d;
+                }
+            }
+        }
+        
+        return d;
     }
 }

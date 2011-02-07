@@ -1,6 +1,7 @@
 package net.finetunes.ftcldstr;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -189,6 +190,15 @@ public class RequestParams {
         
         return null;
     }    
+    
+    public File getFile(String fn) {
+
+        if (fn != null) {
+            return multipartRequest.getFile(fn);
+        }
+        
+        return null;
+    }       
     
     private void createMultipartRequestWrapper() {
         try {

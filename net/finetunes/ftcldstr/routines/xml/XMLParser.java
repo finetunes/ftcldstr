@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -28,7 +29,6 @@ public class XMLParser {
     // empty hashmap if input text was empty
     // hashmap with data if everything was ok
     
-    // TODO: update arrays to array lists
 	public HashMap<String, Object> simpleXMLParser(String text, String encoding, boolean keepRoot) {
 		
 	    if (text != null) {
@@ -89,22 +89,22 @@ public class XMLParser {
             } 
             if (parent instanceof HashMap<?, ?>) {
                 if (((HashMap<String, Object>)parent).containsKey(node.getNodeName())) {
-                    if (((HashMap<String, Object>)parent).get(node.getNodeName()).getClass().isArray()) {
-                        Object parentObj = ((HashMap<String, Object>)parent).get(node.getNodeName());
-                        Object[] parentArray = (Object[])parentObj;
-                        Object[] parentArrayEx = new Object[parentArray.length + 1];
-                        System.arraycopy(parentArray, 0, parentArrayEx, 0, parentArray.length);
-                        parentArrayEx[parentArray.length] = value;
-                        ((HashMap<String, Object>)parent).put(node.getNodeName(), parentArrayEx);
+                    if (((HashMap<String, Object>)parent).get(node.getNodeName()) instanceof ArrayList<?>) {
+                        ArrayList<Object> parentObj = (ArrayList<Object>)((HashMap<String, Object>)parent).get(node.getNodeName());
+                        parentObj.add(value);
+                        ((HashMap<String, Object>)parent).put(node.getNodeName(), parentObj);
                     } else {
-                        Object[] parentArray = {((HashMap<String, Object>)parent).get(node.getNodeName()), value};
+                        ArrayList<Object> parentArray = new ArrayList<Object>();
+                        parentArray.add(((HashMap<String, Object>)parent).get(node.getNodeName()));
+                        parentArray.add(value);
+                        
                         ((HashMap<String, Object>)parent).put(node.getNodeName(), parentArray);
                     }
                 } else {
                     ((HashMap<String, Object>)parent).put(node.getNodeName(), value);
                 }
-            } else if (parent.getClass().isArray()) {
-                Arrays.asList(parent).add(value);
+            } else if (parent instanceof ArrayList<?>) {
+                ((ArrayList) parent).add(value);
             } else if (parent instanceof String) {
                 return;
             }

@@ -1,6 +1,5 @@
 package net.finetunes.ftcldstr.routines.xml;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,7 +14,6 @@ import net.finetunes.ftcldstr.routines.NamespaceService;
 
 public class XMLService {
 	
-    // TODO: check parameter types
     public static void createXMLData(Map<String, Integer> namespaceElements, XMLData w, Object dd, HashMap<String, String> xmlns) {
         
         Matcher m;
@@ -34,7 +32,7 @@ public class XMLService {
                 
                 for (int i = 0; i < keys.size(); i++) {
                     String e = keys.get(i);
-                    String el = e;
+                    String el = new String(e);
                     String euns = "";
                     String uns = "";
                     String ns = NamespaceService.getNameSpace(e);
