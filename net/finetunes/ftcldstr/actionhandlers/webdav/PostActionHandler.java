@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.annotation.processing.RoundEnvironment;
 
@@ -21,6 +23,7 @@ import net.finetunes.ftcldstr.rendering.RenderingService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
+import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
 
 /**
  * The POST method is used to request that the origin server accept the
@@ -290,23 +293,57 @@ public class PostActionHandler extends AbstractActionHandler {
             }
         }
         else if (ConfigService.ALLOW_ZIP_DOWNLOAD && requestParams.multipartRequestParamExists("zip")) {
-/*            
- * TODO
-            my $zip =  Archive::Zip->new();     
-            foreach my $file ($cgi->param('file')) {
-                if (-d $PATH_TRANSLATED.$file) {
-                    $zip->addTree($PATH_TRANSLATED.$file, $file);
-                } else {
-                    $zip->addFile($PATH_TRANSLATED.$file, $file);
-                }
-            }
-            my $zfn = basename($PATH_TRANSLATED).'.zip';
-            $zfn=~s/ /_/;
-            print $cgi->header(-status=>'200 OK', -type=>'application/zip',-Content_disposition=>'attachment; filename='.$zfn);
-            $zip->writeToFileHandle(\*STDOUT,0);
-*/            
+            
+            // won't work recursively
+            // perhaps using system buil-in functions will be a better approach
+            // TODO: implement
+            
+//            byte[] buf = new byte[1024];
+//            
+//            try {
+//                String zfn = FileOperationsService.basename(fn) + ".zip";
+//                zfn = zfn.replaceAll(" ", "_");
+//                ZipOutputStream out = new ZipOutputStream(requestParams.getResponse().getOutputStream());
+//                
+//                requestParams.getResponse().setStatus(200);
+//                requestParams.getResponse().addHeader("Content-Type", "application/zip");
+//                requestParams.getResponse().addHeader("Content-Disposition", "attachment; filename=" + zfn);
+//                
+//                String[] files = requestParams.getMultipartRequestParamValues("file");
+//                for (int i = 0; i < files.length; i++) {
+//                    String file = files[i];
+//                    String filename = fn + file;
+//                    FileInputStream in = new FileInputStream(filename);
+//                    out.putNextEntry(new ZipEntry(filename));
+//                    
+//                    int len;
+//                    while ((len = in.read(buf)) > 0) {
+//                        out.write(buf, 0, len);
+//                    }
+//                    
+//                    out.closeEntry();
+//                    in.close();
+//                }
+//                // out.close(); // shoud be closed later
+//            }
+//            catch (IOException e) {
+//                Logger.log("Exception on creating an archive: " + e.getMessage());
+//            }
         }
         else if (ConfigService.ALLOW_ZIP_UPLOAD && requestParams.multipartRequestParamExists("uncompress")) {
+            
+            //  my @zipfiles;
+//            String[] files = requestParams.getMultipartRequestParamValues("zipfile_upload");
+//            for (int i = 0; i < files.length; i++) {
+//                String fh = files[i];
+//                String rfn = new String(fh);
+//                rfn = rfn.replaceAll("\\", "/"); // # fix M$ Windows backslashes
+//                rfn = FileOperationsService.basename(rfn);
+//                
+//            }
+            
+            
+            
 /*
 // TODO
         my @zipfiles;
