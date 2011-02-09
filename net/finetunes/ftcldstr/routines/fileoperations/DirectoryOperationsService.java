@@ -1,7 +1,5 @@
 package net.finetunes.ftcldstr.routines.fileoperations;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,12 +23,11 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.Stat
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
 import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
-import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
-import net.finetunes.ftcldstr.wrappers.ReadDirectoryResult;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class DirectoryOperationsService {
 	
-	public static void readDirBySuffix(String fn, String base, 
+	public static void readDirBySuffix(RequestParams requestParams, String fn, String base, 
 			ArrayList<String> hrefs, String suffix, 
 			int depth, ArrayList<String> visited) {
 	    
@@ -54,7 +51,7 @@ public class DirectoryOperationsService {
 	    
 	    visited.add(nfn);
 	    
-        List<String> files = ReadDirectoryContentWrapper.getFileList(fn);
+        List<String> files = WrappingUtilities.getFileList(requestParams, fn);
         if (files != null) {
     	    Iterator<String> it = files.iterator();
     	    while (it.hasNext()) {
@@ -71,7 +68,7 @@ public class DirectoryOperationsService {
     	            }
     	            
     	            if (depth != 0 && FileOperationsService.is_directory(fn + sf)) {
-    	                readDirBySuffix(fn + sf, nbase, hrefs, suffix, depth - 1, visited);
+    	                readDirBySuffix(requestParams, fn + sf, nbase, hrefs, suffix, depth - 1, visited);
     	            }
     	            // ## add only files with requested components 
     	            // ## filter (comp-filter > comp-filter >)	            
@@ -80,9 +77,9 @@ public class DirectoryOperationsService {
         }
 	}
 	
-    public static void readDirBySuffix(String fn, String base, 
+    public static void readDirBySuffix(RequestParams requestParams, String fn, String base, 
             ArrayList<String> hrefs, String suffix, int depth) {
-        readDirBySuffix(fn, base, hrefs, suffix, depth, null);
+        readDirBySuffix(requestParams, fn, base, hrefs, suffix, depth, null);
     }
 	
 	public static Object[] getFolderList(RequestParams requestParams, String fn, String ru, String filter) {
@@ -189,7 +186,7 @@ public class DirectoryOperationsService {
             list += FileHelper.getfancyfilename(requestParams, FileOperationsService.splitFilename(ru)[0] + "/", "..", "< .. >", FileOperationsService.splitFilename(fn)[0]) + "\n";
 	    }
 	    
-        List<String> files = ReadDirectoryContentWrapper.getFileList(fn);
+        List<String> files = WrappingUtilities.getFileList(requestParams, fn);
         if (files == null) {
             files = new ArrayList<String>();
         }
@@ -341,7 +338,7 @@ public class DirectoryOperationsService {
     // though such an approach seems not to take into account
     // the situation when the directory contents is changed;
     // implemented without the cache here
-	public static int getDirInfo(String fn, String prop) {
+	public static int getDirInfo(RequestParams requestParams, String fn, String prop) {
 	    
         int childcount = 0;
         int visiblecount = 0;
@@ -349,7 +346,7 @@ public class DirectoryOperationsService {
         int hassubs = 0;
         int realchildcount = 0;
 	    
-        List<String> files = ReadDirectoryContentWrapper.getFileList(fn);
+        List<String> files = WrappingUtilities.getFileList(requestParams, fn);
         if (files != null) {
             Iterator<String> it = files.iterator();
             while (it.hasNext()) {
@@ -427,7 +424,7 @@ public class DirectoryOperationsService {
 	    
 	    visited.add(nfn);
 	    if (depth != 0 && FileOperationsService.is_directory(nfn)) {
-	        List<String> files = ReadDirectoryContentWrapper.getFileList(nfn);
+	        List<String> files = WrappingUtilities.getFileList(requestParams, nfn);
 	        if (files != null) {
     	        String order = requestParams.getRequest().getParameter("order");
     	        if (order == null || order.isEmpty()) {

@@ -12,7 +12,7 @@ import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.routines.webdav.LockingService;
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
-import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 
 public class FileHelper {
@@ -195,7 +195,7 @@ public class FileHelper {
 	        }
 	    }
 	    else if (FileOperationsService.is_directory(f)) {
-	        ArrayList<String> files = ReadDirectoryContentWrapper.getFileList(f);
+	        ArrayList<String> files = WrappingUtilities.getFileList(requestParams, f);
 	        if (files != null) {
     	        Iterator<String> it = files.iterator();
     	        while (it.hasNext()) {

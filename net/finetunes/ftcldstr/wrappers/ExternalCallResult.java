@@ -4,13 +4,13 @@ package net.finetunes.ftcldstr.wrappers;
  * Class to store the raw result from a wrapper.
  *
  */
-public class WrapperResult {
+public class ExternalCallResult {
     
     private String stdOutput = null;
     private String errOutput = null;
     private int exitCode = 0;
     
-    public WrapperResult(String stdOutput, String errOutput, int errorCode) {
+    public ExternalCallResult(String stdOutput, String errOutput, int errorCode) {
         super();
         this.stdOutput = stdOutput;
         this.errOutput = errOutput;

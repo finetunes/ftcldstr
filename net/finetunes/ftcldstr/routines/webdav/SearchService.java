@@ -1,7 +1,6 @@
 package net.finetunes.ftcldstr.routines.webdav;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import net.finetunes.ftcldstr.RequestParams;
@@ -10,9 +9,7 @@ import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.rendering.RenderingService;
 import net.finetunes.ftcldstr.routines.fileoperations.DirectoryOperationsService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
-import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
-
-import org.w3c.dom.Element;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class SearchService {
 	
@@ -68,7 +65,7 @@ public class SearchService {
         
         fullcount.incValue(count);
         
-        ArrayList<String> files = ReadDirectoryContentWrapper.getFileList(fn);
+        ArrayList<String> files = WrappingUtilities.getFileList(requestParams, fn);
         if (files != null) {
             Iterator<String> it = files.iterator();
             while (it.hasNext()) {

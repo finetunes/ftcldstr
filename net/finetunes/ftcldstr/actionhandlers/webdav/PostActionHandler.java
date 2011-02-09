@@ -221,7 +221,7 @@ public class PostActionHandler extends AbstractActionHandler {
                     
                     for (int i = 0; i < files.length; i++) {
                         String file = files[i];
-                        FileOperationsService.changeFilePermissions(fn + file, mode, 
+                        FileOperationsService.changeFilePermissions(requestParams, fn + file, mode, 
                                 fp_type, ConfigService.ALLOW_CHANGEPERMRECURSIVE && (fp_recursive != null && !fp_recursive.isEmpty()));
                     }
                 }

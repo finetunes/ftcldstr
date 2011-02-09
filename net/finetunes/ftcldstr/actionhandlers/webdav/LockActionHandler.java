@@ -91,7 +91,7 @@ public class LockActionHandler extends AbstractActionHandler {
             Logger.debug("LOCK: not lockable ... but...");
             if (LockingService.isAllowed(requestParams, fn)) {
                 status = "200 OK";
-                LockingService.lockResource(fn, ru, xmldata, depth, timeout, token);
+                LockingService.lockResource(requestParams, fn, ru, xmldata, depth, timeout, token);
                 HashMap<String, Object> prop = new HashMap<String, Object>();
                 ArrayList<HashMap<String, Object>> lockdiscovery = LockingService.getLockDiscovery(fn);
                 prop.put("lockdiscovery", lockdiscovery);
@@ -104,7 +104,7 @@ public class LockActionHandler extends AbstractActionHandler {
         }
         else if (!FileOperationsService.file_exits(fn)) {
             if (FileOperationsService.create_file(fn, "")) {
-                HashMap<String, Object> resp = LockingService.lockResource(fn, ru, xmldata, depth, timeout, token);
+                HashMap<String, Object> resp = LockingService.lockResource(requestParams, fn, ru, xmldata, depth, timeout, token);
                 if (resp != null && resp.get("multistatus") != null) {
                     status = "207 Multi-Status";
                 }
@@ -120,7 +120,7 @@ public class LockActionHandler extends AbstractActionHandler {
             }
         }
         else {
-            HashMap<String, Object> resp = LockingService.lockResource(fn, ru, xmldata, depth, timeout, token);
+            HashMap<String, Object> resp = LockingService.lockResource(requestParams, fn, ru, xmldata, depth, timeout, token);
             content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, resp);
             if (resp != null && resp.containsKey("multistatus") && resp.get("multistatus") != null) {
                 status = "207 Multi-Status";

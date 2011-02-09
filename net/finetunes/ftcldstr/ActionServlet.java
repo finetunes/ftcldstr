@@ -1,6 +1,10 @@
 package net.finetunes.ftcldstr;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,6 +17,8 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.base.NotSupportedMethodActionHandler;
@@ -60,29 +66,28 @@ public class ActionServlet extends MServlet {
         InitializationService.init();
         initMethods();
         
-//        int filecount = 5;
-//        int foldercount = 6;
-//        int count = 7;
-//        int filesizes = 77293334;
-//        
-//        int mode = 0642;
-//        int uid = 100;
-//        int gid = 250;
-//        
-        int size = 128823;
-        Date mtime = new Date();
-        DateFormat dateFormat = new SimpleDateFormat(ConfigService.stringMessages.get("lastmodifiedformat"));
-        String lmf = dateFormat.format(mtime);        
+        // ****
+
+        try{
+            // Open the file that is the first 
+            // command line parameter
+            String path = "d:\\1.txt";
+            FileInputStream fstream = new FileInputStream(path);
+            // Get the object of DataInputStream
+            DataInputStream in = new DataInputStream(fstream);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String strLine;
+            //Read File Line By Line
+            while ((strLine = br.readLine()) != null)   {
+              // Print the content on the console
+              System.out.println (strLine);
+            }
+            //Close the input stream
+            in.close();
+            }catch (Exception e){//Catch exception if any
+              System.err.println("Error: " + e.getMessage());
+            }        
         
-        System.out.println(String.format("%-11s", ConfigService.stringMessages.get("permissions")));
-        
-        String[] x = new String[] {};
-        
-        
-        HashMap<String, Object> a = null;
-        Object b = a;
-        String c = (String)b;
-        System.out.println("done");
         
     }
     

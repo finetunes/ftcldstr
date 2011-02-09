@@ -256,6 +256,7 @@ public class InitializationService {
         params.setPathTranslated(pathTranslated);
         params.setRequestURI(requestURI);
         params.setScriptURI(scriptURI);
+        params.setServletContext(servletContext);
         
         return params;
     }

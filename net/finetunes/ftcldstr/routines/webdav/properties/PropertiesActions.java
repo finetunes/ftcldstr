@@ -364,7 +364,7 @@ public class PropertiesActions {
             
             int dirinfo = 0;
             if (FileOperationsService.is_directory(fn)) {
-                dirinfo = DirectoryOperationsService.getDirInfo(fn, prop); 
+                dirinfo = DirectoryOperationsService.getDirInfo(requestParams, fn, prop); 
             }
             resp_200.putProp("childcount", dirinfo);
         }
@@ -397,7 +397,7 @@ public class PropertiesActions {
             
             int hassubs = 0;
             if (FileOperationsService.is_directory(fn)) {
-                hassubs = DirectoryOperationsService.getDirInfo(fn, prop); 
+                hassubs = DirectoryOperationsService.getDirInfo(requestParams, fn, prop); 
             }
             resp_200.putProp("hassubs", hassubs);
         }
@@ -423,7 +423,7 @@ public class PropertiesActions {
             
             int objectcount = 0;
             if (FileOperationsService.is_directory(fn)) {
-                objectcount = DirectoryOperationsService.getDirInfo(fn, prop); 
+                objectcount = DirectoryOperationsService.getDirInfo(requestParams, fn, prop); 
             }
             resp_200.putProp("objectcount", objectcount);
         }        
@@ -436,7 +436,7 @@ public class PropertiesActions {
             
             int visiblecount = 0;
             if (FileOperationsService.is_directory(fn)) {
-                visiblecount = DirectoryOperationsService.getDirInfo(fn, prop); 
+                visiblecount = DirectoryOperationsService.getDirInfo(requestParams, fn, prop); 
             }
             resp_200.putProp("visiblecount", visiblecount);
         }

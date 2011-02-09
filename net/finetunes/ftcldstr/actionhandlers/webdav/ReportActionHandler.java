@@ -170,7 +170,7 @@ public class ReportActionHandler extends AbstractActionHandler {
             }
             else if (xmldata.containsKey("{urn:ietf:params:xml:ns:caldav}calendar-query")) { // ## missing filter
                 rn = "{urn:ietf:params:xml:ns:caldav}calendar-query";
-                DirectoryOperationsService.readDirBySuffix(fn, ru, hrefs, "ics", depth);
+                DirectoryOperationsService.readDirBySuffix(requestParams, fn, ru, hrefs, "ics", depth);
             }
             else if (xmldata.containsKey("{urn:ietf:params:xml:ns:caldav}calendar-multiget")) { // ## OK - complete
                 rn = "{urn:ietf:params:xml:ns:caldav}calendar-multiget";
@@ -189,7 +189,7 @@ public class ReportActionHandler extends AbstractActionHandler {
             }
             else if (xmldata.containsKey("{urn:ietf:params:xml:ns:carddav}addressbook-query")) {
                 rn = "{urn:ietf:params:xml:ns:carddav}addressbook-query";
-                DirectoryOperationsService.readDirBySuffix(fn, ru, hrefs, "vcf", depth);
+                DirectoryOperationsService.readDirBySuffix(requestParams, fn, ru, hrefs, "vcf", depth);
             }
             else if (xmldata.containsKey("{urn:ietf:params:xml:ns:carddav}addressbook-multiget")) {
                 rn = "{urn:ietf:params:xml:ns:carddav}addressbook-multiget";

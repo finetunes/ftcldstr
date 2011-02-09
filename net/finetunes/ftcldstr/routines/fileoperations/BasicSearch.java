@@ -1,16 +1,17 @@
 package net.finetunes.ftcldstr.routines.fileoperations;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 
-import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
+import net.finetunes.ftcldstr.RequestParams;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class BasicSearch {
 
 	// TODO: clarify the type of expression param
 	// TODO: matches requires to be passes by reference
 	public static void doBasicSearch(
+	        RequestParams requestParams,
 			String expr, 
 			String base, String href, 
 			int depth, int limit, 
@@ -58,7 +59,7 @@ public class BasicSearch {
 	    
 	    visited.add(nbase);
 	    if (FileOperationsService.is_directory(base)) {
-	        ArrayList<String> files = ReadDirectoryContentWrapper.getFileList(base);
+	        ArrayList<String> files = WrappingUtilities.getFileList(requestParams, base);
 	        
 	        if (files != null) {
 	            Iterator<String> it = files.iterator();
@@ -73,7 +74,7 @@ public class BasicSearch {
 	                    if (depth != Integer.MAX_VALUE) {
 	                        dp = depth - 1;
 	                    }
-	                    doBasicSearch(expr, base + sf, href + sf, dp, limit, matches, visited);
+	                    doBasicSearch(requestParams, expr, base + sf, href + sf, dp, limit, matches, visited);
 	                }
 	            }
 	        }

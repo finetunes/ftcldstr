@@ -11,11 +11,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import sun.org.mozilla.javascript.internal.WrapFactory;
+
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
-import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
-import net.finetunes.ftcldstr.wrappers.ReadDirectoryResult;
+import net.finetunes.ftcldstr.wrappers.CommonContentWrapper;
+import net.finetunes.ftcldstr.wrappers.CommonWrapperResult;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class FileOperationsService {
 	
@@ -38,7 +42,7 @@ public class FileOperationsService {
 		
 	}
 	
-	public static void changeFilePermissions(String fn, 
+	public static void changeFilePermissions(RequestParams requestParams, String fn, 
 			int mode, String type, boolean recurse, 
 			ArrayList<String> visited) {
 	    
@@ -79,32 +83,25 @@ public class FileOperationsService {
 	        
 	    }
 	    
-        List<String> files = new ArrayList<String>();
-        ReadDirectoryContentWrapper rdw = new ReadDirectoryContentWrapper();
-        ReadDirectoryResult d = rdw.readDirectory(fn);
-        if (d.getExitCode() != 0) {
-            Logger.log("Error reading directory content. Dir: " + fn + "; Error: " + d.getErrorMessage());
-        }
-        else {
-            files = d.getContent();
-        }
-        
-        Iterator<String> it = files.iterator();
-        while (it.hasNext()) {
-            String f = it.next();
-            
-            if (FileOperationsService.is_directory(fn + f) && !f.endsWith("/")) {
-                f += "/";
+        List<String> files = WrappingUtilities.getFileList(requestParams, fn);
+        if (files != null) {
+            Iterator<String> it = files.iterator();
+            while (it.hasNext()) {
+                String f = it.next();
+                
+                if (FileOperationsService.is_directory(fn + f) && !f.endsWith("/")) {
+                    f += "/";
+                }
+                
+                changeFilePermissions(requestParams, fn + f, mode, type, recurse, visited);
             }
-            
-            changeFilePermissions(fn + f, mode, type, recurse, visited);
         }
 	}
 	
-    public static void changeFilePermissions(String filename, 
+    public static void changeFilePermissions(RequestParams requestParams, String filename, 
             int mode, String type, boolean recurse) {
 
-        changeFilePermissions(filename, mode, type, recurse, null);
+        changeFilePermissions(requestParams, filename, mode, type, recurse, null);
     }	
 
 	public static boolean is_hidden(String filename) {
@@ -139,7 +136,7 @@ public class FileOperationsService {
     }
 	
     public static boolean is_directory(String filename) {
-        
+
         File file = new File(filename);
         return file.isDirectory();
     }	
@@ -153,7 +150,7 @@ public class FileOperationsService {
 
     // determines whether the file is a plain file (not a link, directory, pipe, etc.)
     public static boolean is_plain_file(String filename) {
-        
+
         // TODO: implement
         // return false;
         // File.isFile() ?

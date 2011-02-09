@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +24,7 @@ public class RequestParams {
     private String pathTranslated;
     private String requestURI;
     private String scriptURI;
+    private ServletContext servletContext;
     
     private MultipartRequest multipartRequest;
     
@@ -209,6 +211,13 @@ public class RequestParams {
             Logger.log("Exception: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    
+    public ServletContext getServletContext() {
+        return servletContext;
+    }
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
     
     

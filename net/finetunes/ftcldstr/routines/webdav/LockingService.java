@@ -12,8 +12,9 @@ import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks.WebDAVLock;
 import net.finetunes.ftcldstr.routines.xml.XMLService;
-import net.finetunes.ftcldstr.wrappers.ReadDirectoryContentWrapper;
-import net.finetunes.ftcldstr.wrappers.ReadDirectoryResult;
+import net.finetunes.ftcldstr.wrappers.CommonContentWrapper;
+import net.finetunes.ftcldstr.wrappers.CommonWrapperResult;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class LockingService {
 	
@@ -163,13 +164,13 @@ public class LockingService {
 	    return null;
 	}
 
-    public static HashMap<String, Object> lockResource(String fn, String ru, HashMap<String, Object> xmldata, 
+    public static HashMap<String, Object> lockResource(RequestParams requestParams, String fn, String ru, HashMap<String, Object> xmldata, 
             int depth, int timeout, String token) {
-        return lockResource(fn, ru, xmldata, depth, timeout, token, null, null);
+        return lockResource(requestParams, fn, ru, xmldata, depth, timeout, token, null, null);
     }
 	
 	
-	public static HashMap<String, Object> lockResource(String fn, String ru, HashMap<String, Object> xmldata, 
+	public static HashMap<String, Object> lockResource(RequestParams requestParams, String fn, String ru, HashMap<String, Object> xmldata, 
 	        int depth, int timeout, String token, String base, ArrayList<String> visited) {
 	    
 	    HashMap<String, Object> resp = new HashMap<String, Object>();
@@ -274,7 +275,7 @@ public class LockingService {
         if (FileOperationsService.is_directory(fn) && (depth == Integer.MAX_VALUE || depth > 0)) {
             Logger.debug("lockResource: depth=" + depth);
             
-            ArrayList<String> files = ReadDirectoryContentWrapper.getFileList(fn);
+            ArrayList<String> files = WrappingUtilities.getFileList(requestParams, fn);
             if (files != null && !files.isEmpty()) {
                 Iterator<String> it = files.iterator();
                 
@@ -295,7 +296,7 @@ public class LockingService {
                         if (depth != Integer.MAX_VALUE) {
                             d = depth - 1;
                         }
-                        HashMap<String, Object> subreqresp = lockResource(nfnn, nru, xmldata, d,
+                        HashMap<String, Object> subreqresp = lockResource(requestParams, nfnn, nru, xmldata, d,
                                 timeout, token, basefn, visited);
                         
                         if (subreqresp != null && subreqresp.containsKey("multistatus")) {
@@ -525,33 +526,26 @@ public class LockingService {
             ConfigService.locks.insertLock(row.getBasefn(), fn, row.getType(), 
                     row.getScope(), row.getToken(), row.getDepth(), row.getTimeout(), row.getOwner());
             
-            List<String> files = new ArrayList<String>();
-            ReadDirectoryContentWrapper rdw = new ReadDirectoryContentWrapper();
-            ReadDirectoryResult d = rdw.readDirectory(fn);
-            if (d.getExitCode() != 0) {
-                Logger.log("Error reading directory content. Dir: " + fn + "; Error: " + d.getErrorMessage());
-            }
-            else {
-                files = d.getContent();
-            }
-            
-            Iterator<String> it = files.iterator();
-            while (it.hasNext()) {
-                String f = it.next();
-                
-                if (f.matches("(\\.|\\.\\.)")) {
-                    continue;
-                }
-                
-                String full = fn + f;
-                if (FileOperationsService.is_directory(full) && !full.endsWith("/")) {
-                    full += "/";
+            List<String> files = WrappingUtilities.getFileList(requestParams, fn);
+            if (files != null) {
+                Iterator<String> it = files.iterator();
+                while (it.hasNext()) {
+                    String f = it.next();
                     
-                    ConfigService.locks.insertLock(row.getBasefn(), full, row.getType(), 
-                            row.getScope(), row.getToken(), row.getDepth(), row.getTimeout(), row.getOwner());
-                    LockingService.inheritLock(requestParams, full, false, visited);
+                    if (f.matches("(\\.|\\.\\.)")) {
+                        continue;
+                    }
+                    
+                    String full = fn + f;
+                    if (FileOperationsService.is_directory(full) && !full.endsWith("/")) {
+                        full += "/";
+                        
+                        ConfigService.locks.insertLock(row.getBasefn(), full, row.getType(), 
+                                row.getScope(), row.getToken(), row.getDepth(), row.getTimeout(), row.getOwner());
+                        LockingService.inheritLock(requestParams, full, false, visited);
+                    }
                 }
-            }            
+            }
         }
         else {
             ConfigService.locks.insertLock(row.getBasefn(), fn, row.getType(), 
