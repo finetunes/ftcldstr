@@ -41,14 +41,31 @@ public class XMLParser {
 	        if (!text.isEmpty()) {
 	            try {
 	                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	                dbf.setNamespaceAware(true);
+	                dbf.setValidating(true);
 	                DocumentBuilder db = dbf.newDocumentBuilder();
 	                InputStream is = new ByteArrayInputStream(text.getBytes(encoding));
 	                Document doc = db.parse(is);
 	                doc.getDocumentElement().normalize();
 	                
-	                NodeList nodes = doc.getChildNodes();
+                    NodeList nodes = doc.getChildNodes();
 	                XMLIn in = new XMLIn();
-	                in.addXml(outXml, nodes.item(0));
+	                
+	                Node n = null;
+	                if (keepRoot) {
+	                    if (nodes.getLength() > 0) {
+	                        n = nodes.item(0);
+	                    }
+	                }
+	                else {
+	                    if (nodes.getLength() > 0 && nodes.item(0).getChildNodes() != null &&
+	                            nodes.item(0).getChildNodes().getLength() > 0)
+	                    n = nodes.item(0).getChildNodes().item(0);
+	                }
+	                
+	                if (n != null) {
+	                    in.addXml(outXml, n);
+	                }
 	            }
 	            catch (ParserConfigurationException e) {
 	                Logger.log("Exception on xml parsing: " + e.getMessage());
@@ -79,29 +96,57 @@ public class XMLParser {
     public class XMLIn{
     
         public void addXml(Object parent, Node node) {
+            String ns = "";
+            String nodename = "";
+            
+            if (node != null) {
+                ns = node.getNamespaceURI();
+                nodename = node.getNodeName();
+                
+                if (ns == null) {
+                    ns = "";
+                }
+                if (!ns.isEmpty()) {
+                    ns = "{" + ns + "}";
+                }
+
+                if (ns != null && !ns.isEmpty() && nodename != null) {
+                    if (nodename.indexOf(":") > -1) {
+                        nodename = nodename.substring(nodename.indexOf(":") + 1);
+                    }
+                    nodename = ns + nodename;
+                }
+            }
+                
             String type = getNodeType(node);
             Object value = new Object();
             if (type.equals("Hash")) {
                 value = new HashMap<String, Object>();
             } else if (type.equals("String") && node.getNodeType() != Node.TEXT_NODE) {
-                value = node.getChildNodes().item(0).getNodeValue();
+                if (node.getChildNodes().item(0) != null) {
+                    value = node.getChildNodes().item(0).getNodeValue();
+                }
+                else {
+                    value = null;
+                }
                 //value = node.getNodeValue();
-            } 
+            }
+            
             if (parent instanceof HashMap<?, ?>) {
-                if (((HashMap<String, Object>)parent).containsKey(node.getNodeName())) {
-                    if (((HashMap<String, Object>)parent).get(node.getNodeName()) instanceof ArrayList<?>) {
-                        ArrayList<Object> parentObj = (ArrayList<Object>)((HashMap<String, Object>)parent).get(node.getNodeName());
+                if (((HashMap<String, Object>)parent).containsKey(nodename)) {
+                    if (((HashMap<String, Object>)parent).get(nodename) instanceof ArrayList<?>) {
+                        ArrayList<Object> parentObj = (ArrayList<Object>)((HashMap<String, Object>)parent).get(nodename);
                         parentObj.add(value);
-                        ((HashMap<String, Object>)parent).put(node.getNodeName(), parentObj);
+                        ((HashMap<String, Object>)parent).put(nodename, parentObj);
                     } else {
                         ArrayList<Object> parentArray = new ArrayList<Object>();
-                        parentArray.add(((HashMap<String, Object>)parent).get(node.getNodeName()));
+                        parentArray.add(((HashMap<String, Object>)parent).get(nodename));
                         parentArray.add(value);
                         
-                        ((HashMap<String, Object>)parent).put(node.getNodeName(), parentArray);
+                        ((HashMap<String, Object>)parent).put(nodename, parentArray);
                     }
                 } else {
-                    ((HashMap<String, Object>)parent).put(node.getNodeName(), value);
+                    ((HashMap<String, Object>)parent).put(nodename, value);
                 }
             } else if (parent instanceof ArrayList<?>) {
                 ((ArrayList) parent).add(value);
@@ -119,9 +164,9 @@ public class XMLParser {
         public String getNodeType(Node node) {
             String retValue = "String";
             
-            if (node.getChildNodes().getLength() > 1) {
+            if (node != null && node.getChildNodes() != null && node.getChildNodes().getLength() > 1) {
                 retValue = "Hash";
-            } else if (node.getChildNodes().getLength() == 0) {
+            } else if (node == null || node.getChildNodes() == null || node.getChildNodes().getLength() == 0) {
                 retValue = "String";
             } else if (node.getChildNodes().getLength() == 1) {
                 if (node.getChildNodes().item(0).getChildNodes().getLength() == 0 && node.getChildNodes().item(0).getNodeType() == Node.TEXT_NODE) {

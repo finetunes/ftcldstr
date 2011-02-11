@@ -40,7 +40,7 @@ public class XMLService {
                     
                     if (ConfigService.DATATYPES.containsKey(e) && ConfigService.DATATYPES.get(e) != null){
                         
-                        attr.concat(" " + ConfigService.DATATYPES.get(e));
+                        attr += " " + ConfigService.DATATYPES.get(e);
                         
                         m = checkCondition("(\\w+):dt", ConfigService.DATATYPES.get(e));
                         
@@ -63,7 +63,7 @@ public class XMLService {
                             }
                             ns = ConfigService.NAMESPACES.get(ns);
                         } else {
-                            uns = ns;
+                            uns = new String(ns);
                             euns = e;
                             m = checkCondition("\\{[^\\}]*\\}", euns);
                             if (m != null) {
@@ -71,12 +71,12 @@ public class XMLService {
                             }
                         }
                     }
-                    String el_end = el;
+                    String el_end = new String(el);
                     m = checkCondition(" .*$", el_end);
                     if (m != null) {
                         el_end = m.replaceAll("");
                     } 
-                    String euns_end = euns;
+                    String euns_end = new String(euns);
                     m = checkCondition(" .*$", euns_end);
                     if (m != null) {
                         euns_end = m.replaceAll("");
@@ -90,14 +90,14 @@ public class XMLService {
                     }
                     String nsd = "";
                     if (e.equals("xmlns")) {
-                        
+                        // # ignore namespace defs
                     } else if (e.equals("content")){
-                        w.setData(w.getData().concat("" + d.get(e)));
+                        w.setData(w.getData() + d.get(e));
                     } else if (!(d.containsKey(e) && d.get(e) != null)) {
                         if (uns != null && !uns.equals("")){
-                            w.setData(w.getData().concat("<" + euns + " xmlns=\"" + uns + "\"/>"));
+                            w.setData(w.getData() + "<" + euns + " xmlns=\"" + uns + "\"/>");
                         } else {
-                            w.setData(w.getData().concat("<" + ns + ":" + el + nsd + attr + "/>"));
+                            w.setData(w.getData() + "<" + ns + ":" + el + nsd + attr + "/>");
                         }
                     } 
                     else if (d.get(e) instanceof ArrayList<?>) {
@@ -112,20 +112,20 @@ public class XMLService {
                                 
                                 ArrayList<String> keys2 = new ArrayList<String>(xmlns.keySet()); 
                                 for (int j = 0; j < keys2.size(); j++) {
-                                    String abbr = keys.get(j);
-                                    nsd.concat(" xmlns:" + abbr + "=\"" + ConfigService.NAMESPACEABBR.get(abbr) + "\"");
+                                    String abbr = keys2.get(j);
+                                    nsd += " xmlns:" + abbr + "=\"" + ConfigService.NAMESPACEABBR.get(abbr) + "\"";
                                     xmlns.remove(keys2.get(j));
                                 }
                             }
-                            w.setData(w.getData().concat("<" + ns + ":" + el + nsd +attr + ">"));
-                            w.setData(w.getData().concat(tmpw.getData()));
-                            w.setData(w.getData().concat("</" + ns + ":" + el_end + ">"));
+                            w.setData(w.getData() + "<" + ns + ":" + el + nsd +attr + ">");
+                            w.setData(w.getData() + tmpw.getData());
+                            w.setData(w.getData() + "</" + ns + ":" + el_end + ">");
                         }
                     } else {
                         if (uns != null && !uns.equals("")) {
-                            w.setData(w.getData().concat("<" + euns + " xmlns=\"" + uns + "\">"));
+                            w.setData(w.getData() + "<" + euns + " xmlns=\"" + uns + "\">");
                             createXMLData(namespaceElements, w, d.get(e), xmlns);
-                            w.setData(w.getData().concat("</" + euns_end + ">"));
+                            w.setData(w.getData() + "</" + euns_end + ">");
                         } else {
                             XMLData tmpw2 = new XMLData(); 
                             tmpw2.setData("");
@@ -135,14 +135,14 @@ public class XMLService {
                                 
                                 ArrayList<String> keys3 = new ArrayList<String>(xmlns.keySet()); 
                                 for (int k = 0; k < keys3.size(); k++) {
-                                    String abbr = keys.get(k);
-                                    nsd.concat(" xmlns:" + abbr + "=\"" + ConfigService.NAMESPACEABBR.get(abbr) + "\"");
+                                    String abbr = keys3.get(k);
+                                    nsd += " xmlns:" + abbr + "=\"" + ConfigService.NAMESPACEABBR.get(abbr) + "\"";
                                     xmlns.remove(keys3.get(k));
                                 }
                             }
-                            w.setData(w.getData().concat("<" + ns + ":" + el + nsd + attr + ">"));
-                            w.setData(w.getData().concat(tmpw2.getData()));
-                            w.setData(w.getData().concat("</" + ns + ":" + el_end + ">"));
+                            w.setData(w.getData() + "<" + ns + ":" + el + nsd + attr + ">");
+                            w.setData(w.getData() + tmpw2.getData());
+                            w.setData(w.getData() + "</" + ns + ":" + el_end + ">");
                         }
                     }
                 }
@@ -151,10 +151,10 @@ public class XMLService {
                     createXMLData(namespaceElements, w, ((ArrayList<Object>)dd).get(i), xmlns);
                 }
             } else if (dd.getClass().isPrimitive() || dd instanceof String) {
-                w.setData(w.getData().concat((String)dd));
+                w.setData(w.getData() + (String)dd);
             } else {
                 Logger.log("XMLService: unknown data type:" + dd.getClass().toString());
-                w.setData(w.getData().concat((String)dd));
+                w.setData(w.getData() + (String)dd);
             }
         }
         

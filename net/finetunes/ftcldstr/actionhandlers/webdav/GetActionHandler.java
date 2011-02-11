@@ -141,8 +141,8 @@ public class GetActionHandler extends AbstractActionHandler {
                 FileOperationsService.mkdir(ConfigService.THUMBNAIL_CACHEDIR);
             }
             
-            StatData statfn = FileOperationsService.stat(fn);
-            StatData statcf = FileOperationsService.stat(cachefile);
+            StatData statfn = FileOperationsService.stat(requestParams, fn);
+            StatData statcf = FileOperationsService.stat(requestParams, cachefile);
             if (!FileOperationsService.file_exits(cachefile) || statfn.getMtimeDate().after(statcf.getMtimeDate())) {
                 
                 try {
@@ -172,7 +172,7 @@ public class GetActionHandler extends AbstractActionHandler {
             
             InputStream fs = FileOperationsService.getFileContentStream(fn);
             if (fs != null) {
-                StatData stat = FileOperationsService.stat(cachefile);
+                StatData stat = FileOperationsService.stat(requestParams, cachefile);
                 int contentLength = stat.getSize();
                 requestParams.getResponse().setStatus(200);
                 requestParams.getResponse().addHeader("Content-Type", MIMETypesHelper.getMIMEType(fn));

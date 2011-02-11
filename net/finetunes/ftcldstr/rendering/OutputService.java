@@ -187,7 +187,7 @@ public class OutputService {
 	 */
     public static void printFileHeader(RequestParams requestParams, String fn) {
 
-        StatData stat = FileOperationsService.stat(fn);
+        StatData stat = FileOperationsService.stat(requestParams, fn);
         
         // print header
         requestParams.getResponse().setStatus(200);

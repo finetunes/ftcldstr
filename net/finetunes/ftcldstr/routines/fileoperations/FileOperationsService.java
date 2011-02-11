@@ -54,7 +54,7 @@ public class FileOperationsService {
 	        FileOperationsService.chmod(mode, fn);
 	    }
 	    else {
-	        StatData stat = FileOperationsService.stat(fn);
+	        StatData stat = FileOperationsService.stat(requestParams, fn);
 	        int newmode = 0;
 	        if (type.equals("a")) {
 	            newmode = stat.getMode() | mode;
@@ -286,7 +286,7 @@ public class FileOperationsService {
     }
     
     // returns the result of stat unix funtion
-    public static StatData stat(String filename) {
+    public static StatData stat(RequestParams requestParams, String fn) {
         
         // ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, 
         // $atime,$mtime,$ctime,$blksize,$blocks) = stat($filename);
@@ -296,6 +296,7 @@ public class FileOperationsService {
         
         // return new Object[] {0, 0, "0888", 0, 0, 0, 0, 0, 0, "", 0, 0, 0};
         return new FileOperationsService().new StatData();
+        // return WrappingUtilities.stat(requestParams, fn);
         
     }   
     
@@ -347,7 +348,7 @@ public class FileOperationsService {
         // This sub uses Cwd::abs_path and is independent of the rest of File::Spec::Link.
         
         // TODO implement
-        return "";
+        return filename;
     }
     
     public static boolean write_file(String fn, String content) {

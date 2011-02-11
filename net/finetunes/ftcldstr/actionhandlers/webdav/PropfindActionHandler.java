@@ -47,8 +47,8 @@ public class PropfindActionHandler extends AbstractActionHandler {
             depthstr = "-1";
         }
         
-        depthstr = depthstr.replaceFirst(",noroot", ""); // $noroot=1 if $depth =~ s/,noroot//;
-        if (!depthstr.isEmpty()) {
+        if (depthstr.matches(".*,noroot.*")) {
+            depthstr = depthstr.replaceFirst(",noroot", ""); // $noroot=1 if $depth =~ s/,noroot//;
             noroot = true;
         }
         

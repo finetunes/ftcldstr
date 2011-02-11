@@ -195,7 +195,7 @@ public class PropertiesActions {
 	    Logger.debug("getProperty: fn=" + fn + ", uri=" + uri + ", prop=" + prop);
 	    StatData stat = statRef;
 	    if (stat == null) {
-	        stat = FileOperationsService.stat(fn);
+	        stat = FileOperationsService.stat(requestParams, fn);
 	    }
 
         if (resp_200 == null) {
@@ -302,7 +302,7 @@ public class PropertiesActions {
             lockentry1.put("locktype", locktype1);
             lockentry.add(lockentry1);
             supportedlock.put("lockentry", lockentry);
-            resp_200.putProp("resourcetype", supportedlock);
+            resp_200.putProp("supportedlock", supportedlock);
         }        
         
         if (prop.equals("executable")) {
@@ -846,7 +846,7 @@ public class PropertiesActions {
             if (elementParentRef.get(propname) != null && elementParentRef.get(propname) instanceof HashMap<?, ?>) {
                 String executable = (String)((HashMap<String, Object>)elementParentRef.get(propname)).get("content");
                 if (executable != null) {
-                    StatData stat = FileOperationsService.stat(fn);
+                    StatData stat = FileOperationsService.stat(requestParams, fn);
                     int mode;
                     if (executable.matches(".*F.*")) {
                         mode = stat.getMode() & 0666;

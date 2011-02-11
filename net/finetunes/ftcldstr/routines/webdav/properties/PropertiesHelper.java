@@ -52,7 +52,7 @@ public class PropertiesHelper {
 	    ArrayList<StatusResponse> propstat = new ArrayList<StatusResponse>();
 	    String nfn = FileOperationsService.full_resolve(fn);
 	    
-	    StatData stat = FileOperationsService.stat(fn);
+	    StatData stat = FileOperationsService.stat(requestParams, fn);
 	    StatusResponse resp_200 = new StatusResponse();
 	    StatusResponse resp_404 = new StatusResponse();
 	    
@@ -98,7 +98,7 @@ public class PropertiesHelper {
             else if ((ConfigService.NAMESPACES.get(xmlnsuri) == null || liveSource.contains(propname)) && !ConfigService.PROTECTED_PROPS.contains(propname)) {
                 
                 String propparam;
-                if (prop.matches(".*{[^}]*}.*")) {
+                if (prop.matches(".*\\{[^\\}]*\\}.*")) {
                     propparam = prop;
                 }
                 else {
@@ -165,7 +165,7 @@ public class PropertiesHelper {
 	    }
 	    
         // my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($file);
-	    StatData stat = FileOperationsService.stat(file);
+	    StatData stat = FileOperationsService.stat(requestParams, file);
         int size = stat.getSize(); 
         long mtime = stat.getMtime(); 
 	    

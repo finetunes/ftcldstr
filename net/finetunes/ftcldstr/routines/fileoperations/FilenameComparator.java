@@ -2,6 +2,7 @@ package net.finetunes.ftcldstr.routines.fileoperations;
 
 import java.util.Comparator;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 
@@ -9,8 +10,10 @@ public class FilenameComparator implements Comparator<String> {
     
     private String pathTranslated;
     private String order;
+    private RequestParams requestParams;
     
-    public FilenameComparator(String pathTranslated, String order) {
+    public FilenameComparator(RequestParams requestParams, String pathTranslated, String order) {
+        this.requestParams = requestParams;
         this.pathTranslated = pathTranslated;
         this.order = order;
     }
@@ -30,8 +33,8 @@ public class FilenameComparator implements Comparator<String> {
         
         if (order != null && !order.isEmpty()) {
             if (order.matches("(lastmodified|size|mode).*")) {
-                StatData a_stats = FileOperationsService.stat(fp_a);
-                StatData b_stats = FileOperationsService.stat(fp_b);
+                StatData a_stats = FileOperationsService.stat(requestParams, fp_a);
+                StatData b_stats = FileOperationsService.stat(requestParams, fp_b);
 
                 int idx = 7;
                 if (order.matches(".*(lastmodified).*")) {

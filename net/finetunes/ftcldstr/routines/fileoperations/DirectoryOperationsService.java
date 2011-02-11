@@ -190,7 +190,7 @@ public class DirectoryOperationsService {
         if (files == null) {
             files = new ArrayList<String>();
         }
-        Collections.sort(files, new FilenameComparator(requestParams.getPathTranslated(), order));
+        Collections.sort(files, new FilenameComparator(requestParams, requestParams.getPathTranslated(), order));
         
 	    String pagenum = requestParams.getRequest().getParameter("page");
 	    int page = 0;
@@ -261,7 +261,7 @@ public class DirectoryOperationsService {
                 continue;
             }
             
-            StatData stat = FileOperationsService.stat(full);
+            StatData stat = FileOperationsService.stat(requestParams, full);
             int mode = stat.getMode(); 
 
             int uid = stat.getUid(); 
@@ -405,6 +405,9 @@ public class DirectoryOperationsService {
 	        // here, but it seems there is no need in the second object
 	        
 	        ArrayList<StatusResponse> r = PropertiesHelper.getPropStat(requestParams, nfn, ru, props, all, noval);
+	        if (r.size() > 0) {
+	            response.setPropstat(r.get(0));
+	        }
 	        if (r.size() == 0) {
 	            response.setStatus("HTTP/1.1 200 OK");
 	            response.setPropstat(null);
@@ -431,7 +434,7 @@ public class DirectoryOperationsService {
     	            order = "name";
     	        }
     	        
-    	        Collections.sort(files, new FilenameComparator(requestParams.getPathTranslated(), order));
+    	        Collections.sort(files, new FilenameComparator(requestParams, requestParams.getPathTranslated(), order));
                 Iterator<String> it = files.iterator();
                 
                 while (it.hasNext()) {

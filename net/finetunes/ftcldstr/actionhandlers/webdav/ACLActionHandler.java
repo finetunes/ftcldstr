@@ -145,7 +145,7 @@ public class ACLActionHandler extends AbstractActionHandler {
                     return;
                 }
                 
-                StatData stat = FileOperationsService.stat(fn);
+                StatData stat = FileOperationsService.stat(requestParams, fn);
                 int mode = stat.getMode();
                 mode = mode & 07777;
                 

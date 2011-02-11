@@ -25,12 +25,13 @@ public class WrapperPathProvider {
     private void initHashtable(RequestParams requestParams) {
         
         String pt = requestParams.getServletContext().getRealPath("");
-        if (!pt.endsWith("/")) {
-            pt += "/";
+        if (!pt.endsWith( System.getProperty("file.separator"))) {
+            pt +=  System.getProperty("file.separator");
         }
         
+        // pathMap.put(CommonContentWrapper.WRAPPER_ID, pt + "wrappers/operation.sh"); // PZ: DEBUG
+        pathMap.put(CommonContentWrapper.WRAPPER_ID, pt + "wrappers\\1.bat"); // PZ: DEBUG
         // pathMap.put("READ_DIRECTORY_WRAPPER", "wrappers/readdir.sh");
-        pathMap.put(CommonContentWrapper.WRAPPER_ID, pt + "wrappers/operation.sh"); // PZ: DEBUG
         // pathMap.put("READ_DIRECTORY_WRAPPER_2", "wrappers/readdir.sh");
         // ...
         // here the rest of the paths
