@@ -205,7 +205,13 @@ public class LockingService {
             dataRef = (HashMap<String, Object>)xmldata.get("{DAV:}owner");
         }
         else {
-            dataRef = new HashMap<String, Object>(ConfigService.DEFAULT_LOCK_OWNER); 
+            dataRef = new HashMap<String, Object>(ConfigService.DEFAULT_LOCK_OWNER);
+            Set<String> keys = dataRef.keySet();
+            Iterator<String> it = keys.iterator();
+            while (it.hasNext()) {
+                String key = it.next();
+                dataRef.put(key, String.format((String)dataRef.get(key), requestParams.getUsername(), requestParams.getUserIP()));
+            }
         }
         
         String owner = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, dataRef, false);

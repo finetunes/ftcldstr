@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="ftcldstr">
+	<property name="build"    location="bin" />
+	<property name="buildnet"    location="${build}/net" />
+	<property name="src"  location="net" />
+    <property name="dist"  location="dist" />
+    <property name="jarname"  location="root.war" />
+
+	<target name="compile" depends="clean" description="Compile the project">
+		<mkdir dir="${build}" />
+		<mkdir dir="${buildnet}" />
+		<javac destdir="${buildnet}" srcdir="${src}">
+		</javac>
+	</target>
+
+	<target name="buildfs" depends="compile" description="Build war">
+		<mkdir dir="${dist}" />
+		<mkdir dir="${dist}/WEB-INF" />
+		<copy todir="${dist}/WEB-INF">
+			<fileset dir="${build}/WebContent/WEB-INF" />
+		</copy>
+		
+        <mkdir dir="${dist}/WEB-INF/lib" />
+        <copy todir="${dist}/WEB-INF/lib">
+            <fileset dir="${build}/lib" />
+        </copy>
+		
+        <mkdir dir="${dist}/WEB-INF/classes" />
+        <mkdir dir="${dist}/WEB-INF/classes/net" />
+        <copy todir="${dist}/WEB-INF/classes/net">
+            <fileset dir="${build}/net" />
+        </copy>
+		
+        <mkdir dir="${dist}/icons" />
+        <copy todir="${dist}/icons">
+            <fileset dir="${build}/../WebContent/icons" />
+        </copy>
+		
+        <mkdir dir="${dist}/wrappers" />
+        <copy todir="${dist}/wrappers">
+            <fileset dir="${build}/../WebContent/wrappers" />
+        </copy>
+
+		
+	</target>
+
+	<target name="war" depends="buildfs" description="Build war">
+		<delete file="${jarname}" />
+		<jar jarfile="${jarname}" basedir="${dist}" />
+	</target>
+
+	<target name="all" depends="war" description="Recompile from scratch">
+		<copy file="${jarname}" todir="//10.64.3.53/git/" />
+	</target>
+
+
+	<target name="clean" description="Delete all files created by compile">
+		<delete file="//10.64.3.53/git/${jarname}" />
+		<delete dir="${dist}" />
+	</target>
+</project>

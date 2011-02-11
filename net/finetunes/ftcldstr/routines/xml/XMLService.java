@@ -18,6 +18,10 @@ public class XMLService {
         
         Matcher m;
         
+        if (xmlns == null){
+            xmlns = new HashMap<String, String>();
+        }        
+        
         if (namespaceElements == null) {
             namespaceElements = new HashMap<String, Integer>();
         }
@@ -47,7 +51,7 @@ public class XMLService {
                         if (m != null) {
                             if (ConfigService.NAMESPACEABBR.containsKey(m.group(1)) && 
                                     ConfigService.NAMESPACEABBR.get(m.group(1)) != null) {
-                            xmlns.put(m.group(1), "1");
+                                xmlns.put(m.group(1), "1");
                             }
                         }
                     }
@@ -83,9 +87,6 @@ public class XMLService {
                     } 
                     
                     if (uns == null || uns.isEmpty()) {
-                        if (xmlns == null){
-                            xmlns = new HashMap<String, String>();
-                        }
                         xmlns.put(ns, "1");
                     }
                     String nsd = "";
@@ -152,9 +153,12 @@ public class XMLService {
                 }
             } else if (dd.getClass().isPrimitive() || dd instanceof String) {
                 w.setData(w.getData() + (String)dd);
+            } else if (dd instanceof Integer) {
+                w.setData(w.getData() + ((Integer)dd).intValue());
             } else {
                 Logger.log("XMLService: unknown data type:" + dd.getClass().toString());
-                w.setData(w.getData() + (String)dd);
+                // w.setData(w.getData() + (String)dd);
+                w.setData(w.getData() + dd.toString());
             }
         }
         
@@ -164,10 +168,24 @@ public class XMLService {
         createXMLData(namespaceElements, w, d, null);
     }
     
-    public static String createXML(Map<String, Integer> namespaceElements, HashMap<String, Object> dataRef, boolean withoutp) {
+    public static String createXML(Map<String, Integer> namespaceElements, Object dataRef, boolean withoutp) {
         XMLData data = new XMLData();
-        data.setData("<?xml version=\"1.0\" encoding=\"" + ConfigService.CHARSET + "\"?>");
-        createXMLData(namespaceElements, data, dataRef);
+        
+        data.setData("");
+
+        if (!withoutp) {
+            data.setData("<?xml version=\"1.0\" encoding=\"" + ConfigService.CHARSET + "\"?>");
+        }
+        
+        if (dataRef != null) {
+            if (dataRef instanceof HashMap<?, ?>) {
+                createXMLData(namespaceElements, data, (HashMap<String, Object>)dataRef);
+            }
+            else {
+                data.setData(data.getData() + dataRef.toString());
+            }
+        }
+        
         return data.getData();
     }
 	

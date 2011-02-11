@@ -1,17 +1,17 @@
 package net.finetunes.ftcldstr.routines.webdav.properties;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 
 public class HomesetActions {
 
-    public static String getAddressbookHomeSet(String uri) {
+    public static String getAddressbookHomeSet(RequestParams requestParams, String uri) {
         
         if (ConfigService.ADDRESSBOOK_HOME_SET == null) {
             return uri;
         }
         
-        String rmuser = "";
-        // TODO: my $rmuser = $ENV{REDIRECT_REMOTE_USER} || $ENV{REMOTE_USER};
+        String rmuser = requestParams.getUsername();
         
         if (!ConfigService.ADDRESSBOOK_HOME_SET.containsKey(rmuser)) {
             rmuser = ""; // TODO: $rmuser = $< --- real uid of the current process

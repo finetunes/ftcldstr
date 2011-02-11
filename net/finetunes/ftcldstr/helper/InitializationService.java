@@ -252,11 +252,13 @@ public class InitializationService {
 */            
         
         String scriptURI = servletContext.getRealPath("");
+        String userIP = request.getRemoteAddr();
         
         params.setPathTranslated(pathTranslated);
         params.setRequestURI(requestURI);
         params.setScriptURI(scriptURI);
         params.setServletContext(servletContext);
+        params.setUserIP(userIP);
         
         return params;
     }

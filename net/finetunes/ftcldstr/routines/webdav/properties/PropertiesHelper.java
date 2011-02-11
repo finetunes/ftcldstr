@@ -166,7 +166,7 @@ public class PropertiesHelper {
 	    
         // my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($file);
 	    StatData stat = FileOperationsService.stat(requestParams, file);
-        int size = stat.getSize(); 
+        int size = stat.getSize();
         long mtime = stat.getMtime(); 
 	    
 	    String digest = file + String.valueOf(size) + String.valueOf(mtime);

@@ -162,6 +162,7 @@ public class DirectoryOperationsService {
         Arrays.fill(spacesSize, ' ');
         
         list += "<span style=\"font-weight:bold;padding-left:20px\">";
+        list += " ";
         list += "<a href=\"" + ru + "?order=name" + dir + ConfigService.URL_PARAM_SEPARATOR + query + "\" style=\"color:black\">" + ConfigService.stringMessages.get("names") + "</a>";
         list += new String(spacesName);
         list += "<a href=\"" + ru + "?order=lastmodified" + dir + ConfigService.URL_PARAM_SEPARATOR + query + "\" style=\"color:black\">" + ConfigService.stringMessages.get("lastmodified") + "</a>";
@@ -279,6 +280,7 @@ public class DirectoryOperationsService {
             list += FileHelper.getfancyfilename(requestParams, nru, filename, mimetype, full);
             list += String.format(" %-" + ConfigService.MAXLASTMODIFIEDSIZE + "s %" + ConfigService.MAXSIZESIZE + "d", lmf, size);
             if (ConfigService.SHOW_PERM) {
+                list += " ";
                 list += "<span " +
                       " style=\"" + RenderingHelper.getmodecolors(full, mode) + "\"" +
                       " title=\"" + String.format("mode: %04o, uid: %s (%s), gid: %s (%s)", mode & 07777, SystemCalls.getpwuid(uid), uid, SystemCalls.getgrgid(gid), gid) + "\">";

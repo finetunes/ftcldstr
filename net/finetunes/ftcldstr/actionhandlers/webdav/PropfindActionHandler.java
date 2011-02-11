@@ -96,8 +96,8 @@ public class PropfindActionHandler extends AbstractActionHandler {
             depthstr = "0";
         }
         else if (ConfigService.CURRENT_USER_PRINCIPAL != null && ConfigService.CURRENT_USER_PRINCIPAL.length() > 1 &&
-                ru.matches(".*" + Pattern.quote(ConfigService.CURRENT_USER_PRINCIPAL) + "/?")) {
-            fn = fn.replaceAll(Pattern.quote(ConfigService.CURRENT_USER_PRINCIPAL) + "/?$", "");
+                ru.matches(".*" + Pattern.quote(String.format(ConfigService.CURRENT_USER_PRINCIPAL, requestParams.getUsername())) + "/?")) {
+            fn = fn.replaceAll(Pattern.quote(String.format(ConfigService.CURRENT_USER_PRINCIPAL, requestParams.getUsername())) + "/?$", "");
             depthstr = "0";
         }
         
@@ -133,7 +133,7 @@ public class PropfindActionHandler extends AbstractActionHandler {
             propfind.put("multistatus", response);
             content = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, propfind, false);
         }
-
+        
         Logger.debug("PROPFIND: status=" + status + ", type=" + type + "");
         Logger.debug("PROPFIND: REQUEST:\n" + xml + "\nEND-REQUEST");
         Logger.debug("PROPFIND: RESPONSE:\n" + content + "\nEND-RESPONSE");

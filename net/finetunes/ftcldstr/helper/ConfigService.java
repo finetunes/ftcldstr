@@ -287,11 +287,7 @@ public class ConfigService {
      * content after body tag in the Web interface
      */
     public static final String HEADER = "<div style=\"padding-left:3px;background-color:#444444;color:#ffffff;\">" +
-    		"WebDAV CGI - Web interface: You are logged in as " + 
-            // TODO: get current user name
-            // ($ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}) + 
-    		"<b>TODO</b>" + 
-    		".</div>";
+    		"WebDAV CGI - Web interface: You are logged in as %s.</div>";
 
     /*
      * -- SIGNATURE
@@ -342,16 +338,16 @@ public class ConfigService {
         'CREATE INDEX IF NOT EXISTS webdav_props_idx2 ON webdav_props (fn,propname)',
         );
 */
+    
     /*
      * -- DEFAULT_LOCK_OWNER
      * lock owner if not given by client
      * EXAMPLE: $DEFAULT_LOCK_OWNER=$ENV{REMOTE_USER}.'@'.$ENV{REMOTE_ADDR}; ## loggin user @ ip
      */
+    // note %s in the value; have to be used with String.format
     public static final Map<String, Object> DEFAULT_LOCK_OWNER =
         Collections.unmodifiableMap(new HashMap<String, Object>() {{
-            // TODO: put proper value instead of "user@host"
-            // { href=> ($ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}).'@'.$ENV{REMOTE_ADDR} }
-            put("href", "user@host");
+            put("href", "%s@%s");
         }});              
     
     /*
@@ -395,14 +391,13 @@ public class ConfigService {
      */
     public static final boolean ENABLE_ACL = true;
 
-/*
-    ## --- CURRENT_USER_PRINCIPAL
-    ## a virtual URI for ACL principals
-    ## for Apple's iCal &  Addressbook
-    $CURRENT_USER_PRINCIPAL = "/principals/".($ENV{REDIRECT_REMOTE_USER} || $ENV{REMOTE_USER}) .'/';
-*/
-    // TODO: set proper value with username
-    public static final String CURRENT_USER_PRINCIPAL = "/principals/" + "user" + "/";
+    /*
+     * --- CURRENT_USER_PRINCIPAL
+     * a virtual URI for ACL principals
+     * for Apple's iCal &  Addressbook
+     */
+    // note %s in the value; have to be used with String.format
+    public static final String CURRENT_USER_PRINCIPAL = "/principals/%s/";
     
     /*
      * -- PRINCIPAL_COLLECTION_SET
@@ -410,7 +405,6 @@ public class ConfigService {
      * DEFAULT: $PRINCIPAL_COLLECTION_SET = '/directory/';
      */
     public static final String PRINCIPAL_COLLECTION_SET = "/directory/";
-
     
     /*
      * -- ENABLE_CALDAV

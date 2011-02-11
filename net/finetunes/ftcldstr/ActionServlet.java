@@ -1,24 +1,16 @@
 package net.finetunes.ftcldstr;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
+import javax.servlet.http.HttpSession;
 
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.base.NotSupportedMethodActionHandler;
@@ -45,15 +37,11 @@ import net.finetunes.ftcldstr.actionhandlers.webdav.TraceActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.UnbindActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.webdav.UnlockActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
-import net.finetunes.ftcldstr.helper.GeneratorService;
 import net.finetunes.ftcldstr.helper.InitializationService;
-import net.finetunes.ftcldstr.helper.SystemCalls;
-import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
-import net.finetunes.ftcldstr.routines.webdav.properties.ACLActions;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
-import net.finetunes.ftcldstr.routines.xml.XMLParser;
-import net.finetunes.ftcldstr.routines.xml.XMLService;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 
 public class ActionServlet extends MServlet {
@@ -65,30 +53,6 @@ public class ActionServlet extends MServlet {
         super();
         InitializationService.init();
         initMethods();
-        
-        // ****
-
-        try{
-            // Open the file that is the first 
-            // command line parameter
-            String path = "d:\\1.txt";
-            FileInputStream fstream = new FileInputStream(path);
-            // Get the object of DataInputStream
-            DataInputStream in = new DataInputStream(fstream);
-                BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String strLine;
-            //Read File Line By Line
-            while ((strLine = br.readLine()) != null)   {
-              // Print the content on the console
-              System.out.println (strLine);
-            }
-            //Close the input stream
-            in.close();
-            }catch (Exception e){//Catch exception if any
-              System.err.println("Error: " + e.getMessage());
-            }        
-        
-        
     }
     
     public void destroy() {
@@ -112,21 +76,56 @@ public class ActionServlet extends MServlet {
 
         RequestParams requestParams = InitializationService.initRequestParams(request, response,
                 getServletContext());
-        
 
-//        > System.out.println(getServletContext().getRealPath(""));
-//        > System.out.println(request.getQueryString());
-//        > System.out.println(request.getServletPath());
-//        D:\work\finetunes\ftcldstr\git\WebContent\
-//        a=b&c=d
-//        /aa        
+        String auth = request.getHeader("Authorization");
+        if (authorized(requestParams, auth)) {
         
+            
+            System.out.println("MServlet::service::METHOD: " + requestParams.getRequestedMethod());
+            handleRequest(requestParams);
         
-        System.out.println("MServlet::service::METHOD: " + requestParams.getRequestedMethod());
-        handleRequest(requestParams);
-    
+        }
+        else {
+            response.setHeader("WWW-Authenticate", "BASIC realm=\"users\"");
+            response.sendError(response.SC_UNAUTHORIZED);            
+        }
+
         response.getOutputStream().flush();
         response.flushBuffer();
+    }
+    
+    private boolean authorized(RequestParams requestParams, String auth) {
+        if (auth == null) {
+            return false;
+        }
+        
+        if (!auth.toUpperCase().startsWith("BASIC ")) {
+            return false; // only BASIC is accepted now
+        }
+        
+        try {
+            String userpassEncoded = auth.substring(6); // trimming "BASIC "
+            sun.misc.BASE64Decoder dec = new sun.misc.BASE64Decoder();
+            String userpassDecoded = new String(dec.decodeBuffer(userpassEncoded));
+            String[] u = userpassDecoded.split(":");
+            if (u.length >= 2) {
+                String user = u[0];
+                String pass = u[1];
+                
+                if (WrappingUtilities.isUserValid(requestParams, user, pass)) {
+                    requestParams.setUsername(user);
+                    return true;
+                }
+                
+                return false;
+            }
+        }
+        catch (IOException e) {
+            Logger.log("Exception on authorization: " + e.getMessage());
+        }
+        
+        return false;
+        
     }
 
     //@SuppressWarnings("unchecked")

@@ -231,7 +231,7 @@ public class GetActionHandler extends AbstractActionHandler {
         
         content += RenderingService.start_html(ru);
         if (ConfigService.HEADER != null) {
-            content += ConfigService.HEADER;
+            content += String.format(ConfigService.HEADER, requestParams.getUsername());
         }
         
         if (ConfigService.ALLOW_SEARCH && FileOperationsService.is_file_readable(fn)) {
@@ -498,7 +498,7 @@ public class GetActionHandler extends AbstractActionHandler {
         String content = "";
         content += RenderingService.start_html(requestParams.getRequestURI() + " properties");
         if (ConfigService.HEADER != null) {
-            content += ConfigService.HEADER;
+            content += String.format(ConfigService.HEADER, requestParams.getUsername());
         }
 
         // PZ: original perl code
@@ -588,7 +588,7 @@ public class GetActionHandler extends AbstractActionHandler {
             namespaceElements.put(NamespaceService.nonamespace(prop), 1);
             
             String title = XMLService.createXML(namespaceElements, r200.getProps(), true);
-            String value = XMLService.createXML(namespaceElements, (HashMap<String, Object>)r200.getProp(prop), true);
+            String value = XMLService.createXML(namespaceElements, r200.getProp(prop), true);
             String namespace = NamespaceService.getNameSpaceUri(prop);
             
             Pattern p = Pattern.compile("^\\{([^\\}]*)\\}");
@@ -607,7 +607,8 @@ public class GetActionHandler extends AbstractActionHandler {
             
             content += "<tr style=\"background-color: + " + bgcolor + "; text-align:left\">";
             content += "<th title=\"" + namespace + "\" style=\"vertical-align:top;\">" + NamespaceService.nonamespace(prop) + "</th>";
-            content += "<td title=\"" + title + "\" style=\"vertical-align:bottom;\">";
+            // note: HTMLEncode is requered here
+            content += "<td title=\"" + RenderingHelper.HTMLEncode(title) + "\" style=\"vertical-align:bottom;\">";
             content += "<pre style=\"margin:0px; overflow:auto;\">";
             content += RenderingHelper.HTMLEncode(value);
             content += "</pre>";

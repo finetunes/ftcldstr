@@ -187,9 +187,17 @@ public class StatusResponse {
             HashMap<String, Object> propstatMap = statusResponseToHashMap(statusResponse.getPropstat());
             
             HashMap<String, Object> h = new HashMap<String, Object>();
-            h.put("status", statusResponse.getStatus());
-            h.put("href", statusResponse.getHref());
-            h.put("prop", statusResponse.getProps());
+            if (statusResponse.getStatus() != null) {
+                h.put("status", statusResponse.getStatus());
+            }
+            
+            if (statusResponse.getHref() != null) {
+                h.put("href", statusResponse.getHref());
+            }
+            
+            if (statusResponse.getProps() != null) {
+                h.put("prop", statusResponse.getProps());
+            }
             
             if (propstatMap != null) {
                 h.put("propstat", propstatMap);

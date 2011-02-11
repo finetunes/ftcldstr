@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -51,20 +52,26 @@ public class XMLParser {
                     NodeList nodes = doc.getChildNodes();
 	                XMLIn in = new XMLIn();
 	                
-	                Node n = null;
-	                if (keepRoot) {
-	                    if (nodes.getLength() > 0) {
-	                        n = nodes.item(0);
+                    in.addXml(outXml, nodes.item(0));
+	                if (!keepRoot) {
+	                    if (outXml != null) {
+	                        Set<String> keys = outXml.keySet();
+	                        if (keys.size() > 0) {
+	                            Object c = outXml.get(keys.toArray(new String[0])[0]);
+	                            if (c instanceof HashMap<?, ?>) {
+	                                outXml = (HashMap<String, Object>)c;
+	                            }
+	                            else if (c instanceof ArrayList<?>) {
+	                                ArrayList<HashMap<String, Object>> c2 = (ArrayList<HashMap<String, Object>>)c;
+	                                if (c2 != null && c2.size() > 0) {
+	                                    Object c3 = c2.get(0);
+	                                    if (c3 instanceof HashMap<?, ?>) {
+	                                        outXml = (HashMap<String, Object>)c3;
+	                                    }
+	                                }
+	                            }
+	                        }
 	                    }
-	                }
-	                else {
-	                    if (nodes.getLength() > 0 && nodes.item(0).getChildNodes() != null &&
-	                            nodes.item(0).getChildNodes().getLength() > 0)
-	                    n = nodes.item(0).getChildNodes().item(0);
-	                }
-	                
-	                if (n != null) {
-	                    in.addXml(outXml, n);
 	                }
 	            }
 	            catch (ParserConfigurationException e) {
@@ -132,32 +139,35 @@ public class XMLParser {
                 //value = node.getNodeValue();
             }
             
-            if (parent instanceof HashMap<?, ?>) {
-                if (((HashMap<String, Object>)parent).containsKey(nodename)) {
-                    if (((HashMap<String, Object>)parent).get(nodename) instanceof ArrayList<?>) {
-                        ArrayList<Object> parentObj = (ArrayList<Object>)((HashMap<String, Object>)parent).get(nodename);
-                        parentObj.add(value);
-                        ((HashMap<String, Object>)parent).put(nodename, parentObj);
+            if (node.getNodeType() != Node.TEXT_NODE) {
+                if (parent instanceof HashMap<?, ?>) {
+                    if (((HashMap<String, Object>)parent).containsKey(nodename)) {
+                        if (((HashMap<String, Object>)parent).get(nodename) instanceof ArrayList<?>) {
+                            ArrayList<Object> parentObj = (ArrayList<Object>)((HashMap<String, Object>)parent).get(nodename);
+                            parentObj.add(value);
+                            ((HashMap<String, Object>)parent).put(nodename, parentObj);
+                        } else {
+                            ArrayList<Object> parentArray = new ArrayList<Object>();
+                            parentArray.add(((HashMap<String, Object>)parent).get(nodename));
+                            parentArray.add(value);
+                            
+                            ((HashMap<String, Object>)parent).put(nodename, parentArray);
+                        }
                     } else {
-                        ArrayList<Object> parentArray = new ArrayList<Object>();
-                        parentArray.add(((HashMap<String, Object>)parent).get(nodename));
-                        parentArray.add(value);
-                        
-                        ((HashMap<String, Object>)parent).put(nodename, parentArray);
+                        ((HashMap<String, Object>)parent).put(nodename, value);
                     }
-                } else {
-                    ((HashMap<String, Object>)parent).put(nodename, value);
+                } else if (parent instanceof ArrayList<?>) {
+                    ((ArrayList) parent).add(value);
+                } else if (parent instanceof String) {
+                    return;
                 }
-            } else if (parent instanceof ArrayList<?>) {
-                ((ArrayList) parent).add(value);
-            } else if (parent instanceof String) {
-                return;
             }
             
             NodeList nodes = node.getChildNodes();
-            
-            for (int i = 0; i < nodes.getLength(); i++) {
-                addXml(value, nodes.item(i));
+            if (nodes != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    addXml(value, nodes.item(i));
+                }
             }
         }
         

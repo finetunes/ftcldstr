@@ -141,7 +141,7 @@ public class PropertiesActions {
 	        
 	        Object ref = xmldata.get(prop);
 	        // original code: if (ref($$xmldata{$prop}) !~/^(HASH|ARRAY)$/)
-	        if ((!(ref instanceof HashMap<?, ?>)) || (!ref.getClass().isArray())) {
+	        if (ref != null && ((!(ref instanceof HashMap<?, ?>)) || (!(ref instanceof ArrayList<?>)))) {
 	            // ignore namespaces
 	        }
 	        // original code:  elsif ($ns eq "" && ! defined $$xmldata{$prop}{xmlns}) {
@@ -239,7 +239,7 @@ public class PropertiesActions {
         }	    
 
         if (prop.equals("getlastmodified")) {
-            resp_200.putProp("getlastmodified", new SimpleDateFormat("EEE, dd MM yyyy HH:mm:ss z").format(stat.getMtimeDate()));
+            resp_200.putProp("getlastmodified", new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(stat.getMtimeDate()));
         }
         
         if (prop.equals("lockdiscovery")) {
@@ -475,13 +475,12 @@ public class PropertiesActions {
         }        
 
         if (prop.equals("modifiedby")) {
-            String user = "";
-            // user = $ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}; // TODO
+            String user = requestParams.getUsername();
             resp_200.putProp("modifiedby", user);
         }        
 
         if (prop.equals("Win32CreationTime")) {
-            SimpleDateFormat dateFormatGmt = new SimpleDateFormat("EEE, dd MM yyyy HH:mm:ss z");
+            SimpleDateFormat dateFormatGmt = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
             dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));            
             resp_200.putProp("Win32CreationTime", dateFormatGmt.format(stat.getCtimeDate()));
         }
@@ -498,13 +497,13 @@ public class PropertiesActions {
         }
 
         if (prop.equals("Win32LastAccessTime")) {
-            SimpleDateFormat dateFormatGmt = new SimpleDateFormat("EEE, dd MM yyyy HH:mm:ss z");
+            SimpleDateFormat dateFormatGmt = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
             dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));            
             resp_200.putProp("Win32LastAccessTime", dateFormatGmt.format(stat.getAtimeDate()));
         }
         
         if (prop.equals("Win32LastModifiedTime")) {
-            SimpleDateFormat dateFormatGmt = new SimpleDateFormat("EEE, dd MM yyyy HH:mm:ss z");
+            SimpleDateFormat dateFormatGmt = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
             dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));            
             resp_200.putProp("Win32LastModifiedTime", dateFormatGmt.format(stat.getMtimeDate()));
         }
@@ -670,13 +669,13 @@ public class PropertiesActions {
 
         if (prop.equals("current-user-principal")) {
             HashMap<String, Object> cup = new HashMap<String, Object>();
-            cup.put("href", ConfigService.CURRENT_USER_PRINCIPAL);
+            cup.put("href", String.format(ConfigService.CURRENT_USER_PRINCIPAL, requestParams.getUsername()));
             resp_200.putProp("current-user-principal", cup);
         }
 
         if (prop.equals("principal-URL")) {
             HashMap<String, Object> cup = new HashMap<String, Object>();
-            cup.put("href", ConfigService.CURRENT_USER_PRINCIPAL);
+            cup.put("href", String.format(ConfigService.CURRENT_USER_PRINCIPAL, requestParams.getUsername()));
             resp_200.putProp("principal-URL", cup);
         }
 
@@ -688,7 +687,7 @@ public class PropertiesActions {
 
         if (prop.equals("calendar-user-address-set")) {
             HashMap<String, Object> cup = new HashMap<String, Object>();
-            cup.put("href", ConfigService.CURRENT_USER_PRINCIPAL);
+            cup.put("href", String.format(ConfigService.CURRENT_USER_PRINCIPAL, requestParams.getUsername()));
             resp_200.putProp("calendar-user-address-set", cup);
         }
         

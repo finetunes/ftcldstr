@@ -25,6 +25,8 @@ public class RequestParams {
     private String requestURI;
     private String scriptURI;
     private ServletContext servletContext;
+    private String username = "anonymous"; // logged as
+    private String userIP = "0.0.0.0";
     
     private MultipartRequest multipartRequest;
     
@@ -218,6 +220,18 @@ public class RequestParams {
     }
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
+    }
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public String getUserIP() {
+        return userIP;
+    }
+    public void setUserIP(String userIP) {
+        this.userIP = userIP;
     }
     
     

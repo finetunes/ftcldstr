@@ -29,8 +29,9 @@ public class WrapperPathProvider {
             pt +=  System.getProperty("file.separator");
         }
         
-        // pathMap.put(CommonContentWrapper.WRAPPER_ID, pt + "wrappers/operation.sh"); // PZ: DEBUG
-        pathMap.put(CommonContentWrapper.WRAPPER_ID, pt + "wrappers\\1.bat"); // PZ: DEBUG
+        pathMap.put(AuthenticationWrapper.WRAPPER_ID, pt + "wrappers/checkpass.sh"); // PZ: DEBUG
+        pathMap.put(CommonContentWrapper.WRAPPER_ID, pt + "wrappers/operation.sh"); // PZ: DEBUG
+        // pathMap.put(CommonContentWrapper.WRAPPER_ID, pt + "wrappers\\1.bat"); // PZ: DEBUG
         // pathMap.put("READ_DIRECTORY_WRAPPER", "wrappers/readdir.sh");
         // pathMap.put("READ_DIRECTORY_WRAPPER_2", "wrappers/readdir.sh");
         // ...
