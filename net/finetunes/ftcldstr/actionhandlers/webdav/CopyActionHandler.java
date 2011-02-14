@@ -86,7 +86,7 @@ public class CopyActionHandler extends AbstractActionHandler {
                 status = "204 No Content";
             }
             
-            if (FileOperationsService.rcopy(fn, destination)) {
+            if (FileOperationsService.rcopy(requestParams, fn, destination)) {
                 LockingService.inheritLock(requestParams, destination, true);
                 Logger.log("COPY(" + fn + ", " + destination + ")");
             }

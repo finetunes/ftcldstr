@@ -17,29 +17,137 @@ import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
+import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesActions;
 import net.finetunes.ftcldstr.wrappers.CommonContentWrapper;
 import net.finetunes.ftcldstr.wrappers.CommonWrapperResult;
 import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class FileOperationsService {
 	
-	public static boolean rcopy(String sourcePath, String destinationPath, 
+	public static boolean rcopy(RequestParams requestParams, String src, String dst, 
 			boolean move) {
-		
-		// TODO: implement
-		return false;
+	    
+	    // src exists and readable?
+	    if (!FileOperationsService.file_exits(src) || !FileOperationsService.is_file_readable(src)) {
+	       return false; 
+	    }
+	    
+	    // dst writeable?
+	    if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_file_writable(dst)) {
+	        return false;
+	    }
+	    
+	    String nsrc = new String(src);
+	    nsrc = nsrc.replaceFirst("/$", ""); // remove trailing slash for link test (-l)
+	    
+	    if (FileOperationsService.is_symbolic_link(nsrc)) { // link
+	        if (!move || !FileOperationsService.rename(nsrc, dst)) {
+	            String orig = FileOperationsService.readlink(nsrc);
+	            if ((!move || FileOperationsService.unlink(nsrc)) && !FileOperationsService.symlink(orig, dst)) {
+	                return false;
+	            }
+	        }
+	    } else if (FileOperationsService.is_plain_file(src)) { // file
+	        if (FileOperationsService.is_directory(dst)) {
+	            if (!dst.endsWith("/")) {
+	                dst += "/";
+	            }
+	            dst += FileOperationsService.basename(src);
+	        }
+	        
+	        if (!move || !FileOperationsService.rename(src, dst)) {
+
+	            try {
+    	            InputStream in = FileOperationsService.getFileContentStream(src);
+    	            OutputStream out = FileOperationsService.getFileWriteStream(dst);
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                    in.close();
+                    out.close();
+	            }
+	            catch (IOException e) {
+	                Logger.log("Error on copying the file " + src + " to " + dst + "; " + e.getMessage());
+	                return false;
+	            }
+	            
+	            if (move) {
+	                if (!FileOperationsService.is_file_writable(src)) {
+	                    return false;
+	                }
+	                
+	                if (!FileOperationsService.unlink(src)) {
+	                    return false;
+	                }
+	            }
+	        }
+	    }
+	    else if (FileOperationsService.is_directory(src)) {
+	        // cannot write folders to files:
+	        if (FileOperationsService.is_plain_file(dst)) {
+	            return false;
+	        }
+	        
+	        if (!dst.endsWith("/")) {
+	            dst += "/";
+	        }
+	        
+	        if (!src.endsWith("/")) {
+	            src += "/";
+	        }
+	        
+	        if (!move || DirectoryOperationsService.getDirInfo(requestParams, src, "realchildcount") > 0 ||
+	                !FileOperationsService.rename(src, dst)) {
+	            if (!FileOperationsService.file_exits(dst)) {
+	                FileOperationsService.mkdir(dst);
+	            }
+	            
+	            ArrayList<String> files = WrappingUtilities.getFileList(requestParams, src);
+	            if (files == null) {
+	                return false;
+	            }
+	            
+	            Iterator<String> it = files.iterator();
+	            while (it.hasNext()) {
+	                String filename = it.next();
+	                FileOperationsService.rcopy(requestParams, src + filename, dst + filename, move);
+	            }
+
+	            if (move) {
+	                if (!FileOperationsService.is_file_writable(src)) {
+	                    return false;
+	                }
+	                
+	                if (!FileOperationsService.rmdir(src)) {
+	                    return false;
+	                }
+	            }
+	            
+	        }
+	    }
+	    else {
+	        return false;
+	    }
+	    
+	    ConfigService.properties.deleteProperties(dst);
+	    ConfigService.properties.copyProperties(src, dst);
+	    if (move) {
+	        ConfigService.properties.deleteProperties(src);
+	    }
+	    
+	    return true;
 	}
 	
-    public static boolean rcopy(String sourcePath, String destinationPath) {
+    public static boolean rcopy(RequestParams requestParams, String src, String dst) {
         
-        return rcopy(sourcePath, destinationPath, false);
+        return rcopy(requestParams, src, dst, false);
     }	
 	
-	public static boolean rmove(String sourcePath, String destinationPath) {
+	public static boolean rmove(RequestParams requestParams, String src, String dst) {
 		
-		// TODO: implement
-		return false;
-		
+        return rcopy(requestParams, src, dst, true);
 	}
 	
 	public static void changeFilePermissions(RequestParams requestParams, String fn, 

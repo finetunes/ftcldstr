@@ -141,7 +141,7 @@ public class PostActionHandler extends AbstractActionHandler {
                             for (int i = 0; i < files.length; i++) {
                                 String file = files[i];
                                 
-                                if (FileOperationsService.rmove(fn + file, fn + newname)) {
+                                if (FileOperationsService.rmove(requestParams, fn + file, fn + newname)) {
                                     Logger.log("MOVE(" + fn + "," + fn + "" + newname + ") via POST");
                                 }
                                 else {

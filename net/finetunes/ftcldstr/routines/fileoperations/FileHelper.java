@@ -161,7 +161,7 @@ public class FileHelper {
 	            }
 	        }
 	        
-	        if (FileOperationsService.mkdir(trash) && FileOperationsService.rmove(fn, trash + FileOperationsService.basename(fn))) {
+	        if (FileOperationsService.mkdir(trash) && FileOperationsService.rmove(requestParams, fn, trash + FileOperationsService.basename(fn))) {
 	            ret = true;
 	        }
 	        Logger.debug("moveToTrash(" + fn + ")->" + trash + " = " + ret);

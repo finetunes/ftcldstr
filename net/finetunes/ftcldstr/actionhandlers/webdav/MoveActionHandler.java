@@ -66,7 +66,7 @@ public class MoveActionHandler extends AbstractActionHandler {
                 status = "204 No Content";
             }
             
-            if (FileOperationsService.rmove(fn, destination)) {
+            if (FileOperationsService.rmove(requestParams, fn, destination)) {
                 ConfigService.properties.moveProperties(fn, destination);
                 ConfigService.locks.deleteLock(fn);
                 LockingService.inheritLock(requestParams, destination, true);
