@@ -51,69 +51,71 @@ public class PropertiesActions {
 	    boolean all = false;
 	    boolean noval = false;
 	    
-	    Set<String> keys = xmldata.keySet();
-	    Iterator<String> it = keys.iterator();
-	    
-	    while (it.hasNext()) {
-	        String propfind = it.next();
-	        String nons = new String(propfind);
-	        String ns = "";
-	        String nonsv = new String(nons);
-	        
-            nons = nons.replaceFirst("\\{([^\\}]*)\\}", "");
-            if (!nons.isEmpty()) {
-                Pattern p = Pattern.compile("\\{([^\\}]*)\\}");
-                Matcher m = p.matcher(nonsv);
-                if (m.find()) {
-                    ns = m.group(1);
-                }
-            }
-            
-            if ((nons.matches(".*(allprop|propname).*") ) && all) {
-                OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
-            }
-            else if (nons.matches("(allprop|propname)")) {
-                all = true;
-                noval = nons.equals("propname");
-                if (noval) {
-                    props.addAll(ConfigService.KNOWN_COLL_PROPS);
-                    props.addAll(ConfigService.KNOWN_FILE_PROPS);
-                }
-                
-                if (!noval) {
-                    props.addAll(ConfigService.ALLPROP_PROPS);
-                }
-            }
-            else if (nons.matches("(prop|include)")) {
-                handlePropElement(requestParams, (HashMap<String, Object>)xmldata.get(propfind), props);
-            }
-            else {
-                
-                boolean grepfound = false;
-                
-                Iterator<String> it2 = ConfigService.IGNORE_PROPS.iterator();
-                while (it2.hasNext()) {
-                    String p = it2.next();
-                    if (p.matches(".*" + Pattern.quote(nons) + ".*")) {
-                        grepfound = true;
-                        break;
+	    if (xmldata != null) {
+    	    Set<String> keys = xmldata.keySet();
+    	    Iterator<String> it = keys.iterator();
+    	    
+    	    while (it.hasNext()) {
+    	        String propfind = it.next();
+    	        String nons = new String(propfind);
+    	        String ns = "";
+    	        String nonsv = new String(nons);
+    	        
+                nons = nons.replaceFirst("\\{([^\\}]*)\\}", "");
+                if (!nons.isEmpty()) {
+                    Pattern p = Pattern.compile("\\{([^\\}]*)\\}");
+                    Matcher m = p.matcher(nonsv);
+                    if (m.find()) {
+                        ns = m.group(1);
                     }
                 }
                 
-                if (grepfound) {
-                    continue;
+                if ((nons.matches(".*(allprop|propname).*") ) && all) {
+                    OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
                 }
-                else if (ConfigService.NAMESPACES.get(xmldata.get(propfind)) != null ||
-                        ConfigService.NAMESPACES.get(ns) != null) {
-                    // sometimes the namespace: ignore
+                else if (nons.matches("(allprop|propname)")) {
+                    all = true;
+                    noval = nons.equals("propname");
+                    if (noval) {
+                        props.addAll(ConfigService.KNOWN_COLL_PROPS);
+                        props.addAll(ConfigService.KNOWN_FILE_PROPS);
+                    }
+                    
+                    if (!noval) {
+                        props.addAll(ConfigService.ALLPROP_PROPS);
+                    }
+                }
+                else if (nons.matches("(prop|include)")) {
+                    handlePropElement(requestParams, (HashMap<String, Object>)xmldata.get(propfind), props);
                 }
                 else {
-                    Logger.debug("Unknown element " + propfind + " (" + nons + ") in PROPFIND request");
-                    Logger.debug(ConfigService.NAMESPACES.get(xmldata.get(propfind)));
-                    OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
-                    return null; // TODO: was "exit;"--check behaviour
+                    
+                    boolean grepfound = false;
+                    
+                    Iterator<String> it2 = ConfigService.IGNORE_PROPS.iterator();
+                    while (it2.hasNext()) {
+                        String p = it2.next();
+                        if (p.matches(".*" + Pattern.quote(nons) + ".*")) {
+                            grepfound = true;
+                            break;
+                        }
+                    }
+                    
+                    if (grepfound) {
+                        continue;
+                    }
+                    else if (ConfigService.NAMESPACES.get(xmldata.get(propfind)) != null ||
+                            ConfigService.NAMESPACES.get(ns) != null) {
+                        // sometimes the namespace: ignore
+                    }
+                    else {
+                        Logger.debug("Unknown element " + propfind + " (" + nons + ") in PROPFIND request");
+                        Logger.debug(ConfigService.NAMESPACES.get(xmldata.get(propfind)));
+                        OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
+                        return null; // TODO: was "exit;"--check behaviour
+                    }
                 }
-            }
+    	    }
 	    }
 	    
 	    return new Object[] {props, new Boolean(all), new Boolean(noval)};
@@ -121,70 +123,72 @@ public class PropertiesActions {
 	
 	public static void handlePropElement(RequestParams requestParams, HashMap<String, Object> xmldata, ArrayList<String> props) {
 	    
-	    Set<String> keys = xmldata.keySet();
-	    Iterator<String> it = keys.iterator();
-	    
-	    while (it.hasNext()) {
-	        String prop = it.next();
-	        String nons = new String(prop);
-	        String ns = "";
-	        String nonsv = new String(nons);
-	        
-	        nons = nons.replaceFirst("\\{([^}]*)\\}", "");
-	        if (!nons.isEmpty()) {
-    	        Pattern p = Pattern.compile("\\{([^}]*)\\}");
-    	        Matcher m = p.matcher(nonsv);
-    	        if (m.find()) {
-    	            ns = m.group(1);
+	    if (xmldata != null) {
+    	    Set<String> keys = xmldata.keySet();
+    	    Iterator<String> it = keys.iterator();
+    	    
+    	    while (it.hasNext()) {
+    	        String prop = it.next();
+    	        String nons = new String(prop);
+    	        String ns = "";
+    	        String nonsv = new String(nons);
+    	        
+    	        nons = nons.replaceFirst("\\{([^}]*)\\}", "");
+    	        if (!nons.isEmpty()) {
+        	        Pattern p = Pattern.compile("\\{([^}]*)\\}");
+        	        Matcher m = p.matcher(nonsv);
+        	        if (m.find()) {
+        	            ns = m.group(1);
+        	        }
     	        }
-	        }
-	        
-	        Object ref = xmldata.get(prop);
-	        // original code: if (ref($$xmldata{$prop}) !~/^(HASH|ARRAY)$/)
-	        if (ref != null && ((!(ref instanceof HashMap<?, ?>)) || (!(ref instanceof ArrayList<?>)))) {
-	            // ignore namespaces
-	        }
-	        // original code:  elsif ($ns eq "" && ! defined $$xmldata{$prop}{xmlns}) {
-	        else if (ns.equals("") && (!(ref instanceof HashMap<?, ?> && ((HashMap<String, Object>)ref).get("xmlns") != null))) {
-	            OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
-	            return;
-                // TODO: was "exit;" -- check behaviour
-	        }
-	        else {
-	            boolean contains = false;
-                Iterator<String> it2 = ConfigService.KNOWN_FILE_PROPS.iterator();
-                Iterator<String> it3 = ConfigService.KNOWN_COLL_PROPS.iterator();
-                
-                while (it2.hasNext() && !contains) {
-                    String fp = it2.next();
-                    if (fp.matches(".*" + Pattern.quote(nons) + ".*")) {
-                        contains = true;
-                        break;
+    	        
+    	        Object ref = xmldata.get(prop);
+    	        // original code: if (ref($$xmldata{$prop}) !~/^(HASH|ARRAY)$/)
+    	        if (ref != null && ((!(ref instanceof HashMap<?, ?>)) || (!(ref instanceof ArrayList<?>)))) {
+    	            // ignore namespaces
+    	        }
+    	        // original code:  elsif ($ns eq "" && ! defined $$xmldata{$prop}{xmlns}) {
+    	        else if (ns.equals("") && (!(ref instanceof HashMap<?, ?> && ((HashMap<String, Object>)ref).get("xmlns") != null))) {
+    	            OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
+    	            return;
+                    // TODO: was "exit;" -- check behaviour
+    	        }
+    	        else {
+    	            boolean contains = false;
+                    Iterator<String> it2 = ConfigService.KNOWN_FILE_PROPS.iterator();
+                    Iterator<String> it3 = ConfigService.KNOWN_COLL_PROPS.iterator();
+                    
+                    while (it2.hasNext() && !contains) {
+                        String fp = it2.next();
+                        if (fp.matches(".*" + Pattern.quote(nons) + ".*")) {
+                            contains = true;
+                            break;
+                        }
                     }
-                }
-                
-                while (it3.hasNext() && !contains) {
-                    String fp = it3.next();
-                    if (fp.matches(".*" + Pattern.quote(nons) + ".*")) {
-                        contains = true;
-                        break;
+                    
+                    while (it3.hasNext() && !contains) {
+                        String fp = it3.next();
+                        if (fp.matches(".*" + Pattern.quote(nons) + ".*")) {
+                            contains = true;
+                            break;
+                        }
                     }
-                }
-                
-                if (props == null) {
-                    props = new ArrayList<String>();
-                }
-                
-                if (contains) {
-                    props.add(nons);
-                }
-                else if (ns.equals("")) {
-                    props.add("{}" + prop);
-                }
-                else {
-                    props.add(prop);
-                }
-	        }
+                    
+                    if (props == null) {
+                        props = new ArrayList<String>();
+                    }
+                    
+                    if (contains) {
+                        props.add(nons);
+                    }
+                    else if (ns.equals("")) {
+                        props.add("{}" + prop);
+                    }
+                    else {
+                        props.add(prop);
+                    }
+    	        }
+    	    }
 	    }
 	}
 	

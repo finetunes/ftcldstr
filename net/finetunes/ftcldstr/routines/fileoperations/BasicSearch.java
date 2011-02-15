@@ -80,4 +80,13 @@ public class BasicSearch {
 	        }
 	    }
 	}	
+	
+    public static void doBasicSearch(
+            RequestParams requestParams,
+            String expr, 
+            String base, String href, 
+            int depth, int limit, 
+            ArrayList<String[]> matches) {
+        doBasicSearch(requestParams, expr, base, href, depth, limit, matches, null);
+    }
 }
