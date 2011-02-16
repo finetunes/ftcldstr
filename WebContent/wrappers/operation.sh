@@ -17,7 +17,7 @@ case $COMMAND in
     "isBlockSpecial")
     cmd="test -b $FILE"
     ;;
-    "isCharecterSpecial")
+    "isCharacterSpecial")
     cmd="test -c $FILE"
     ;;
     "hasUserIDbitSet")
@@ -55,6 +55,9 @@ case $COMMAND in
     ;;
     "write")
     cmd="exec >$FILE cat"
+    ;;
+    "mkdir")
+    cmd="mkdir -p $FILE"
     ;;
 esac
 cmd="sudo -u ${USERNAME} -s $cmd"

@@ -44,8 +44,8 @@ public class FileHelper {
 	        fntext = s.substring(0, ConfigService.MAXFILENAMESIZE - 3);
 	    }
 	    
-	    if ((!FileOperationsService.is_directory(fn) && FileOperationsService.is_file_readable(fn)) || 
-	            FileOperationsService.is_file_executable(fn)) {
+	    if ((!FileOperationsService.is_directory(fn) && FileOperationsService.is_file_readable(requestParams, fn)) || 
+	            FileOperationsService.is_file_executable(requestParams, fn)) {
 	        ret = "<a href=\"" + full + "\" title=\"" + s + "\" style=\"padding:1px\">";
 	        ret += RenderingHelper.HTMLEncode(fntext);
 	        ret += "</a>";
@@ -95,7 +95,7 @@ public class FileHelper {
 	    
 	    id = id.replaceAll("\"", "");
 
-	    if (ConfigService.ENABLE_THUMBNAIL && FileOperationsService.is_file_readable(fn) &&
+	    if (ConfigService.ENABLE_THUMBNAIL && FileOperationsService.is_file_readable(requestParams, fn) &&
 	            MIMETypesHelper.getMIMEType(fn).startsWith("image/")) {
 	        
             // Original code: $icon=$full.($full=~/\?.*/?';':'?').'action=thumb';
@@ -152,7 +152,7 @@ public class FileHelper {
 	        
 	        Logger.debug("moveToTrash(" + fn + ")->/dev/null = " + ret);
 	    }
-	    else if (FileOperationsService.file_exits(ConfigService.TRASH_FOLDER) || FileOperationsService.mkdir(ConfigService.TRASH_FOLDER)) {
+	    else if (FileOperationsService.file_exits(ConfigService.TRASH_FOLDER) || FileOperationsService.mkdir(requestParams, ConfigService.TRASH_FOLDER)) {
 	        if (FileOperationsService.file_exits(trash)) {
 	            int i = 0;
 	            while (FileOperationsService.file_exits(trash)) {
@@ -161,7 +161,7 @@ public class FileHelper {
 	            }
 	        }
 	        
-	        if (FileOperationsService.mkdir(trash) && FileOperationsService.rmove(requestParams, fn, trash + FileOperationsService.basename(fn))) {
+	        if (FileOperationsService.mkdir(requestParams, trash) && FileOperationsService.rmove(requestParams, fn, trash + FileOperationsService.basename(fn))) {
 	            ret = true;
 	        }
 	        Logger.debug("moveToTrash(" + fn + ")->" + trash + " = " + ret);
@@ -184,8 +184,8 @@ public class FileHelper {
 	        Logger.debug("Cannot delete '" + f + "': not allowed");
 	        errRef.add(new String[] {f, "Cannot delete " + f});
 	    }
-	    else if (FileOperationsService.is_symbolic_link(nf)) {
-	        if (FileOperationsService.unlink(nf)) {
+	    else if (FileOperationsService.is_symbolic_link(requestParams, nf)) {
+	        if (FileOperationsService.unlink(requestParams, nf)) {
 	            count++;
 	            ConfigService.properties.deleteProperties(f);
 	            ConfigService.locks.deleteLock(f);
@@ -227,7 +227,7 @@ public class FileHelper {
 	        }
 	    }
 	    else if (FileOperationsService.file_exits(f)) {
-	        if (FileOperationsService.unlink(f)) {
+	        if (FileOperationsService.unlink(requestParams, f)) {
 	            count++;
 	            ConfigService.properties.deleteProperties(f);
 	            ConfigService.locks.deleteLock(f);

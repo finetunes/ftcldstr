@@ -33,7 +33,7 @@ public class DirectoryOperationsService {
 	    
 	    Logger.debug("readDirBySuffix(" + fn + ", ..., " + suffix + ", " + depth + ")");
 	    
-	    String nfn = FileOperationsService.full_resolve(fn);
+	    String nfn = FileOperationsService.full_resolve(requestParams, fn);
 	    
 	    if (visited == null) {
 	        visited = new ArrayList<String>();
@@ -63,7 +63,7 @@ public class DirectoryOperationsService {
     	            }
     	            
     	            String nbase = base + sf;
-    	            if (FileOperationsService.is_plain_file(fn + sf) && sf.matches(".*\\." + Pattern.quote(suffix) + ".*")) {
+    	            if (FileOperationsService.is_plain_file(requestParams, fn + sf) && sf.matches(".*\\." + Pattern.quote(suffix) + ".*")) {
     	                hrefs.add(nbase);
     	            }
     	            
@@ -282,9 +282,9 @@ public class DirectoryOperationsService {
             if (ConfigService.SHOW_PERM) {
                 list += " ";
                 list += "<span " +
-                      " style=\"" + RenderingHelper.getmodecolors(full, mode) + "\"" +
+                      " style=\"" + RenderingHelper.getmodecolors(requestParams, full, mode) + "\"" +
                       " title=\"" + String.format("mode: %04o, uid: %s (%s), gid: %s (%s)", mode & 07777, SystemCalls.getpwuid(uid), uid, SystemCalls.getgrgid(gid), gid) + "\">";
-                list += String.format("%-11s", RenderingHelper.mode2str(full, mode));
+                list += String.format("%-11s", RenderingHelper.mode2str(requestParams, full, mode));
                 list += "</span>";
             }
             list += " " + RenderingHelper.HTMLEncode(mimetype);
@@ -295,7 +295,7 @@ public class DirectoryOperationsService {
                 foldercount++;
             }
             
-            if (FileOperationsService.is_plain_file(full)) {
+            if (FileOperationsService.is_plain_file(requestParams, full)) {
                 filecount++;
                 filesizes += size;
             }
@@ -398,7 +398,7 @@ public class DirectoryOperationsService {
 	        visited = new ArrayList<String>();
 	    }
 	    
-	    String nfn = FileOperationsService.full_resolve(fn);
+	    String nfn = FileOperationsService.full_resolve(requestParams, fn);
 	    if (!noroot) {
 	        StatusResponse response = new StatusResponse();
 	        response.setHref(ru);
@@ -450,7 +450,7 @@ public class DirectoryOperationsService {
                         fru += "/";
                     }
                     
-                    String nnfn = FileOperationsService.full_resolve(nfn + "/" + f);
+                    String nnfn = FileOperationsService.full_resolve(requestParams, nfn + "/" + f);
                     int nd = depth; 
                     if (depth > 0) {
                         nd = depth - 1;

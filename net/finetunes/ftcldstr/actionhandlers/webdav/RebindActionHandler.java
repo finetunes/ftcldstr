@@ -63,30 +63,30 @@ public class RebindActionHandler extends AbstractActionHandler {
             if (!FileOperationsService.file_exits(src)) {
                 status = "404 Not Found";
             }
-            else if (!FileOperationsService.is_symbolic_link(nsrc)) {
+            else if (!FileOperationsService.is_symbolic_link(requestParams, nsrc)) {
                 status = "403 Forbidden";
             }
             else if (FileOperationsService.file_exits(dst) && !overwrite.equals("T")) {
                 status = "403 Forbidden";
             }
-            else if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_symbolic_link(ndst)) {
+            else if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_symbolic_link(requestParams, ndst)) {
                 status = "403 Forbidden";
             }
             else {
-                if (FileOperationsService.is_symbolic_link(ndst)) {
+                if (FileOperationsService.is_symbolic_link(requestParams, ndst)) {
                     status = "204 No Content";
                 }
                 else {
                     status = "201 Created";
                 }
                 
-                if (FileOperationsService.is_symbolic_link(ndst)) {
-                    FileOperationsService.unlink(ndst);
+                if (FileOperationsService.is_symbolic_link(requestParams, ndst)) {
+                    FileOperationsService.unlink(requestParams, ndst);
                 }
                 
                 if (!FileOperationsService.rename(nsrc, ndst)) {
-                    String orig = FileOperationsService.readlink(nsrc);
-                    if (!(FileOperationsService.symlink(orig, dst) && FileOperationsService.unlink(nsrc))) {
+                    String orig = FileOperationsService.readlink(requestParams, nsrc);
+                    if (!(FileOperationsService.symlink(orig, dst) && FileOperationsService.unlink(requestParams, nsrc))) {
                         status = "403 Forbidden";
                     }
                 }

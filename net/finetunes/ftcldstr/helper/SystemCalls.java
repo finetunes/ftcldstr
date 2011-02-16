@@ -13,4 +13,12 @@ public class SystemCalls {
         return "TODO";
     }
     
+    // returns real uid of the current process 
+    public static String getCurrentProcessUid() {
+        // TODO: implement;
+        return "0";
+    }
+    
+    
+    
 }

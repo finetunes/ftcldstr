@@ -58,8 +58,8 @@ public class MoveActionHandler extends AbstractActionHandler {
             status = "423 Locked";
         }
         else {
-            if (FileOperationsService.is_plain_file(destination)) {
-                FileOperationsService.unlink(destination);
+            if (FileOperationsService.is_plain_file(requestParams, destination)) {
+                FileOperationsService.unlink(requestParams, destination);
             }
             
             if (FileOperationsService.file_exits(destination)) {

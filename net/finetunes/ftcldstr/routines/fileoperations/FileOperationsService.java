@@ -28,26 +28,26 @@ public class FileOperationsService {
 			boolean move) {
 	    
 	    // src exists and readable?
-	    if (!FileOperationsService.file_exits(src) || !FileOperationsService.is_file_readable(src)) {
+	    if (!FileOperationsService.file_exits(src) || !FileOperationsService.is_file_readable(requestParams, src)) {
 	       return false; 
 	    }
 	    
 	    // dst writeable?
-	    if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_file_writable(dst)) {
+	    if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_file_writable(requestParams, dst)) {
 	        return false;
 	    }
 	    
 	    String nsrc = new String(src);
 	    nsrc = nsrc.replaceFirst("/$", ""); // remove trailing slash for link test (-l)
 	    
-	    if (FileOperationsService.is_symbolic_link(nsrc)) { // link
+	    if (FileOperationsService.is_symbolic_link(requestParams, nsrc)) { // link
 	        if (!move || !FileOperationsService.rename(nsrc, dst)) {
-	            String orig = FileOperationsService.readlink(nsrc);
-	            if ((!move || FileOperationsService.unlink(nsrc)) && !FileOperationsService.symlink(orig, dst)) {
+	            String orig = FileOperationsService.readlink(requestParams, nsrc);
+	            if ((!move || FileOperationsService.unlink(requestParams, nsrc)) && !FileOperationsService.symlink(orig, dst)) {
 	                return false;
 	            }
 	        }
-	    } else if (FileOperationsService.is_plain_file(src)) { // file
+	    } else if (FileOperationsService.is_plain_file(requestParams, src)) { // file
 	        if (FileOperationsService.is_directory(dst)) {
 	            if (!dst.endsWith("/")) {
 	                dst += "/";
@@ -74,11 +74,11 @@ public class FileOperationsService {
 	            }
 	            
 	            if (move) {
-	                if (!FileOperationsService.is_file_writable(src)) {
+	                if (!FileOperationsService.is_file_writable(requestParams, src)) {
 	                    return false;
 	                }
 	                
-	                if (!FileOperationsService.unlink(src)) {
+	                if (!FileOperationsService.unlink(requestParams, src)) {
 	                    return false;
 	                }
 	            }
@@ -86,7 +86,7 @@ public class FileOperationsService {
 	    }
 	    else if (FileOperationsService.is_directory(src)) {
 	        // cannot write folders to files:
-	        if (FileOperationsService.is_plain_file(dst)) {
+	        if (FileOperationsService.is_plain_file(requestParams, dst)) {
 	            return false;
 	        }
 	        
@@ -101,7 +101,7 @@ public class FileOperationsService {
 	        if (!move || DirectoryOperationsService.getDirInfo(requestParams, src, "realchildcount") > 0 ||
 	                !FileOperationsService.rename(src, dst)) {
 	            if (!FileOperationsService.file_exits(dst)) {
-	                FileOperationsService.mkdir(dst);
+	                FileOperationsService.mkdir(requestParams, dst);
 	            }
 	            
 	            ArrayList<String> files = WrappingUtilities.getFileList(requestParams, src);
@@ -116,7 +116,7 @@ public class FileOperationsService {
 	            }
 
 	            if (move) {
-	                if (!FileOperationsService.is_file_writable(src)) {
+	                if (!FileOperationsService.is_file_writable(requestParams, src)) {
 	                    return false;
 	                }
 	                
@@ -175,7 +175,7 @@ public class FileOperationsService {
             FileOperationsService.chmod(newmode, fn);
 	    }
 	    
-	    String nfn = FileOperationsService.full_resolve(fn);
+	    String nfn = FileOperationsService.full_resolve(requestParams, fn);
 	    
 	    if (visited == null) {
 	        visited = new ArrayList<String>();
@@ -212,11 +212,14 @@ public class FileOperationsService {
         changeFilePermissions(requestParams, filename, mode, type, recurse, null);
     }	
 
-	public static boolean is_hidden(String filename) {
+	public static boolean is_hidden(String fn) {
 		
-		// TODO: implement
-		return false;
-		
+	    if (ConfigService.HIDDEN != null && ConfigService.HIDDEN.size() > 0) {
+	        return ConfigService.HIDDEN.contains(fn);
+	    }
+	    else {
+	        return false;
+	    }
 	}
 	
 	public static String getFileContent(String filename) {
@@ -257,84 +260,62 @@ public class FileOperationsService {
     }
 
     // determines whether the file is a plain file (not a link, directory, pipe, etc.)
-    public static boolean is_plain_file(String filename) {
+    public static boolean is_plain_file(RequestParams requestParams, String fn) {
 
-        // TODO: implement
-        // return false;
-        // File.isFile() ?
-        
-        return !is_directory(filename);
-        
+        return WrappingUtilities.checkFileIsPlain(requestParams, fn);
     }
     
     // determines whether the file is a symbolic link
-    public static boolean is_symbolic_link(String filename) {
-        
-        // TODO: implement
-        return false;
-        
+    public static boolean is_symbolic_link(RequestParams requestParams, String fn) {
+
+        return WrappingUtilities.checkFileIsSymbolicLink(requestParams, fn);
     }   
     
     // determines whether the file is a block special file
-    public static boolean is_block_special_file(String filename) {
+    public static boolean is_block_special_file(RequestParams requestParams, String fn) {
         
-        // TODO: implement
-        return false;
-        
+        return WrappingUtilities.checkFileIsBlockSpecialFile(requestParams, fn);
     }
     
     // determines whether the file is a character special file
-    public static boolean is_character_special_file(String filename) {
+    public static boolean is_character_special_file(RequestParams requestParams, String fn) {
         
-        // TODO: implement
-        return false;
-        
+        return WrappingUtilities.checkFileIsCharacterSpecialFile(requestParams, fn);
     }       
     
     // determines whether the file has setuid bit set
-    public static boolean file_has_setuid_bit_set(String filename) {
+    public static boolean file_has_setuid_bit_set(RequestParams requestParams, String fn) {
         
-        // TODO: implement
-        return false;
-        
+        return WrappingUtilities.checkFileHasSetuidBitSet(requestParams, fn);
     }           
     
     // determines whether the file has setgid bit set
-    public static boolean file_has_setgid_bit_set(String filename) {
-        
-        // TODO: implement
-        return false;
-        
+    public static boolean file_has_setgid_bit_set(RequestParams requestParams, String fn) {
+
+        return WrappingUtilities.checkFileHasSetgidBitSet(requestParams, fn);
     }   
     
-    public static boolean file_has_sticky_bit_set(String filename) {
+    public static boolean file_has_sticky_bit_set(RequestParams requestParams, String fn) {
         
-        // TODO: implement
-        return false;
+        return WrappingUtilities.checkFileHasStickyBitSet(requestParams, fn);
     }        
     
     // determines whether the file or directory is readable with the effective uid/gid
-    public static boolean is_file_readable(String filename) {
+    public static boolean is_file_readable(RequestParams requestParams, String fn) {
         
-        // TODO: implement
-        return true;
-        
+        return WrappingUtilities.checkFileIsReadable(requestParams, fn);
     }       
     
     // determines whether the file or directory is writable with the effective uid/gid
-    public static boolean is_file_writable(String filename) {
+    public static boolean is_file_writable(RequestParams requestParams, String fn) {
         
-        // TODO: implement
-        return true;
-        
+        return WrappingUtilities.checkFileIsWritable(requestParams, fn);
     }
     
     // determines whether the file or directory is executable with the effective uid/gid
-    public static boolean is_file_executable(String filename) {
+    public static boolean is_file_executable(RequestParams requestParams, String fn) {
         
-        // TODO: implement
-        return true;
-        
+        return WrappingUtilities.checkFileIsExecutable(requestParams, fn);
     }
     
     public static String dirname(String filename) {
@@ -386,13 +367,7 @@ public class FileOperationsService {
         // ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, 
         // $atime,$mtime,$ctime,$blksize,$blocks) = stat($filename);
         
-        // TODO: implement
-        // return true;
-        
-        // return new Object[] {0, 0, "0888", 0, 0, 0, 0, 0, 0, "", 0, 0, 0};
-        // return new FileOperationsService().new StatData();
         return WrappingUtilities.stat(requestParams, fn);
-        
     }   
     
     // returns the result of lstat unix funtion
@@ -412,19 +387,14 @@ public class FileOperationsService {
         
     }       
     
-    public static boolean mkdir(String dirname, ArrayList<String> err) {
+    public static boolean mkdir(RequestParams requestParams, String dirname, ArrayList<String> err) {
         
-        // push into err any system errors
-        // create it first if null
-        
-        // TODO: implement
-        return false;
-        
+        return WrappingUtilities.mkdir(requestParams, dirname, err);
     }
     
-    public static boolean mkdir(String dirname) {
+    public static boolean mkdir(RequestParams requestParams, String dirname) {
         
-        return mkdir(dirname, null);
+        return mkdir(requestParams, dirname, null);
     }    
     
     public static boolean chmod(int mode, String filename) {
@@ -434,16 +404,10 @@ public class FileOperationsService {
         
     }
     
-    public static String full_resolve(String filename) {
+    public static String full_resolve(RequestParams requestParams, String fn) {
         
         // Returns the filename of $file with all links in the path resolved.
-        // This sub tries to use Cwd::abs_path via ->resolve_path.
-        
-        // resolve_path($file) Returns the filename of $file with all links in the path resolved.
-        // This sub uses Cwd::abs_path and is independent of the rest of File::Spec::Link.
-        
-        // TODO implement
-        return filename;
+        return WrappingUtilities.fullResolveSymbolicLink(requestParams, fn);
     }
     
     public static boolean write_file(String fn, String content) {
@@ -522,14 +486,9 @@ public class FileOperationsService {
     }
         
     
-    public static boolean unlink(String filename) {
+    public static boolean unlink(RequestParams requestParams, String fn) {
         
-        // TODO: write errors in log if any
-        // as there is no way to get the error code
-        // without passing errRef param in this method
-        
-        // TODO: implement
-        return false;
+        return WrappingUtilities.unlink(requestParams, fn);
     }
     
     public static boolean rmdir(String dirname) {
@@ -552,14 +511,16 @@ public class FileOperationsService {
         return false;
     }    
     
-    public static String readlink(String fn) {
+    public static String readlink(RequestParams requestParams, String fn) {
         
-        // TODO: write errors in log if any
-        // as there is no way to get the error code
-        // without passing errRef param in this method        
+        if (is_symbolic_link(requestParams, fn)) {
+            return full_resolve(requestParams, fn);
+        }
+        else {
+            Logger.log("Error: not a symblic link: " + fn);
+        }
         
-        // TODO: implement
-        return "";
+        return null;
     }      
     
     public static boolean symlink(String src, String dst) {

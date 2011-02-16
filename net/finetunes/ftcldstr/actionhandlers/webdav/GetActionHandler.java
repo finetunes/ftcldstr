@@ -81,8 +81,8 @@ public class GetActionHandler extends AbstractActionHandler {
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("davmount")) {
             doDavmountRequest(requestParams, fn);
         }
-        else if (ConfigService.ENABLE_THUMBNAIL && FileOperationsService.is_plain_file(fn) &&
-                FileOperationsService.is_file_readable(fn) &&
+        else if (ConfigService.ENABLE_THUMBNAIL && FileOperationsService.is_plain_file(requestParams, fn) &&
+                FileOperationsService.is_file_readable(requestParams, fn) &&
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("thumb")) {
             doThumbnailRequest(requestParams, fn);
         }
@@ -94,7 +94,7 @@ public class GetActionHandler extends AbstractActionHandler {
             doFileIsDirectory(requestParams, fn);
         }
         else if (FileOperationsService.file_exits(fn) &&
-                !FileOperationsService.is_file_readable(fn)) {
+                !FileOperationsService.is_file_readable(requestParams, fn)) {
             OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
         }
         else if (FileOperationsService.file_exits(fn)) {
@@ -138,7 +138,7 @@ public class GetActionHandler extends AbstractActionHandler {
             
             String cachefile = ConfigService.THUMBNAIL_CACHEDIR + "/" + uniqname + ".thumb";
             if (!FileOperationsService.file_exits(ConfigService.THUMBNAIL_CACHEDIR)) {
-                FileOperationsService.mkdir(ConfigService.THUMBNAIL_CACHEDIR);
+                FileOperationsService.mkdir(requestParams, ConfigService.THUMBNAIL_CACHEDIR);
             }
             
             StatData statfn = FileOperationsService.stat(requestParams, fn);
@@ -234,7 +234,7 @@ public class GetActionHandler extends AbstractActionHandler {
             content += String.format(ConfigService.HEADER, requestParams.getUsername());
         }
         
-        if (ConfigService.ALLOW_SEARCH && FileOperationsService.is_file_readable(fn)) {
+        if (ConfigService.ALLOW_SEARCH && FileOperationsService.is_file_readable(requestParams, fn)) {
             String search = requestParams.getRequest().getParameter("search");
             
             String form = "";
@@ -304,13 +304,13 @@ public class GetActionHandler extends AbstractActionHandler {
         }
         else {
             
-            if (!FileOperationsService.is_file_writable(fn)) {
+            if (!FileOperationsService.is_file_writable(requestParams, fn)) {
                 content += "<div style=\"background-color:#ffeeee\">";
                 content += ConfigService.stringMessages.get("foldernotwriteable");
                 content += "</div>";
             }
 
-            if (!FileOperationsService.is_file_readable(fn)) {
+            if (!FileOperationsService.is_file_readable(requestParams, fn)) {
                 content += "<div style=\"background-color:#ffeeee\">";
                 content += ConfigService.stringMessages.get("foldernotreadable");
                 content += "</div>";
@@ -328,7 +328,7 @@ public class GetActionHandler extends AbstractActionHandler {
             
             content += list;
             
-            if (ConfigService.ALLOW_FILE_MANAGEMENT && FileOperationsService.is_file_writable(fn)) {
+            if (ConfigService.ALLOW_FILE_MANAGEMENT && FileOperationsService.is_file_writable(requestParams, fn)) {
                 
                 content += "<hr>";
                 content += "&bull; " + ConfigService.stringMessages.get("createfoldertext");
@@ -455,7 +455,7 @@ public class GetActionHandler extends AbstractActionHandler {
                 content += "</form>";
             }
             
-            if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_file_writable(fn)) {
+            if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_file_writable(requestParams, fn)) {
                 
                 content += "<hr>";
                 content += "<form " +

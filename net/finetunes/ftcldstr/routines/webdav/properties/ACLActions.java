@@ -3,6 +3,7 @@ package net.finetunes.ftcldstr.routines.webdav.properties;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
 public class ACLActions {
@@ -126,10 +127,10 @@ public class ACLActions {
 	}
 	
 	// returns an array to build an xml from (using createXML)
-	public static HashMap<String, Object> getACLCurrentUserPrivilegeSet(String fn) {
+	public static HashMap<String, Object> getACLCurrentUserPrivilegeSet(RequestParams requestParams, String fn) {
 		
 	    HashMap<String, Object> usergrant = new HashMap<String, Object>();
-	    if (FileOperationsService.is_file_readable(fn)) {
+	    if (FileOperationsService.is_file_readable(requestParams, fn)) {
 	        HashMap<String, Object> readprivilege = new HashMap<String, Object>();
 	        readprivilege.put("read", null);
             HashMap<String, Object> readaclprivilege = new HashMap<String, Object>();
@@ -144,7 +145,7 @@ public class ACLActions {
 	        
 	        usergrant.put("privilege", rp);
 	        
-	        if (FileOperationsService.is_file_writable(fn)) {
+	        if (FileOperationsService.is_file_writable(requestParams, fn)) {
 
 	            HashMap<String, Object> wp = new HashMap<String, Object>();
 	            wp.put("write", null);

@@ -63,23 +63,23 @@ public class BindActionHandler extends AbstractActionHandler {
             if (!FileOperationsService.file_exits(src)) {
                 status = "404 Not Found";
             }
-            else if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_symbolic_link(ndst)) {
+            else if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_symbolic_link(requestParams, ndst)) {
                 status = "403 Forbidden";
             }
-            else if (FileOperationsService.file_exits(dst) && FileOperationsService.is_symbolic_link(ndst) &&
+            else if (FileOperationsService.file_exits(dst) && FileOperationsService.is_symbolic_link(requestParams, ndst) &&
                     overwrite.equals("F")) {
                 status = "403 Forbidden";
             }
             else {
-                if (FileOperationsService.is_symbolic_link(ndst)) {
+                if (FileOperationsService.is_symbolic_link(requestParams, ndst)) {
                     status = "204 No Content";
                 }
                 else {
                     status = "201 Created";
                 }
                 
-                if (FileOperationsService.is_symbolic_link(ndst)) {
-                    FileOperationsService.unlink(ndst);
+                if (FileOperationsService.is_symbolic_link(requestParams, ndst)) {
+                    FileOperationsService.unlink(requestParams, ndst);
                 }
                 
                 if (!FileOperationsService.symlink(src, dst)) {

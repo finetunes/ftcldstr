@@ -3,6 +3,7 @@ package net.finetunes.ftcldstr.routines.handlers;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
@@ -10,7 +11,7 @@ public class SupportedMethodsHandler {
 	
 	// returns methods list
 	// FIXME: try to find a more suitable wrapper for an array of strings 
-	public static ArrayList<String> getSupportedMethods(String path) {
+	public static ArrayList<String> getSupportedMethods(RequestParams requestParams, String path) {
 		
 	    ArrayList<String> methods = new ArrayList<String>();
 	    
@@ -43,7 +44,7 @@ public class SupportedMethodsHandler {
         
         methods.addAll(rmethods);
         
-        if (path == null || path.isEmpty() || FileOperationsService.is_file_writable(path)) {
+        if (path == null || path.isEmpty() || FileOperationsService.is_file_writable(requestParams, path)) {
             methods.addAll(wmethods);
         }
         

@@ -22,7 +22,7 @@ public class SearchService {
 		ConfigService.ALLOW_FILE_MANAGEMENT = false;
 		
 		// link loop detection:
-		String nfn = FileOperationsService.full_resolve(fn);
+		String nfn = FileOperationsService.full_resolve(requestParams, fn);
 		
 		if (visited == null) {
 		    visited = new ArrayList<String>();

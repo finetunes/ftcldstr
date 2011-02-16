@@ -45,7 +45,7 @@ public class OptionsActionHandler extends AbstractActionHandler {
                 type = MIMETypesHelper.getMIMEType(fn);
             }
             
-            ArrayList<String> supportedMethods = SupportedMethodsHandler.getSupportedMethods(fn);
+            ArrayList<String> supportedMethods = SupportedMethodsHandler.getSupportedMethods(requestParams, fn);
             methods = RenderingHelper.joinArray(supportedMethods.toArray(new String[] {}), ", ");
         }
         else {

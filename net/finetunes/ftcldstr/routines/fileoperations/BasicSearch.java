@@ -47,7 +47,7 @@ public class BasicSearch {
         push @{$matches}, { fn=> $base, href=> $href };
     }
 */
-	    String nbase = FileOperationsService.full_resolve(base);
+	    String nbase = FileOperationsService.full_resolve(requestParams, base);
 	    
 	    if (visited == null) {
 	        visited = new ArrayList<String>();

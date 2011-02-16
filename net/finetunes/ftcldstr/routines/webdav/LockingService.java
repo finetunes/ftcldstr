@@ -266,7 +266,7 @@ public class LockingService {
             response.add(r);
         }
         
-        String nfn = FileOperationsService.full_resolve(fn);
+        String nfn = FileOperationsService.full_resolve(requestParams, fn);
         
         if (visited == null) {
             visited = new ArrayList<String>();
@@ -438,7 +438,7 @@ public class LockingService {
 	        rowsRef = ConfigService.locks.getLocks(fn);
 	    }
 	    
-	    if (FileOperationsService.file_exits(fn) && !FileOperationsService.is_file_writable(fn)) {
+	    if (FileOperationsService.file_exits(fn) && !FileOperationsService.is_file_writable(requestParams, fn)) {
 	        // not writeable
 	        return false;
 	    }
@@ -495,7 +495,7 @@ public class LockingService {
 	        visited = new ArrayList<String>();
 	    }
 	    
-	    String nfn = FileOperationsService.full_resolve(fn);
+	    String nfn = FileOperationsService.full_resolve(requestParams, fn);
 	    if (visited.contains(nfn)) {
 	        return true;
 	    }

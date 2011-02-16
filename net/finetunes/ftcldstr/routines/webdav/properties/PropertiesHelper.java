@@ -45,12 +45,11 @@ public class PropertiesHelper {
         return propval;
 	}
 	
-	// TODO: params
 	public static ArrayList<StatusResponse> getPropStat(RequestParams requestParams, 
 	        String fn, String uri, ArrayList<String> props, boolean all, boolean noval) {
 	    
 	    ArrayList<StatusResponse> propstat = new ArrayList<StatusResponse>();
-	    String nfn = FileOperationsService.full_resolve(fn);
+	    String nfn = FileOperationsService.full_resolve(requestParams, fn);
 	    
 	    StatData stat = FileOperationsService.stat(requestParams, fn);
 	    StatusResponse resp_200 = new StatusResponse();

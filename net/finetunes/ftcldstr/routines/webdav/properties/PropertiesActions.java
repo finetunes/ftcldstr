@@ -14,6 +14,7 @@ import com.sun.xml.internal.ws.encoding.XMLHTTPBindingCodec;
 
 import sun.nio.cs.Surrogate.Generator;
 
+import net.finetunes.ftcldstr.ExitException;
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.GeneratorService;
@@ -112,7 +113,7 @@ public class PropertiesActions {
                         Logger.debug("Unknown element " + propfind + " (" + nons + ") in PROPFIND request");
                         Logger.debug(ConfigService.NAMESPACES.get(xmldata.get(propfind)));
                         OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
-                        return null; // TODO: was "exit;"--check behaviour
+                        throw new ExitException("Bad Request");
                     }
                 }
     	    }
@@ -150,8 +151,7 @@ public class PropertiesActions {
     	        // original code:  elsif ($ns eq "" && ! defined $$xmldata{$prop}{xmlns}) {
     	        else if (ns.equals("") && (!(ref instanceof HashMap<?, ?> && ((HashMap<String, Object>)ref).get("xmlns") != null))) {
     	            OutputService.printHeaderAndContent(requestParams, "400 Bad Request");
-    	            return;
-                    // TODO: was "exit;" -- check behaviour
+    	            throw new ExitException("Bad Request");
     	        }
     	        else {
     	            boolean contains = false;
@@ -311,7 +311,7 @@ public class PropertiesActions {
         
         if (prop.equals("executable")) {
             String executable = "F";
-            if (FileOperationsService.is_file_executable(fn)) {
+            if (FileOperationsService.is_file_executable(requestParams, fn)) {
                 executable = "T";
             }
             resp_200.putProp("executable", executable);
@@ -410,7 +410,7 @@ public class PropertiesActions {
             
             int nosubs = 0;
             if (FileOperationsService.is_directory(fn)) {
-                if (FileOperationsService.is_file_writable(fn)) {
+                if (FileOperationsService.is_file_writable(requestParams, fn)) {
                     nosubs = 1;
                 }
                 else {
@@ -491,7 +491,7 @@ public class PropertiesActions {
         
         if (prop.equals("Win32FileAttributes")) {
             int fileattr = 128 + 32; // # 128 - Normal, 32 - Archive, 4 - System, 2 - Hidden, 1 - Read-Only
-            if (!FileOperationsService.is_file_writable(fn)) {
+            if (!FileOperationsService.is_file_writable(requestParams, fn)) {
                 fileattr += 1;
             }
             if (FileOperationsService.basename(fn).startsWith(".")) {
@@ -526,7 +526,7 @@ public class PropertiesActions {
         
         if (prop.equals("isreadonly")) {
             int isreadonly = 0;
-            if (!FileOperationsService.is_file_writable(fn)) {
+            if (!FileOperationsService.is_file_writable(requestParams, fn)) {
                 isreadonly = 1;
             }
             resp_200.putProp("isreadonly", isreadonly);
@@ -584,7 +584,7 @@ public class PropertiesActions {
         }
         
         if (prop.equals("current-user-privilege-set")) {
-            resp_200.putProp("current-user-privilege-set", ACLActions.getACLCurrentUserPrivilegeSet(fn));
+            resp_200.putProp("current-user-privilege-set", ACLActions.getACLCurrentUserPrivilegeSet(requestParams, fn));
         }
         
         if (prop.equals("acl")) {
@@ -685,7 +685,7 @@ public class PropertiesActions {
 
         if (prop.equals("calendar-home-set")) {
             HashMap<String, Object> cup = new HashMap<String, Object>();
-            cup.put("href", HomesetActions.getCalendarHomeSet(uri));
+            cup.put("href", HomesetActions.getCalendarHomeSet(requestParams, uri));
             resp_200.putProp("calendar-home-set", cup);
         }
 
@@ -697,13 +697,13 @@ public class PropertiesActions {
         
         if (prop.equals("schedule-inbox-URL")) {
             HashMap<String, Object> cup = new HashMap<String, Object>();
-            cup.put("href", HomesetActions.getCalendarHomeSet(uri));
+            cup.put("href", HomesetActions.getCalendarHomeSet(requestParams, uri));
             resp_200.putProp("schedule-inbox-URL", cup);
         }        
         
         if (prop.equals("schedule-outbox-URL")) {
             HashMap<String, Object> cup = new HashMap<String, Object>();
-            cup.put("href", HomesetActions.getCalendarHomeSet(uri));
+            cup.put("href", HomesetActions.getCalendarHomeSet(requestParams, uri));
             resp_200.putProp("schedule-outbox-URL", cup);
         }     
         
@@ -718,7 +718,7 @@ public class PropertiesActions {
         }       
         
         if (prop.equals("schedule-default-calendar-URL")) {
-            resp_200.putProp("schedule-default-calendar-URL", HomesetActions.getCalendarHomeSet(uri));
+            resp_200.putProp("schedule-default-calendar-URL", HomesetActions.getCalendarHomeSet(requestParams, uri));
         }              
         
         if (prop.equals("schedule-tag")) {
@@ -811,7 +811,7 @@ public class PropertiesActions {
         if (prop.equals("supported-method-set")) {
             String sm = "";
             
-            ArrayList<String> methods = SupportedMethodsHandler.getSupportedMethods(fn);
+            ArrayList<String> methods = SupportedMethodsHandler.getSupportedMethods(requestParams, fn);
             Iterator<String> it = methods.iterator();
             while (it.hasNext()) {
                 String method = it.next();
@@ -821,13 +821,12 @@ public class PropertiesActions {
         }           
         
         if (prop.equals("resource-id")) {
-            String e = PropertiesHelper.getETag(requestParams, FileOperationsService.full_resolve(fn));
+            String e = PropertiesHelper.getETag(requestParams, FileOperationsService.full_resolve(requestParams, fn));
             e = e.replaceAll("\"", "");
             resp_200.putProp("resource-id", "urn:uuid:" + e);
         }           
 	}
 	
-	// TODO: params and return type
 	public static void setProperty(RequestParams requestParams, String propname, HashMap<String, Object> elementParentRef, 
 	        StatusResponse resp_200, StatusResponse resp_403) {
 	    

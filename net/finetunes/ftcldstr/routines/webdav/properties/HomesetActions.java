@@ -2,6 +2,7 @@ package net.finetunes.ftcldstr.routines.webdav.properties;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.SystemCalls;
 
 public class HomesetActions {
 
@@ -14,7 +15,7 @@ public class HomesetActions {
         String rmuser = requestParams.getUsername();
         
         if (!ConfigService.ADDRESSBOOK_HOME_SET.containsKey(rmuser)) {
-            rmuser = ""; // TODO: $rmuser = $< --- real uid of the current process
+            rmuser = SystemCalls.getCurrentProcessUid();
         }
         
         if (ConfigService.ADDRESSBOOK_HOME_SET.containsKey(rmuser)) {
@@ -25,10 +26,24 @@ public class HomesetActions {
         }
     }
     
-    public static String getCalendarHomeSet(String uri) {
+    public static String getCalendarHomeSet(RequestParams requestParams, String uri) {
         
-        // TODO: implement after HomesetActions.getAddressbookHomeSet() is ready
-        return null;
+        if (ConfigService.CALENDAR_HOME_SET == null) {
+            return uri;
+        }
+        
+        String rmuser = requestParams.getUsername();
+        
+        if (!ConfigService.CALENDAR_HOME_SET.containsKey(rmuser)) {
+            rmuser = SystemCalls.getCurrentProcessUid();
+        }
+        
+        if (ConfigService.CALENDAR_HOME_SET.containsKey(rmuser)) {
+            return ConfigService.CALENDAR_HOME_SET.get(rmuser);
+        }
+        else {
+            return ConfigService.CALENDAR_HOME_SET.get("default");
+        }        
     }
     
     

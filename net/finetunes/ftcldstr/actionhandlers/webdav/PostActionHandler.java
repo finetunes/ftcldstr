@@ -56,7 +56,7 @@ public class PostActionHandler extends AbstractActionHandler {
         Logger.debug("POST: " + fn);
         
         /*
-        TODO
+        FIXME: do we need this in java?
         if (!$cgi->param('file_upload') && $cgi->cgi_error) {
             printHeaderAndContent($cgi->cgi_error,undef,$cgi->cgi_error);   
             exit 0;
@@ -166,14 +166,14 @@ public class PostActionHandler extends AbstractActionHandler {
                     
                     msgparam = "p1=" + RenderingHelper.uri_escape(colname);
                     ArrayList<String> mkdirErrors = new ArrayList<String>();
-                    if (FileOperationsService.mkdir(fn + colname, mkdirErrors)) {
+                    if (FileOperationsService.mkdir(requestParams, fn + colname, mkdirErrors)) {
                         Logger.log("MKCOL(" + fn + colname + ") via POST");
                         msg = "foldercreated";
                     }
                     else {
                         errmsg = "foldererr";
                         String em = "";
-                        if (mkdirErrors.size() > 0) {
+                        if (mkdirErrors != null && mkdirErrors.size() > 0) {
                             em = mkdirErrors.get(0);
                         }
                         msgparam += ConfigService.URL_PARAM_SEPARATOR + "p2=" + RenderingHelper.uri_escape(em); 

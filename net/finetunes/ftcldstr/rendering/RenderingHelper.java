@@ -9,13 +9,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 
+import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
 public class RenderingHelper {
 	
-	public static String getmodecolors(String fn, int m) {
+	public static String getmodecolors(RequestParams requestParams, String fn, int m) {
 		
 	    String style = "";
 	    
@@ -23,16 +24,16 @@ public class RenderingHelper {
 	        style = "color: darkred";
 	    }
 	    
-	    if ((m & 0002) == 0002 && !FileOperationsService.file_has_sticky_bit_set(fn)) {
+	    if ((m & 0002) == 0002 && !FileOperationsService.file_has_sticky_bit_set(requestParams, fn)) {
 	        style = "color: red";
 	    }
 	    
 	    return style;
 	}
 	
-	public static String mode2str(String fn, int m) {
+	public static String mode2str(RequestParams requestParams, String fn, int m) {
 		
-	    if (FileOperationsService.is_symbolic_link(fn)) {
+	    if (FileOperationsService.is_symbolic_link(requestParams, fn)) {
 	        m = Integer.parseInt((String)FileOperationsService.lstat(fn)[2]); 
 	    }
 	    
@@ -40,24 +41,24 @@ public class RenderingHelper {
 	    Arrays.fill(ret, "-");
 
         if (FileOperationsService.is_directory(fn)) { ret[0] = "d"; }
-        if (FileOperationsService.is_block_special_file(fn)) { ret[0] = "b"; }
-        if (FileOperationsService.is_character_special_file(fn)) { ret[0] = "c"; }
-        if (FileOperationsService.is_symbolic_link(fn)) { ret[0] = "l"; }
+        if (FileOperationsService.is_block_special_file(requestParams, fn)) { ret[0] = "b"; }
+        if (FileOperationsService.is_character_special_file(requestParams, fn)) { ret[0] = "c"; }
+        if (FileOperationsService.is_symbolic_link(requestParams, fn)) { ret[0] = "l"; }
         
         if ((m & 0400) == 0400) { ret[1] = "r"; }
         if ((m & 0200) == 0200) { ret[2] = "w"; }
         if ((m & 0100) == 0100) { ret[3] = "x"; }
-        if (FileOperationsService.file_has_setuid_bit_set(fn)) { ret[3] = "s"; }
+        if (FileOperationsService.file_has_setuid_bit_set(requestParams, fn)) { ret[3] = "s"; }
         
         if ((m & 0040) == 0040) { ret[4] = "r"; }
         if ((m & 0020) == 0020) { ret[5] = "w"; }
         if ((m & 0010) == 0010) { ret[6] = "x"; }
-        if (FileOperationsService.file_has_setgid_bit_set(fn)) { ret[6] = "s"; }
+        if (FileOperationsService.file_has_setgid_bit_set(requestParams, fn)) { ret[6] = "s"; }
         
         if ((m & 0004) == 0004) { ret[7] = "r"; }
         if ((m & 0002) == 0002) { ret[8] = "w"; }
         if ((m & 0001) == 0001) { ret[9] = "x"; }
-        if (FileOperationsService.file_has_sticky_bit_set(fn)) { ret[9] = "t"; }
+        if (FileOperationsService.file_has_sticky_bit_set(requestParams, fn)) { ret[9] = "t"; }
         
 	    return joinArray(ret, ""); 
 	}

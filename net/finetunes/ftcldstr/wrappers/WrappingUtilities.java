@@ -78,6 +78,105 @@ public class WrappingUtilities {
         }
         
         return false;
+    }
+    
+
+    private static boolean runBooleanCommand(RequestParams requestParams, String fn, String command) {
+        return runBooleanCommand(requestParams, fn, command, false, null);
+    }
+
+    private static boolean runBooleanCommand(RequestParams requestParams, String fn, String command,
+            boolean logOnError) {
+        return runBooleanCommand(requestParams, fn, command, logOnError, null);
+    }
+    
+    private static boolean runBooleanCommand(RequestParams requestParams, String fn, String command,
+            boolean logOnError, ArrayList<String> err) {
+        
+        CommonContentWrapper cw = new CommonContentWrapper();
+        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), command, new String[]{fn});
+
+        if (d != null && d.getExitCode() == 0) {
+            return true;
+        }
+        else if (logOnError) {
+            Logger.log("Error running external command: " + command + " on file " + fn + "; " + d.getErrorMessage());
+            if (err == null) {
+                err = new ArrayList<String>();
+            }
+            if (d.getErrorMessage() != null && !d.getErrorMessage().isEmpty()) {
+                err.add(d.getErrorMessage());
+            }
+        }
+        
+        return false;
     }    
+    
+    public static boolean checkFileIsPlain(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "isPlain");
+    }
+    
+    public static boolean checkFileIsSymbolicLink(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "isSymbolicLink");
+    }
+    
+    public static boolean checkFileIsBlockSpecialFile(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "isBlockSpecial");
+    }
+    
+    public static boolean checkFileIsCharacterSpecialFile(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "isCharacterSpecial");
+    }
+    
+    public static boolean checkFileHasSetuidBitSet(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "hasUserIDbitSet");
+    }
+    
+    public static boolean checkFileHasStickyBitSet(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "hasStickyBitSet");
+    }
+    
+    public static boolean checkFileHasSetgidBitSet(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "hasGroupIDbitSet");
+    }
+    
+    public static boolean checkFileIsReadable(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "isReadable");
+    }
+    
+    public static boolean checkFileIsWritable(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "isWritable");
+    }
+    
+    public static boolean checkFileIsExecutable(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "isExecutable");
+    }
+    
+    public static String fullResolveSymbolicLink(RequestParams requestParams, String fn) {
+        
+        CommonContentWrapper cw = new CommonContentWrapper();
+        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), "fullResolve", new String[]{fn});
+
+        if (d == null || d.getExitCode() != 0) {
+            Logger.log("Error getting resolved link. File: " + fn + "; Error: " + d.getErrorMessage());
+        }
+        else {
+            String content = d.getContent();
+            if (content != null && !content.isEmpty()) {
+                content = content.replaceAll("^(\\n|\\r|\\t| )", "").replaceAll("(\\n|\\r|\\t| )$", "");
+                return content;
+            }
+        }
+        
+        return "";           
+    }
+    
+    public static boolean unlink(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "unlink", true);
+    }
+    
+    public static boolean mkdir(RequestParams requestParams, String fn, ArrayList<String> err) {
+        return runBooleanCommand(requestParams, fn, "mkdir", true, err);
+    }
     
 }

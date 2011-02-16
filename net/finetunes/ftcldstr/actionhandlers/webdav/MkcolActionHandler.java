@@ -82,7 +82,7 @@ public class MkcolActionHandler extends AbstractActionHandler {
         else if (!FileOperationsService.file_exits(FileOperationsService.dirname(fn))) {
             status = "409 Conflict";
         }
-        else if (!FileOperationsService.is_file_writable(FileOperationsService.dirname(fn))) {
+        else if (!FileOperationsService.is_file_writable(requestParams, FileOperationsService.dirname(fn))) {
             status = "403 Forbidden";
         }
         else if (!LockingService.isAllowed(requestParams, fn)) {
@@ -95,7 +95,7 @@ public class MkcolActionHandler extends AbstractActionHandler {
         else if (FileOperationsService.is_directory(FileOperationsService.dirname(fn))) {
             Logger.debug("MKCOL: create " + fn);
             
-            if (FileOperationsService.mkdir(fn)) {
+            if (FileOperationsService.mkdir(requestParams, fn)) {
                 
                 StatusResponse resp_200 = null;
                 StatusResponse resp_403 = null;

@@ -8,7 +8,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.finetunes.ftcldstr.ExitException;
 import net.finetunes.ftcldstr.RequestParams;
+import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
@@ -102,76 +104,13 @@ public class InitializationService {
             
         ConfigService.DAV = DAV;
         
-/*
-
-
-        #### PROPERTIES:
-        # from RFC2518:
-        #    creationdate, displayname, getcontentlanguage, getcontentlength, 
-        #    getcontenttype, getetag, getlastmodified, lockdiscovery, resourcetype,
-        #    source, supportedlock
-        # from RFC4918:
-        #    -source
-        # from RFC4331:
-        #    quota-available-bytes, quota-used-bytes
-        # from draft-hopmann-collection-props-00.txt:
-        #    childcount, defaultdocument (live), id, isfolder, ishidden, isstructureddocument, 
-        #    hassubs, nosubs, objectcount, reserved, visiblecount
-        # from MS-WDVME:
-        #    iscollection, isFolder, ishidden (=draft), 
-        #    Repl:authoritative-directory, Repl:resourcetag, Repl:repl-uid,
-        #    Office:modifiedby, Office:specialFolderType (dead),
-        #    Z:Win32CreationTime, Z:Win32FileAttributes, Z:Win32LastAccessTime, Z:Win32LastModifiedTime
-        # from reverse engineering:
-        #    name, href, parentname, isreadonly, isroot, getcontentclass, lastaccessed, contentclass
-        #    executable
-        # from RFC3744 (ACL):
-        #    owner, group, supported-privilege-set, current-user-privilege-set, acl, acl-restrictions
-        # from RFC4791 (CalDAV):
-        #    calendar-description, calendar-timezone, supported-calendar-component-set, supported-calendar-data,
-        #    max-resource-size, min-date-time, max-date-time, max-instances, max-attendees-per-instance,
-        #    calendar-home-set,
-        # from http://svn.calendarserver.org/repository/calendarserver/CalendarServer/trunk/doc/Extensions/caldav-ctag.txt
-        #    getctag
-        # from RFC5397 (WebDAV Current User Principal)
-        #    current-user-principal
-        # from http://tools.ietf.org/html/draft-desruisseaux-caldav-sched-08
-        #    principal: schedule-inbox-URL, schedule-outbox-URL, calendar-user-type, calendar-user-address-set,
-        #    collection: schedule-calendar-transp,schedule-default-calendar-URL,schedule-tag
-        # from http://svn.calendarserver.org/repository/calendarserver/CalendarServer/trunk/doc/Extensions/caldav-pubsubdiscovery.txt
-        # from RFC3253 (DeltaV)
-        #    supported-report-set
-        #    supported-method-set for RFC5323 (DASL/SEARCH):
-        # from http://datatracker.ietf.org/doc/draft-ietf-vcarddav-carddav/
-        #    collection: addressbook-description, supported-address-data 
-        #    principal: addressbook-home-set, principal-address
-        #    report: address-data
-        # from RFC5842 (bind)
-        #    resource-id, parent-set (unsupported yet)
-*/
-
         initMessages();
-        
-        
-        // properties
-        
-//        Properties p = new Properties();
-//        p.setProperty("c:\\1.txt", "prop1", "v1");
-//        p.setProperty("c:\\1.txt", "prop2", "v2");
-//        p.setProperty("c:\\1.txt", "prop3", "v3");
-//        p.setProperty("c:\\2.txt", "prop1", "v22");
-//        
-//        Properties.serialize("c:\\p.txt", p);
-        
+
         Properties p = Properties.deserialize(ConfigService.PROPERTIES_FILE_PATH);
         ConfigService.properties = p;
         
-        // end properties
-
         WebDAVLocks l = WebDAVLocks.deserialize(ConfigService.LOCKS_FILE_PATH);
         ConfigService.locks = l;
-        
-        // end locks
         
         initialized = true;
     }
@@ -199,6 +138,7 @@ public class InitializationService {
             // requestURI += "?" + request.getQueryString(); // PZ: seems no param should be here
         }
         
+        // TODO: finish all this
 /*        
         our $cgi = $ENV{REQUEST_METHOD} eq 'PUT' ? new CGI({}) : new CGI; // PZ: TODO: what is the difference?
         my $method = $cgi->request_method();
@@ -232,7 +172,7 @@ public class InitializationService {
                 printHeaderAndContent('404 Not Found');
                 exit();
             }
-*/            
+*/
 
         if (FileOperationsService.is_directory(pathTranslated) && !pathTranslated.endsWith(pathSeparator)) {
             pathTranslated += pathSeparator;
@@ -242,15 +182,6 @@ public class InitializationService {
             requestURI += "/";
         }
         
-/*
-            TODO:
-            if (grep(/^\Q$<\E$/, @FORBIDDEN_UID)>0) {
-                debug("Forbidden UID");
-                printHeaderAndContent('403 Forbidden');
-                exit(0);
-            }
-*/            
-        
         String scriptURI = servletContext.getRealPath("");
         String userIP = request.getRemoteAddr();
         
@@ -259,6 +190,13 @@ public class InitializationService {
         params.setScriptURI(scriptURI);
         params.setServletContext(servletContext);
         params.setUserIP(userIP);
+
+        String uid = SystemCalls.getCurrentProcessUid();
+        if (ConfigService.FORBIDDEN_UID != null && ConfigService.FORBIDDEN_UID.contains(uid)) {
+            Logger.debug("Forbidden UID");
+            OutputService.printHeaderAndContent(params, "403 Forbidden");
+            throw new ExitException("Forbidden UID");
+        }
         
         return params;
     }

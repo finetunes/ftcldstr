@@ -34,13 +34,13 @@ public class ConfigService {
     // $DOCUMENT_ROOT = $ENV{DOCUMENT_ROOT};
     public static final String DOCUMENT_ROOT = ""; // TODO: PZ: fill with an appropriate value
 
-/*    
-    ## -- UMASK
-    ## mask for file/folder creation 
-    ## (it does not change permission of existing files/folders):
-    ## DEFAULT: $UMASK = 0002; # read/write/execute for users and groups, others get read/execute permissions
-    $UMASK = 0022;
-*/
+    /*
+     * -- UMASK
+     * mask for file/folder creation
+     * (it does not change permission of existing files/folders):
+     * DEFAULT: $UMASK = 0002; # read/write/execute for users and groups, others get read/execute permissions
+     */
+    public static final int UMASK = 0022; // TODO: use it for file operations
     
     /*
      * -- MIMETYPES
@@ -111,7 +111,7 @@ public class ConfigService {
      * -- ICONS
      * for fancy indexing (you need a server alias /icons to your Apache icons directory):
      */
-    // TODO: set proper paths
+    // note proper paths
     public static final Map<String, String> ICONS = 
         Collections.unmodifiableMap(new HashMap<String, String>() {{
             put("< .. >", "/icons/back.gif");
@@ -153,15 +153,19 @@ public class ConfigService {
      * common "forbidden" UIDs: root, Apache process owner UID
      * DEFAULT: @FORBIDDEN_UID = ( 0 );
      */
-    // TODO
-    // @FORBIDDEN_UID = ( 0 );
+    public final static ArrayList<String> FORBIDDEN_UID = new ArrayList<String>(Arrays.asList(
+            "0" 
+            ));    
 
     /*
-    ## -- HIDDEN 
-    ## hide some special files/folders (GET/PROPFIND) 
-    ## EXAMPLES: @HIDDEN = ( '.DAV/?$', '~$', '.bak$' );
-    @HIDDEN = ('/.ht','/.DAV');
-*/
+     * -- HIDDEN
+     * hide some special files/folders (GET/PROPFIND)
+     * EXAMPLES: @HIDDEN = ( '.DAV/?$', '~$', '.bak$' );
+     */
+    public final static ArrayList<String> HIDDEN = new ArrayList<String>(Arrays.asList(
+            "/.ht", 
+            "/.DAV" 
+            ));        
 
     /*
      * -- ALLOW_INFINITE_PROPFIND
@@ -412,12 +416,16 @@ public class ConfigService {
      */
     public static final boolean ENABLE_CALDAV = true;
 
-/*
-    ## -- CALENDAR_HOME_SET
-    ## maps UID numbers or remote users (accounts) to calendar folders
-    %CALENDAR_HOME_SET = ( default=> '/', 1000 =>  '/caldav'  );
-*/
-
+    /*
+     * -- CALENDAR_HOME_SET
+     * maps UID numbers or remote users (accounts) to calendar folders
+     */
+    public static final Map<String, String> CALENDAR_HOME_SET = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{
+            put("default", "/");
+            put("1000", "/caldav");
+        }});      
+    
     /*
      * -- ENABLE_CALDAV_SCHEDULE
      * really incomplete (ALPHA) - properties exists but POST requests are not supported yet

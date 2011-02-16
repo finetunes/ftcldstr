@@ -49,10 +49,10 @@ public class UnbindActionHandler extends AbstractActionHandler {
             if (!FileOperationsService.file_exits(dst)) {
                 status = "404 Not Found";
             }
-            else if (!FileOperationsService.is_symbolic_link(dst)) {
+            else if (!FileOperationsService.is_symbolic_link(requestParams, dst)) {
                 status = "403 Forbidden";
             }
-            else if (!FileOperationsService.unlink(dst)) {
+            else if (!FileOperationsService.unlink(requestParams, dst)) {
                 status = "403 Forbidden";
             }
         }

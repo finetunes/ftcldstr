@@ -43,7 +43,6 @@ import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
-
 public class ActionServlet extends MServlet {
 
     public static final String NOT_SUPPORTED = "NOT_SUPPORTED";
@@ -74,20 +73,25 @@ public class ActionServlet extends MServlet {
     public void service(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException {
 
-        RequestParams requestParams = InitializationService.initRequestParams(request, response,
-                getServletContext());
-
-        String auth = request.getHeader("Authorization");
-        if (authorized(requestParams, auth)) {
-        
+        try {
+            RequestParams requestParams = InitializationService.initRequestParams(request, response,
+                    getServletContext());
+    
+            String auth = request.getHeader("Authorization");
+            if (authorized(requestParams, auth)) {
+                
+                System.out.println("MServlet::service::METHOD: " + requestParams.getRequestedMethod());
+                handleRequest(requestParams);
             
-            System.out.println("MServlet::service::METHOD: " + requestParams.getRequestedMethod());
-            handleRequest(requestParams);
-        
+            }
+            else {
+                response.setHeader("WWW-Authenticate", "BASIC realm=\"webdav\"");
+                response.sendError(response.SC_UNAUTHORIZED);
+            }
         }
-        else {
-            response.setHeader("WWW-Authenticate", "BASIC realm=\"users\"");
-            response.sendError(response.SC_UNAUTHORIZED);            
+        catch (ExitException e) {
+            // do nothing
+            // the script just wants to exit before the normal funish
         }
 
         response.getOutputStream().flush();
@@ -148,41 +152,7 @@ public class ActionServlet extends MServlet {
             actionHandler = getMethodHandler(ActionServlet.NOT_SUPPORTED);
         }
         
-        // do some work
-        String pathTranslated = "/"; // PZ: TODO: get path translated value by filename
         actionHandler.handle(requestParams);
-
-/*        
-        // some temporary output stuff here
-        try {
-            response.getOutputStream().write(("<br><br><br>Got " + method + " request").getBytes());
-            response.getOutputStream().write(("<html><head></head><body>Hallo, I'm a WebDAV servlet.").getBytes());
-            response.getOutputStream().write(("<br><br><a href=\"/\">GET me</a>").getBytes());
-            response.getOutputStream().write(("<br><form method=\"post\" action=\"/\"><input type=submit name=\"b\" value=\"POST me\"></form>").getBytes());
-            
-            Hashtable<String, String> properties = PropertiesContainerSnippet.getInstance().getProperties();
-            
-            Random random = new Random();
-            int rn = random.nextInt(26);
-            char l = new Character((char)(rn + 0x41));
-            properties.put(String.valueOf(l), String.valueOf(rn));
-            
-            String r = "";
-            Set<String> keys = properties.keySet();
-            Iterator<String> it = keys.iterator();
-            
-            while (it.hasNext()) {
-                String key = (String)it.next();
-                r = r +  key + ": " + properties.get(key) + "<br>";
-            }
-            
-            response.getOutputStream().write(("<br><br>" + r).getBytes());
-        }
-        catch (IOException e) {
-            System.out.println("Something went wrong with the output.");
-        }        
-*/        
-        
     }
     
     public void initMethods() {

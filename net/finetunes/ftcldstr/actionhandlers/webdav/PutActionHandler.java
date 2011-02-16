@@ -40,7 +40,7 @@ public class PutActionHandler extends AbstractActionHandler {
         if (requestParams.headerExists("Content-Range")) {
             status = "501 Not Implemented";
         }
-        else if (FileOperationsService.is_directory(FileOperationsService.dirname(fn)) && !FileOperationsService.is_file_writable(fn)) {
+        else if (FileOperationsService.is_directory(FileOperationsService.dirname(fn)) && !FileOperationsService.is_file_writable(requestParams, fn)) {
             status = "403 Forbidden";
         }
         else if (PreconditionsHandler.preConditionFailed(requestParams, fn)) {

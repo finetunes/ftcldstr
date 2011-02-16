@@ -73,7 +73,7 @@ public class CopyActionHandler extends AbstractActionHandler {
             }
             else {
                 ArrayList<String> err = new ArrayList<String>();
-                if (FileOperationsService.mkdir(destination, err)) {
+                if (FileOperationsService.mkdir(requestParams, destination, err)) {
                     LockingService.inheritLock(requestParams, destination);
                 }
                 else {
