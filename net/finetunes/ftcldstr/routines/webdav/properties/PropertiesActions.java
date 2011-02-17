@@ -660,7 +660,7 @@ public class PropertiesActions {
         
         if (prop.equals("calendar-data")) {
             if (fn.toLowerCase().endsWith(".ics")) {
-                resp_200.putProp("calendar-data", RenderingHelper.HTMLEncode(FileOperationsService.getFileContent(fn)));
+                resp_200.putProp("calendar-data", RenderingHelper.HTMLEncode(FileOperationsService.getFileContent(requestParams, fn)));
             }
             else {
                 resp_404.putProp("calendar-data", null);
@@ -727,7 +727,7 @@ public class PropertiesActions {
         
         if (prop.equals("address-data")) {
             if (fn.toLowerCase().endsWith(".vcf")) {
-                resp_200.putProp("address-data", RenderingHelper.HTMLEncode(FileOperationsService.getFileContent(fn)));
+                resp_200.putProp("address-data", RenderingHelper.HTMLEncode(FileOperationsService.getFileContent(requestParams, fn)));
             }
             else {
                 resp_404.putProp("address-data", null);

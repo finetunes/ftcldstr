@@ -1,5 +1,7 @@
 package net.finetunes.ftcldstr.wrappers;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -13,7 +15,7 @@ public class WrappingUtilities {
     public static ArrayList<String> getFileList(RequestParams requestParams, String fn) {
         
         ArrayList<String> files = new ArrayList<String>();
-        CommonContentWrapper rdw = new CommonContentWrapper();
+        CommonContentWrapper rdw = new CommonContentWrapper(requestParams);
         CommonWrapperResult d = rdw.runCommand(requestParams, requestParams.getUsername(), "list", new String[]{fn});
 
         if (d == null || d.getExitCode() != 0) {
@@ -21,9 +23,11 @@ public class WrappingUtilities {
             return null;
         }
         else {
-            String content = d.getContent(); 
-            String[] list = content.split("\n");
-            files = new ArrayList<String>(Arrays.asList(list));
+            String content = d.getContent();
+            if (content != null && !content.isEmpty()) {
+                String[] list = content.split("\n");
+                files = new ArrayList<String>(Arrays.asList(list));
+            }
         }
         
         return files;
@@ -32,7 +36,7 @@ public class WrappingUtilities {
     public static StatData stat(RequestParams requestParams, String fn) {
         
         StatData statData = new FileOperationsService().new StatData();
-        CommonContentWrapper rdw = new CommonContentWrapper();
+        CommonContentWrapper rdw = new CommonContentWrapper(requestParams);
         CommonWrapperResult d = rdw.runCommand(requestParams, requestParams.getUsername(), "stat", new String[]{fn});
 
         if (d == null || d.getExitCode() != 0) {
@@ -70,8 +74,8 @@ public class WrappingUtilities {
     
     public static boolean isUserValid(RequestParams requestParams, String username, String password) {
         
-        AuthenticationWrapper w = new AuthenticationWrapper();
-        CommonWrapperResult d = w.runCommand(requestParams, null, null, new String[]{username, password});
+        AuthenticationWrapper w = new AuthenticationWrapper(requestParams);
+        CommonWrapperResult d = w.runCommand(requestParams, null, null, new String[]{username, password}, false);
 
         if (d != null && d.getExitCode() == 0) {
             return true;
@@ -93,7 +97,7 @@ public class WrappingUtilities {
     private static boolean runBooleanCommand(RequestParams requestParams, String fn, String command,
             boolean logOnError, ArrayList<String> err) {
         
-        CommonContentWrapper cw = new CommonContentWrapper();
+        CommonContentWrapper cw = new CommonContentWrapper(requestParams);
         CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), command, new String[]{fn});
 
         if (d != null && d.getExitCode() == 0) {
@@ -154,7 +158,7 @@ public class WrappingUtilities {
     
     public static String fullResolveSymbolicLink(RequestParams requestParams, String fn) {
         
-        CommonContentWrapper cw = new CommonContentWrapper();
+        CommonContentWrapper cw = new CommonContentWrapper(requestParams);
         CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), "fullResolve", new String[]{fn});
 
         if (d == null || d.getExitCode() != 0) {
@@ -178,5 +182,55 @@ public class WrappingUtilities {
     public static boolean mkdir(RequestParams requestParams, String fn, ArrayList<String> err) {
         return runBooleanCommand(requestParams, fn, "mkdir", true, err);
     }
+    
+    public static String readFile(RequestParams requestParams, String fn) {
+        
+        CommonContentWrapper cw = new CommonContentWrapper(requestParams);
+        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), "read", new String[]{fn});
+
+        if (d == null || d.getExitCode() != 0) {
+            Logger.log("Unable to read file content. File: " + fn + "; Error: " + d.getErrorMessage());
+        }
+        else {
+            String content = d.getContent();
+            if (content != null && !content.isEmpty()) {
+                return content;
+            }
+        }
+        
+        return "";           
+    }    
+    
+    public static InputStream getFileContentReadStream(RequestParams requestParams, String fn) {
+        
+        CommonContentWrapper cw = new CommonContentWrapper(requestParams);
+        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), "read", new String[]{fn});
+
+        if (d == null || d.getInputStream() == null) {
+            Logger.log("Unable to read file content. File: " + fn);
+        }
+        else {
+            InputStream is = d.getInputStream();
+            return is;
+        }
+        
+        return null;           
+    }
+    
+    public static OutputStream getFileContentWriteStream(RequestParams requestParams, String fn) {
+        
+        CommonContentWrapper cw = new CommonContentWrapper(requestParams);
+        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), "write", new String[]{fn});
+
+        if (d == null || d.getOutputStream() == null) {
+            Logger.log("Unable to get file output stream. File: " + fn);
+        }
+        else {
+            OutputStream os = d.getOutputStream();
+            return os;
+        }
+        
+        return null;           
+    }    
     
 }

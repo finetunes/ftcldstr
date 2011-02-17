@@ -50,7 +50,7 @@ public class CopyActionHandler extends AbstractActionHandler {
         
         destination = destination.replaceFirst("^https?://([^@]+@)?\\Q" + host + "\\E" + ConfigService.VIRTUAL_BASE, "");
         destination = RenderingHelper.uri_unescape(destination);
-        destination = RenderingHelper.uri_unescape(destination); // PZ: yes, it was unescaped twice in the perl code
+        destination = RenderingHelper.uri_unescape(destination);
         destination = ConfigService.DOCUMENT_ROOT + destination;
         
         Logger.debug("COPY: " + fn + " => " + destination);

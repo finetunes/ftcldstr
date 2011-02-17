@@ -28,5 +28,24 @@ public class MIMETypesHelper {
 	    
         return ConfigService.MIMETYPES.get("default");
 	}
+	
+	public static String getFileExtentionByMimeType(String fn) {
+	    
+	    if (fn != null && ConfigService.MIMETYPES != null) {
+            String imageMimeType = MIMETypesHelper.getMIMEType(fn);
+            Set<String> keys = ConfigService.MIMETYPES.keySet();
+            Iterator<String> it = keys.iterator();
+            while (it.hasNext()) {
+                String key = it.next();
+                if (ConfigService.MIMETYPES.get(key).equals(imageMimeType)) {
+                    return key;
+                }
+            }
+            
+            return imageMimeType;
+	    }
+	    
+	    return null; 
+	}
 
 }

@@ -3,14 +3,9 @@ package net.finetunes.ftcldstr;
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.actionhandlers.base.NotSupportedMethodActionHandler;
@@ -39,6 +34,7 @@ import net.finetunes.ftcldstr.actionhandlers.webdav.UnlockActionHandler;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.InitializationService;
 import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.helper.SystemCalls;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
@@ -72,26 +68,37 @@ public class ActionServlet extends MServlet {
 	
     public void service(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException {
+        
+        RequestParams requestParams = InitializationService.initRequestParams(request, response,
+                getServletContext());
 
-        try {
-            RequestParams requestParams = InitializationService.initRequestParams(request, response,
-                    getServletContext());
-    
-            String auth = request.getHeader("Authorization");
-            if (authorized(requestParams, auth)) {
-                
-                System.out.println("MServlet::service::METHOD: " + requestParams.getRequestedMethod());
-                handleRequest(requestParams);
+        String auth = request.getHeader("Authorization");
+        if (authorized(requestParams, auth)) {
             
+            try {
+                InitializationService.checkRunPermissions(requestParams);
+                // System.out.println("MServlet::service::METHOD: " + requestParams.getRequestedMethod());
+                Logger.debug("MServlet called with UID=" + SystemCalls.getCurrentProcessUid() + 
+                        " (" + requestParams.getUsername() + ") method=" + requestParams.getRequestedMethod());
+                Logger.debug("User-Agent: " + requestParams.getHeader("User-Agent"));
+                
+                if (requestParams.headerExists("X-Litmus")) {
+                    Logger.debug("MServlet: X-Litmus: " + requestParams.getHeader("X-Litmus"));
+                }
+                if (requestParams.headerExists("X-Litmus-Second")) {
+                    Logger.debug("MServlet: X-Litmus-Second: " + requestParams.getHeader("X-Litmus-Second"));
+                }
+                
+                handleRequest(requestParams);
             }
-            else {
-                response.setHeader("WWW-Authenticate", "BASIC realm=\"webdav\"");
-                response.sendError(response.SC_UNAUTHORIZED);
+            catch (ExitException e) {
+                // do nothing
+                // the script just wants to exit before the normal finish
             }
         }
-        catch (ExitException e) {
-            // do nothing
-            // the script just wants to exit before the normal funish
+        else {
+            response.setHeader("WWW-Authenticate", "BASIC realm=\"webdav\"");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
         response.getOutputStream().flush();
@@ -141,8 +148,6 @@ public class ActionServlet extends MServlet {
         if (pathinfo == null) {
             pathinfo = "";
         }
-
-        System.out.println("Pathinfo: [" + pathinfo + "]");
 
         // Handle the request
         // with the corresponding method handler

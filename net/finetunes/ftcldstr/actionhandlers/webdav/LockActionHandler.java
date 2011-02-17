@@ -103,7 +103,7 @@ public class LockActionHandler extends AbstractActionHandler {
             }
         }
         else if (!FileOperationsService.file_exits(fn)) {
-            if (FileOperationsService.create_file(fn, "")) {
+            if (FileOperationsService.create_file(requestParams, fn, "")) {
                 HashMap<String, Object> resp = LockingService.lockResource(requestParams, fn, ru, xmldata, depth, timeout, token);
                 if (resp != null && resp.get("multistatus") != null) {
                     status = "207 Multi-Status";

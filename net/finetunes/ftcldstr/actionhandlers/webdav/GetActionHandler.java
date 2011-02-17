@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.MissingFormatArgumentException;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -146,7 +147,7 @@ public class GetActionHandler extends AbstractActionHandler {
             if (!FileOperationsService.file_exits(cachefile) || statfn.getMtimeDate().after(statcf.getMtimeDate())) {
                 
                 try {
-                    BufferedImage image = ImageIO.read(FileOperationsService.getFileContentStream(fn));
+                    BufferedImage image = ImageIO.read(FileOperationsService.getFileContentStream(requestParams, fn));
                     
                     int type = image.getType();
                     if (type == 0) {
@@ -163,14 +164,15 @@ public class GetActionHandler extends AbstractActionHandler {
                     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     
-                    ImageIO.write(resizedImage, MIMETypesHelper.getMIMEType(fn), FileOperationsService.getFileWriteStream(cachefile));
+                    String imageType = MIMETypesHelper.getFileExtentionByMimeType(fn); 
+                    ImageIO.write(resizedImage, imageType, FileOperationsService.getFileWriteStream(requestParams, cachefile));
                 }
                 catch (IOException e) {
                     Logger.log("Exception on creating cached thumbnail: " + e.getMessage());
                 }
             }
             
-            InputStream fs = FileOperationsService.getFileContentStream(fn);
+            InputStream fs = FileOperationsService.getFileContentStream(requestParams, cachefile);
             if (fs != null) {
                 StatData stat = FileOperationsService.stat(requestParams, cachefile);
                 int contentLength = stat.getSize();
@@ -181,9 +183,11 @@ public class GetActionHandler extends AbstractActionHandler {
                 
                 try {
                     OutputStream outStream = requestParams.getResponse().getOutputStream();
-                    int val;  
-                    while ((val = fs.read()) != -1) {
-                        outStream.write(val);  
+                    
+                    byte[] buf = new byte[1024 * 20];
+                    int len;
+                    while ((len = fs.read(buf)) > 0) {
+                        outStream.write(buf, 0, len);
                     }
                 }
                 catch (IOException e) {
@@ -197,7 +201,7 @@ public class GetActionHandler extends AbstractActionHandler {
             requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, fn));
             
             try {
-                BufferedImage image = ImageIO.read(FileOperationsService.getFileContentStream(fn));
+                BufferedImage image = ImageIO.read(FileOperationsService.getFileContentStream(requestParams, fn));
                 
                 int type = image.getType();
                 if (type == 0) {
@@ -215,11 +219,12 @@ public class GetActionHandler extends AbstractActionHandler {
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
                 OutputStream outStream = requestParams.getResponse().getOutputStream();
-                ImageIO.write(resizedImage, MIMETypesHelper.getMIMEType(fn), outStream);
+                String imageType = MIMETypesHelper.getFileExtentionByMimeType(fn); 
+                ImageIO.write(resizedImage, imageType, outStream);
             }
             catch (IOException e) {
                 Logger.log("Exception on creating thumbnail: " + e.getMessage());
-            }            
+            }
         }
     }
     
@@ -418,7 +423,7 @@ public class GetActionHandler extends AbstractActionHandler {
                     }
                     
                     content += "; ";
-                    content += "<input type=\"submit\" name=\"changeperm\" value=\"changepermissions\" " +
+                    content += "<input type=\"submit\" name=\"changeperm\" value=\"" + ConfigService.stringMessages.get("changepermissions") + "\" " +
                     		" onclick=\"return window.confirm('" + ConfigService.stringMessages.get("changepermconfirm") + "');\">";
                     
                     content += "<br>";
@@ -631,7 +636,7 @@ public class GetActionHandler extends AbstractActionHandler {
     private void doFileExists(RequestParams requestParams, String fn) {
         Logger.debug("GET: DOWNLOAD");
         OutputService.printFileHeader(requestParams, fn);
-        OutputService.printContentStream(requestParams, FileOperationsService.getFileContentStream(fn));
+        OutputService.printContentStream(requestParams, FileOperationsService.getFileContentStream(requestParams, fn));
     }
     
     public class PropertyComparator implements Comparator<String> {

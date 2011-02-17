@@ -264,7 +264,7 @@ public class PostActionHandler extends AbstractActionHandler {
                     Logger.log("Exception: Unable to read the file. " + e.getMessage());
                 }
                 
-                if (!(is != null && FileOperationsService.writeFileFromStream(destination, is))) {
+                if (!(is != null && FileOperationsService.writeFileFromStream(requestParams, destination, is))) {
                     OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
                     break;
                 }
@@ -376,7 +376,7 @@ public class PostActionHandler extends AbstractActionHandler {
             // ## NOT IMPLEMENTED YET // was original perl code;
         }
         else {
-            Logger.debug("_POST: forbidden POST to " + fn);
+            Logger.debug("POST: forbidden POST to " + fn);
             OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
         }
     }

@@ -15,11 +15,12 @@ import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
  */
 public class ConfigService {
     
-    // TODO: add all the config values here
-
+    // has to have the trailing slash
+    public static final String BASE_PATH = "/home/";
+    
     /*
      * -- VIRTUAL_BASE
-     * only neccassary if you use redirects or rewrites
+     * only necessary if you use redirects or rewrites
      * from a VIRTUAL_BASE to the DOCUMENT_ROOT
      * regular expressions are allowed
      * DEFAULT: $VIRTUAL_BASE = "";
@@ -32,7 +33,9 @@ public class ConfigService {
      * (don't forget a trailing slash '/'):
      */
     // $DOCUMENT_ROOT = $ENV{DOCUMENT_ROOT};
-    public static final String DOCUMENT_ROOT = ""; // TODO: PZ: fill with an appropriate value
+    // the variable is initialised in InitializationService.initRequestParams
+    // trailing slash shouldn't be used
+    public static String DOCUMENT_ROOT = null;
 
     /*
      * -- UMASK
@@ -280,12 +283,6 @@ public class ConfigService {
      */
     public final static ArrayList<String> PERM_OTHERS = new ArrayList<String>(Arrays.asList("r", "w", "x", "t"));
 
-
-//    PZ: no language support
-//    ## -- LANGSWITCH
-//    ## a simple language switch
-//    $LANGSWITCH = '<div style="font-size:0.6em;text-align:right;border:0px;padding:0px;"><a href="?lang=default">[EN]</a> <a href="?lang=de">[DE]</a></div>';
-
     /*
      * -- HEADER
      * content after body tag in the Web interface
@@ -299,49 +296,6 @@ public class ConfigService {
      * EXAMPLE: $SIGNATURE=$ENV{SERVER_SIGNATURE};
      */
     public static final String SIGNATURE = "<div style=\"padding-left:3px;background-color:#444444;color:#ffffff;\">&copy; ZE CMS, Humboldt-Universit&auml;t zu Berlin | Written 2010 by <a style=\"color:#ffffff;\" href=\"http://amor.cms.hu-berlin.de/~rohdedan/webdav/\">Daniel Rohde</a></div>";
-
-/*
-    ## -- LANG
-    ## defines the default language for the Web interface
-    ## see %TRANSLATION option for supported languages
-    ## DEFAULT: $LANG='default';
-    $LANG = 'default';
-    #$LANG = 'de';
-
-    // TRANSLATION WAS HERE
-    
-
-    ## -- DBI_(SRC/USER/PASS)
-    ## database setup for LOCK/UNLOCK/PROPPATCH/PROPFIND data
-    ## EXAMPLE: $DBI_SRC='dbi:SQLite:dbname=/tmp/webdav.'.($ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}).'.db';
-    ## ATTENTION: if users share the same folder they should use the same database. The example works only for users with unshared folders and $CREATE_DB should be enabled.
-    $DBI_SRC='dbi:SQLite:dbname=/usr/local/www/var/webdav/webdav.'.($ENV{REDIRECT_REMOTE_USER}||$ENV{REMOTE_USER}).'.db';
-    $DBI_USER="";
-    $DBI_PASS="";
-
-    ## enables persitent database connection (only usefull in conjunction with mod_perl, Speedy/PersistenPerl)
-    $DBI_PERSISTENT = 0;
-
-    ## -- CREATE_DB
-    ## if set to 1 this script creates the database schema ($DB_SCHEMA)
-    ## performance hint: if the database schema exists set CREATE_DB to 0
-    ## DEFAULT: $CREATE_DB = 1;
-    $CREATE_DB = 1;
-
-    ## -- DB_SCHEMA
-    ## database schema (works with SQlite3 & MySQL5)
-    ## WARNING!!! do not use a unique index 
-    @DB_SCHEMA = (
-        'CREATE TABLE IF NOT EXISTS webdav_locks (basefn VARCHAR(255) NOT NULL, fn VARCHAR(255) NOT NULL, type VARCHAR(255) NOT NULL, scope VARCHAR(255), token VARCHAR(255) NOT NULL, depth VARCHAR(255) NOT NULL, timeout VARCHAR(255) NULL, owner TEXT NULL, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)',
-        'CREATE TABLE IF NOT EXISTS webdav_props (fn VARCHAR(255) NOT NULL, propname VARCHAR(255) NOT NULL, value TEXT)',
-        'CREATE INDEX IF NOT EXISTS webdav_locks_idx1 ON webdav_locks (fn)',
-        'CREATE INDEX IF NOT EXISTS webdav_locks_idx2 ON webdav_locks (basefn)',
-        'CREATE INDEX IF NOT EXISTS webdav_locks_idx3 ON webdav_locks (fn,basefn)',
-        'CREATE INDEX IF NOT EXISTS webdav_locks_idx4 ON webdav_locks (fn,basefn,token)',
-        'CREATE INDEX IF NOT EXISTS webdav_props_idx1 ON webdav_props (fn)',
-        'CREATE INDEX IF NOT EXISTS webdav_props_idx2 ON webdav_props (fn,propname)',
-        );
-*/
     
     /*
      * -- DEFAULT_LOCK_OWNER
@@ -361,26 +315,34 @@ public class ConfigService {
      */
     public static final String CHARSET = "utf-8";
 /*    
+ *  * FIXME: remove
     # and Perl's UTF-8 pragma for the right string length:
     # use utf8;
     # no utf8;
-
-    
+*/
+  
+/*
+ * FIXME: remove    
     ## -- BUFSIZE
     ## buffer size for read and write operations
     $BUFSIZE = 1073741824;
+*/    
 
-    ## -- LOGFILE
-    ## simple log for file/folder modifications (PUT/MKCOL/DELETE/COPY/MOVE)
-    ## EXAMPLE: $LOGFILE='/tmp/webdavcgi.log';
-    # $LOGFILE='/tmp/webdavcgi.log';
+    /*
+     * -- LOGFILE
+     * simple log for file/folder modifications (PUT/MKCOL/DELETE/COPY/MOVE)
+     * EXAMPLE: $LOGFILE='/tmp/webdavcgi.log';
+     */
+    public static final String LOGFILE = "/tmp/webdavcgi.log";
 
-    ## -- GFSQUOTA
-    ## if you use a GFS/GFS2 filesystem and if you want quota property support set this variable
-    ## ($FS - will be replaced by the filesystem (filename/folder))
-    ## EXAMPLE: $GFSQUOTA='/usr/sbin/gfs2_quota -f';
-    $GFSQUOTA='/usr/sbin/gfs_quota -f';
-*/
+    /*
+     * -- GFSQUOTA
+     * if you use a GFS/GFS2 filesystem and if you want quota property support set this variable
+     * ($FS - will be replaced by the filesystem (filename/folder))
+     * EXAMPLE: $GFSQUOTA='/usr/sbin/gfs2_quota -f';
+     */
+    public static final String GFSQUOTA= "/usr/sbin/gfs_quota -f";
+
     
     /*
      * -- ENABLE_LOCK
@@ -506,7 +468,7 @@ public class ConfigService {
      */
     // FIXME: PZ: set the proper path here 
     // public static final String THUMBNAIL_CACHEDIR = "/usr/local/www/tmp/thumbs";
-    public static final String THUMBNAIL_CACHEDIR = "e:\\webdav\\thumbs";
+    public static final String THUMBNAIL_CACHEDIR = "/usr/local/www/tmp/thumbs";
     
     /*
      * -- ENABLE_BIND
@@ -519,7 +481,7 @@ public class ConfigService {
      * enables/disables debug output
      * you can find the debug output in your web server error log
      */
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 /*
     ############  S E T U P - END ###########################################
     #########################################################################

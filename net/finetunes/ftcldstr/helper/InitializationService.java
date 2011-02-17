@@ -126,33 +126,28 @@ public class InitializationService {
         params.setResponse(response);
         params.setRequestedMethod(request.getMethod());
 
-        // Setting the path_translated value
-        // String servletPath = request.getServletPath().substring(1).replaceAll("/", System.getProperty("path.separator"));
-
-        // our $PATH_TRANSLATED = $ENV{PATH_TRANSLATED};
-        // our $REQUEST_URI = $ENV{REQUEST_URI};
-        String pathTranslated = servletContext.getRealPath(request.getServletPath());
         String requestURI = request.getServletPath();
+
+        String pathTranslated;
+        String documentRoot;
         
-        if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
-            // requestURI += "?" + request.getQueryString(); // PZ: seems no param should be here
+        if (ConfigService.BASE_PATH == null || ConfigService.BASE_PATH.isEmpty()) {
+            pathTranslated = servletContext.getRealPath(request.getServletPath());
+            if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
+                // requestURI += "?" + request.getQueryString(); // PZ: seems no param should be here
+            }
+            
+            documentRoot = servletContext.getRealPath("");
         }
-        
-        // TODO: finish all this
-/*        
-        our $cgi = $ENV{REQUEST_METHOD} eq 'PUT' ? new CGI({}) : new CGI; // PZ: TODO: what is the difference?
-        my $method = $cgi->request_method();
-*/        
-
-/*        
-        debug("$0 called with UID='$<' EUID='$>' GID='$(' EGID='$)' method=$method");
-        debug("User-Agent: $ENV{HTTP_USER_AGENT}");
-
-        debug("$0: X-Litmus: ".$cgi->http("X-Litmus")) if defined $cgi->http("X-Litmus");
-        debug("$0: X-Litmus-Second: ".$cgi->http("X-Litmus-Second")) if defined $cgi->http("X-Litmus-Second");
-*/        
+        else {
+            pathTranslated = ConfigService.BASE_PATH + request.getServletPath().replaceFirst("^/", "");
+            documentRoot = ConfigService.BASE_PATH;
+        }
+        documentRoot = documentRoot.replaceFirst("/$", "");
+        ConfigService.DOCUMENT_ROOT = documentRoot;
 
 /*
+ * not required in java
         # 404/rewrite/redirect handling:
         if (!defined $PATH_TRANSLATED) {
             $PATH_TRANSLATED = $ENV{REDIRECT_PATH_TRANSLATED};
@@ -163,15 +158,6 @@ public class InitializationService {
                 $PATH_TRANSLATED = $DOCUMENT_ROOT.$su;
             }
         }
-*/        
-
-/*        
-        # protect against direct CGI script call:
-            if (!defined $PATH_TRANSLATED || $PATH_TRANSLATED eq "") {
-                debug('FORBIDDEN DIRECT CALL!');
-                printHeaderAndContent('404 Not Found');
-                exit();
-            }
 */
 
         if (FileOperationsService.is_directory(pathTranslated) && !pathTranslated.endsWith(pathSeparator)) {
@@ -191,14 +177,17 @@ public class InitializationService {
         params.setServletContext(servletContext);
         params.setUserIP(userIP);
 
+        return params;
+    }
+    
+    public static void checkRunPermissions(RequestParams requestParams) {
+        
         String uid = SystemCalls.getCurrentProcessUid();
         if (ConfigService.FORBIDDEN_UID != null && ConfigService.FORBIDDEN_UID.contains(uid)) {
             Logger.debug("Forbidden UID");
-            OutputService.printHeaderAndContent(params, "403 Forbidden");
+            OutputService.printHeaderAndContent(requestParams, "403 Forbidden");
             throw new ExitException("Forbidden UID");
         }
-        
-        return params;
     }
     
     

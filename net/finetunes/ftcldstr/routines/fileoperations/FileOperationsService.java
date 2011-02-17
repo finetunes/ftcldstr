@@ -1,12 +1,15 @@
 package net.finetunes.ftcldstr.routines.fileoperations;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -58,9 +61,9 @@ public class FileOperationsService {
 	        if (!move || !FileOperationsService.rename(src, dst)) {
 
 	            try {
-    	            InputStream in = FileOperationsService.getFileContentStream(src);
-    	            OutputStream out = FileOperationsService.getFileWriteStream(dst);
-                    byte[] buf = new byte[1024];
+    	            InputStream in = FileOperationsService.getFileContentStream(requestParams, src);
+    	            OutputStream out = FileOperationsService.getFileWriteStream(requestParams, dst);
+                    byte[] buf = new byte[1024 * 20];
                     int len;
                     while ((len = in.read(buf)) > 0) {
                         out.write(buf, 0, len);
@@ -222,28 +225,16 @@ public class FileOperationsService {
 	    }
 	}
 	
-	public static String getFileContent(String filename) {
+	public static String getFileContent(RequestParams requestParams, String fn) {
 		
-		// TODO: implement
-		return null;
-		
+        return WrappingUtilities.readFile(requestParams, fn);
 	}
 	
 	// additional methods
 	
-    public static InputStream getFileContentStream(String filename) {
+    public static InputStream getFileContentStream(RequestParams requestParams, String fn) {
 
-    //  if (open(F,"<$fn")) {
-//      binmode(STDOUT);
-//      while (read(F,my $buffer, $BUFSIZE)>0) {
-//          print $buffer;
-//      }
-//      close(F);
-//  }             
-        
-        // TODO: implement
-        return null;
-        
+        return WrappingUtilities.getFileContentReadStream(requestParams, fn);
     }
 	
     public static boolean is_directory(String filename) {
@@ -252,7 +243,6 @@ public class FileOperationsService {
         return file.isDirectory();
     }	
     
-    // TODO: check whether works on dirs as well, not only files 
     public static boolean file_exits(String filename) {
         
         File file = new File(filename);
@@ -410,52 +400,16 @@ public class FileOperationsService {
         return WrappingUtilities.fullResolveSymbolicLink(requestParams, fn);
     }
     
-    public static boolean write_file(String fn, String content) {
-
-        // method creates a new file and writets content to it
-        // returns false if file can't be created or written
-        // otherwise returns true
-
-/*            
-        if (open(my $f,">$PATH_TRANSLATED")) {
-            binmode STDIN;
-            binmode $f;
-            my $maxread = 0;
-            while (my $read = read(STDIN, $buffer, $BUFSIZE)>0) {
-                print $f $buffer;
-                $maxread+=$read;
-            }
-            close($f);
-            inheritLock();
-            if (exists $ENV{CONTENT_LENGTH} && $maxread != $ENV{CONTENT_LENGTH}) {
-                debug("_PUT: ERROR: maxread=$maxread, content-length: $ENV{CONTENT_LENGTH}");
-                #$status='400';
-            }
-
-
-            logger("PUT($PATH_TRANSLATED)");
-        } else {
-            $status='403 Forbidden';
-            $content="";
-            $type='text/plain';
-        }
-            
-*/
+    // returns stream to write the file contents to
+    public static OutputStream getFileWriteStream(RequestParams requestParams, String fn) {
         
-        // TODO: implement
-        return false;
-        
-    }
-    
-    // TODO: returns stream to write the file contents to
-    public static OutputStream getFileWriteStream(String fn) {
-        return null;
+        return WrappingUtilities.getFileContentWriteStream(requestParams, fn);
     }
     
     
-    public static boolean writeFileFromStream(String fn, FileInputStream fis) {
+    public static boolean writeFileFromStream(RequestParams requestParams, String fn, FileInputStream fis) {
         if (fn != null && fis != null) {
-            OutputStream outStream = getFileWriteStream(fn);
+            OutputStream outStream = getFileWriteStream(requestParams, fn);
             BufferedInputStream buf = null;
             try {
                 buf = new BufferedInputStream(fis);
@@ -534,18 +488,26 @@ public class FileOperationsService {
     }          
     
     // creates a new file (or rewrites exising and writes content into it)
-    // e. g.:
-    // open(F,">$fn")
-    // print F '';
-    // close(F);
-    public static boolean create_file(String fn, String content) {
+    public static boolean create_file(RequestParams requestParams, String fn, String content) {
         
-        // TODO: write errors in log if any
-        // as there is no way to get the error code
-        // without passing errRef param in this method        
-        
-        // TODO: implement
-        return false;
+        OutputStream os = getFileWriteStream(requestParams, fn);
+        Writer out = new BufferedWriter(new OutputStreamWriter(os));
+        try {
+            out.write(content);
+        }
+        catch (IOException e) {
+            return false;
+        }
+        finally {
+            try {
+                out.close();
+            }
+            catch (IOException ex) {
+                // ignore
+            }
+        }
+
+        return true;
     }
     
     // sets access and modification time of a file
@@ -561,14 +523,14 @@ public class FileOperationsService {
 
         int dev;
         int ino;
-        int mode; // 2
+        int mode;
         int nlink;
         int uid;
         int gid;
         int rdev;
-        int size; // 7
+        int size;
         long atime;
-        long mtime; // 9
+        long mtime;
         long ctime;
         int blksize;
         int blocks;

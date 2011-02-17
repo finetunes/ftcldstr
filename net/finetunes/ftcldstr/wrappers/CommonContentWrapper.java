@@ -1,11 +1,13 @@
 package net.finetunes.ftcldstr.wrappers;
 
+import net.finetunes.ftcldstr.RequestParams;
+
 public class CommonContentWrapper extends AbstractWrapper {
     
     public static final String WRAPPER_ID = "COMMON_WRAPPER";
     
-    public CommonContentWrapper() {
+    public CommonContentWrapper(RequestParams requestParams) {
         super();
-        setWrapperID(WRAPPER_ID);
+        setWrapperID(requestParams, WRAPPER_ID);
     }
 }

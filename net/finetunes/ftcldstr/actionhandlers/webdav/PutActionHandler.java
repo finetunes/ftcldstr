@@ -1,5 +1,9 @@
 package net.finetunes.ftcldstr.actionhandlers.webdav;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.actionhandlers.base.AbstractActionHandler;
 import net.finetunes.ftcldstr.helper.Logger;
@@ -61,8 +65,42 @@ public class PutActionHandler extends AbstractActionHandler {
                 content += "<body><h1>Created</h1><p>Resource " + requestParams.getRequest().getQueryString() + " has been created.</p></body></html>\n";
             }
             
-            String c = requestParams.getRequestBody();
-            if (!FileOperationsService.write_file(fn, c)) {
+            InputStream is = requestParams.getRequestBodyInputStream();
+            OutputStream os = FileOperationsService.getFileWriteStream(requestParams, fn);
+
+            if (is != null && os != null) {
+                try {
+                    int numRead;
+                    byte[] buf = new byte[1024];
+                    int maxread = 0;
+                    while ((numRead = is.read(buf)) >= 0) {
+                        os.write(buf, 0, numRead);
+                        maxread += numRead;
+                    }
+                    
+                    is.close();
+                    os.close();
+                    
+                    LockingService.inheritLock(requestParams);
+                    
+                    try {
+                        if (requestParams.headerExists("Content-Length") && maxread != Integer.parseInt(requestParams.getHeader("Content-Length"))) {
+                            Logger.debug("PUT: ERROR: maxread=" + maxread + ", content-length: " + requestParams.getHeader("Content-Length"));
+                        }
+                    }
+                    catch (NumberFormatException e) {
+                        // ignore
+                    }
+
+                    Logger.log("PUT(" + fn +")");
+                }
+                catch (IOException e) {
+                    status = "403 Forbidden";
+                    content = "";
+                    type = "text/plain";
+                }
+            }
+            else {
                 status = "403 Forbidden";
                 content = "";
                 type = "text/plain";

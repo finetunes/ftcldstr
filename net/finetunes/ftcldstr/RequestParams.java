@@ -68,6 +68,16 @@ public class RequestParams {
         this.scriptURI = scriptURI;
     }
     
+    public InputStream getRequestBodyInputStream() {
+        try {
+            return request.getInputStream();
+        }
+        catch (IOException e) {
+            Logger.log("Failed to obtain input stream of the request.");
+            return null;
+        }
+    }
+    
     public String getRequestBody() {
         
         if (request != null) {
@@ -175,7 +185,7 @@ public class RequestParams {
             createMultipartRequestWrapper();
         }
         
-        if (multipartRequestParamExists(param)) {
+        if (multipartRequest != null && multipartRequestParamExists(param)) {
             return multipartRequest.getParameter(param);
         }
         
@@ -210,8 +220,10 @@ public class RequestParams {
             setMultipartRequest(m);
         }
         catch (IOException e) {
-            Logger.log("Exception: " + e.getMessage());
-            e.printStackTrace();
+            Logger.log("Error on multipart request parsing: " + e.getMessage());
+        }
+        catch (IllegalArgumentException e) {
+            Logger.log("Error on multipart request parsing: " + e.getMessage());
         }
     }
     
