@@ -259,11 +259,10 @@ public class WebDAVLocks implements Serializable {
                 return true;
             }
             catch (FileNotFoundException e) {
-                Logger.log("Exception on searization: " + e.getMessage());
-                e.printStackTrace();
+                Logger.log("Unable to serialize locks. Exception on searization: " + e.getMessage());
             }
             catch (IOException e) {
-                Logger.log("Exception on searization: " + e.getMessage());
+                Logger.log("Unable to serialize locks. Exception on searization: " + e.getMessage());
                 e.printStackTrace();
             }
         }

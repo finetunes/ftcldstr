@@ -3,6 +3,7 @@ package net.finetunes.ftcldstr;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,13 +47,13 @@ public class ActionServlet extends MServlet {
     
     public ActionServlet() {
         super();
-        InitializationService.init();
+        InitializationService.init(getServletContext());
         initMethods();
     }
     
     public void destroy() {
-        Properties.serialize(ConfigService.PROPERTIES_FILE_PATH, ConfigService.properties);
-        WebDAVLocks.serialize(ConfigService.LOCKS_FILE_PATH, ConfigService.locks);
+        Properties.serialize(ConfigService.ROOT_PATH + ConfigService.PROPERTIES_FILE_PATH, ConfigService.properties);
+        WebDAVLocks.serialize(ConfigService.ROOT_PATH + ConfigService.LOCKS_FILE_PATH, ConfigService.locks);
     }    
     
     

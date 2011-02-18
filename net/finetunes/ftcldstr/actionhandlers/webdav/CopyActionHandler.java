@@ -52,7 +52,7 @@ public class CopyActionHandler extends AbstractActionHandler {
         destination = RenderingHelper.uri_unescape(destination);
         destination = RenderingHelper.uri_unescape(destination);
         destination = ConfigService.DOCUMENT_ROOT + destination;
-        
+
         Logger.debug("COPY: " + fn + " => " + destination);
         
         if (destination == null || destination.isEmpty() || (fn.equals(destination))) {
@@ -61,7 +61,7 @@ public class CopyActionHandler extends AbstractActionHandler {
         else if (FileOperationsService.file_exits(destination) && overwrite.equals("F")) {
             status = "412 Precondition Failed";
         }
-        else if (!FileOperationsService.is_directory(destination)) {
+        else if (!FileOperationsService.is_directory(FileOperationsService.dirname(destination))) {
             status = "409 Conflict - " + destination;
         }
         else if (!LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(fn))) {

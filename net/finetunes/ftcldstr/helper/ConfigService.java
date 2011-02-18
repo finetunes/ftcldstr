@@ -17,6 +17,8 @@ public class ConfigService {
     
     // has to have the trailing slash
     public static final String BASE_PATH = "/home/";
+    // Root path of the servlet
+    public static String ROOT_PATH = null; // init in InitializationService.init();
     
     /*
      * -- VIRTUAL_BASE
@@ -679,31 +681,73 @@ public class ConfigService {
             put("default", 1000);
         }});       
     
-/*                
- * TODO:
-    %SEARCH_PROPTYPES = ( default=>'string',
-                  '{DAV:}getlastmodified'=> 'dateTime', '{DAV:}lastaccessed'=>'dateTime', '{DAV:}getcontentlength' => 'int', 
-                  '{DAV:}creationdate' => 'dateTime','{urn:schemas-microsoft-com:}Win32CreationTime' =>'dateTime', 
-                  '{urn:schemas-microsoft-com:}Win32LastAccessTime'=>'dateTime',  '{urn:schemas-microsoft-com:}Win32LastModifiedTime'=>'dateTime',
-                  '{DAV:}childcount'=>'int', '{DAV:}objectcount'=>'int','{DAV:}visiblecount'=>'int',
-                  '{DAV:}acl'=>'xml', '{DAV:}acl-restrictions'=>'xml','{urn:ietf:params:xml:ns:carddav}addressbook-home-set'=>'xml',
-                  '{urn:ietf:params:xml:ns:caldav}calendar-home-set'=>'xml', '{DAV:}current-user-principal}'=>'xml',
-                  '{DAV:}current-user-privilege-set'=>'xml', '{DAV:}group'=>'xml',
-                  '{DAV:}owner'=>'xml', '{urn:ietf:params:xml:ns:carddav}principal-address'=>'xml',
-                  '{DAV:}principal-collection-set'=>'xml', '{DAV:}principal-URL'=>'xml',
-                  '{DAV:}resourcetype'=>'xml', '{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp'=>'xml',
-                  '{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL'=>'xml', '{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL'=>'xml',
-                  '{DAV:}source'=>'xml', '{urn:ietf:params:xml:ns:carddav}supported-address-data'=>'xml',
-                  '{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set'=>'xml','{urn:ietf:params:xml:ns:caldav}supported-calendar-data'=>'xml',
-                  '{DAV:}supported-method-set'=>'xml','{DAV:}supported-privilege-set'=>'xml','{DAV:}supported-report-set'=>'xml',
-                  '{DAV:}supportedlock'=>'xml'
-                );
-    %SEARCH_SPECIALCONV = ( dateTime => 'str2time', xml=>'convXML2Str' );
-    %SEARCH_SPECIALOPS = ( int => { eq => '==', gt => '>', lt =>'<', gte=>'>=', lte=>'<=', cmp=>'<=>' }, 
-                               dateTime => { eq => '==', gt => '>', lt =>'<', gte=>'>=', lte=>'<=', cmp=>'<=>' }, 
-                               string => { lte=>'le', gte=>'ge' } );
+    public static final Map<String, String> SEARCH_PROPTYPES = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{ 
+            put("default", "string");
+            put("{DAV:}getlastmodified", "dateTime");
+            put("{DAV:}lastaccessed", "dateTime");
+            put("{DAV:}getcontentlength", "int");
+            put("{DAV:}creationdate", "dateTime");
+            put("{urn:schemas-microsoft-com:}Win32CreationTime", "dateTime");
+            put("{urn:schemas-microsoft-com:}Win32LastAccessTime", "dateTime" );
+            put("{urn:schemas-microsoft-com:}Win32LastModifiedTime", "dateTime");
+            put("{DAV:}childcount", "int");
+            put("{DAV:}objectcount", "int");
+            put("{DAV:}visiblecount", "int");
+            put("{DAV:}acl", "xml");
+            put("{DAV:}acl-restrictions", "xml");
+            put("{urn:ietf:params:xml:ns:carddav}addressbook-home-set", "xml");
+            put("{urn:ietf:params:xml:ns:caldav}calendar-home-set", "xml");
+            put("{DAV:}current-user-principal}", "xml");
+            put("{DAV:}current-user-privilege-set", "xml");
+            put("{DAV:}group", "xml");
+            put("{DAV:}owner", "xml");
+            put("{urn:ietf:params:xml:ns:carddav}principal-address", "xml");
+            put("{DAV:}principal-collection-set", "xml");
+            put("{DAV:}principal-URL", "xml");
+            put("{DAV:}resourcetype", "xml");
+            put("{urn:ietf:params:xml:ns:caldav}schedule-calendar-transp", "xml");
+            put("{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL", "xml");
+            put("{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL", "xml");
+            put("{DAV:}source", "xml");
+            put("{urn:ietf:params:xml:ns:carddav}supported-address-data", "xml");
+            put("{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set", "xml");
+            put("{urn:ietf:params:xml:ns:caldav}supported-calendar-data", "xml");
+            put("{DAV:}supported-method-set", "xml");
+            put("{DAV:}supported-privilege-set", "xml");
+            put("{DAV:}supported-report-set", "xml");
+            put("{DAV:}supportedlock", "xml");
+        }});     
     
-*/
+    public static final Map<String, String> SEARCH_SPECIALCONV = 
+        Collections.unmodifiableMap(new HashMap<String, String>() {{ 
+            put("dateTime", "str2time");
+            put("xml", "convXML2Str");
+        }});
+    
+    public static final Map<String, HashMap<String, String>> SEARCH_SPECIALOPS = 
+        Collections.unmodifiableMap(new HashMap<String, HashMap<String, String>>() {{ 
+            put("int", new HashMap<String, String>() {{
+                put("eq", "==");
+                put("gt", ">");
+                put("lt", "<");
+                put("gte", ">=");
+                put("lte", "<=");
+                put("cmp", "<=>");
+            }});
+            put("dateTime", new HashMap<String, String>() {{
+                put("eq", "==");
+                put("gt", ">");
+                put("lt", "<");
+                put("gte", ">=");
+                put("lte", "<=");
+                put("cmp", "<=>");
+            }});
+            put("string", new HashMap<String, String>() {{
+                put("lte", "le");
+                put("gte", "ge");
+            }});
+        }});       
     
     public final static ArrayList<String> IGNORE_PROPS = new ArrayList<String>(Arrays.asList(
             "xmlns", 
@@ -719,8 +763,8 @@ public class ConfigService {
     
     public static final String URL_PARAM_SEPARATOR = "&"; // was ";" in perl
     
-    public static final String PROPERTIES_FILE_PATH = "c:\\p.txt";
-    public static final String LOCKS_FILE_PATH = "c:\\p2.txt";
+    public static final String PROPERTIES_FILE_PATH = "properties.dat";
+    public static final String LOCKS_FILE_PATH = "locks.dat";
     
 
 }

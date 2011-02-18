@@ -23,12 +23,18 @@ public class InitializationService {
     /*
      * initialises runtime variables
      */
-    public synchronized static void init() {
+    public synchronized static void init(final ServletContext servletContext) {
         
         if (initialized) {
             return;
         }
         
+        String rootPath = servletContext.getRealPath("");
+        if (!rootPath.endsWith( System.getProperty("file.separator"))) {
+            rootPath +=  System.getProperty("file.separator");
+        }        
+        
+        ConfigService.ROOT_PATH = rootPath;
         initProps();
         
 /*
@@ -168,12 +174,11 @@ public class InitializationService {
             requestURI += "/";
         }
         
-        String scriptURI = servletContext.getRealPath("");
         String userIP = request.getRemoteAddr();
         
         params.setPathTranslated(pathTranslated);
         params.setRequestURI(requestURI);
-        params.setScriptURI(scriptURI);
+        params.setScriptURI(ConfigService.ROOT_PATH);
         params.setServletContext(servletContext);
         params.setUserIP(userIP);
 

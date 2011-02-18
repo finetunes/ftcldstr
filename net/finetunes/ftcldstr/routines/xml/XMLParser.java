@@ -43,7 +43,7 @@ public class XMLParser {
 	            try {
 	                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	                dbf.setNamespaceAware(true);
-	                dbf.setValidating(true);
+	                dbf.setValidating(false);
 	                DocumentBuilder db = dbf.newDocumentBuilder();
 	                InputStream is = new ByteArrayInputStream(text.getBytes(encoding));
 	                Document doc = db.parse(is);

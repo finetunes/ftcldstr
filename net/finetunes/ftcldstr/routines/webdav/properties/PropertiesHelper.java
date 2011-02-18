@@ -58,6 +58,9 @@ public class PropertiesHelper {
 	    resp_200.setStatus("HTTP/1.1 200 OK");
 	    resp_404.setStatus("HTTP/1.1 404 Not Found");
 	    
+	    if (props == null) {
+	        props = new ArrayList<String>();
+	    }
 	    Iterator<String> it = props.iterator();
 	    
 	    while (it.hasNext()) {

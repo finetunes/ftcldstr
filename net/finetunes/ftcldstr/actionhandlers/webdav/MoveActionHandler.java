@@ -50,8 +50,8 @@ public class MoveActionHandler extends AbstractActionHandler {
         else if (FileOperationsService.file_exits(destination) && overwrite.equals("F")) {
             status = "412 Precondition Failed";
         }
-        else if (!FileOperationsService.is_directory(destination)) {
-            status = "409 Conflict - " + destination;
+        else if (!FileOperationsService.is_directory(FileOperationsService.dirname(destination))) {
+            status = "409 Conflict - " + FileOperationsService.dirname(destination);
         }
         else if (!LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(fn)) ||
                 !LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(destination))) {

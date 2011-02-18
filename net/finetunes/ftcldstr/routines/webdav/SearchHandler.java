@@ -1,20 +1,26 @@
 package net.finetunes.ftcldstr.routines.webdav;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.helper.MIMETypesHelper;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.BasicSearch;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesActions;
+import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
+import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
 
 public class SearchHandler {
 
-	// TODO: params and return type
 	public static void handleBasicSearch(RequestParams requestParams,
 	        HashMap<String, Object> xmldata,
 	        ArrayList<HashMap<String, Object>> resps,
@@ -26,7 +32,7 @@ public class SearchHandler {
 	    
 	    // select > (allprop | prop)  
         Object[] propFindElement = PropertiesActions.handlePropFindElement(requestParams, (HashMap<String, Object>)xmldata.get("{DAV:}select"));
-        ArrayList<String> props = (ArrayList<String>)propFindElement[0];
+        ArrayList<String> propsref = (ArrayList<String>)propFindElement[0];
         boolean all = ((Boolean)propFindElement[1]).booleanValue();
         boolean noval = ((Boolean)propFindElement[2]).booleanValue();
         
@@ -66,7 +72,7 @@ public class SearchHandler {
         }
         
         String host = requestParams.getHeader("Host");
-        ArrayList<String[]> matches = new ArrayList<String[]>();
+        ArrayList<HashMap<String, Object>> matches = new ArrayList<HashMap<String,Object>>();
         Iterator<HashMap<String, Object>> it = scopes.iterator();
         while (it.hasNext()) {
             HashMap<String, Object> scope = it.next();
@@ -105,48 +111,160 @@ public class SearchHandler {
         
         // orderby > order+ (caseless=(yes|no))> (prop|score), (ascending|descending)?
         
-/*	    
-        # orderby > order+ (caseless=(yes|no))> (prop|score), (ascending|descending)? 
-        my $sortfunc="";
-        if (exists $$xmldata{'{DAV:}orderby'} && $#matches>0) {
-            my @orders;
-            if (ref($$xmldata{'{DAV:}orderby'}{'{DAV:}order'}) eq 'ARRAY') {
-                push @orders, @{$$xmldata{'{DAV:}orderby'}{'{DAV:}order'}};
-            } elsif (ref($$xmldata{'{DAV:}orderby'}{'{DAV:}order'}) eq 'HASH') {
-                push @orders, $$xmldata{'{DAV:}orderby'}{'{DAV:}order'};
-            }
-            foreach my $order (@orders) {
-                my @props = keys %{$$order{'{DAV:}prop'}};
-                my $prop = $props[0] || '{DAV:}displayname';
-                my $proptype = $SEARCH_PROPTYPES{$prop} || $SEARCH_PROPTYPES{default};
-                my $type = $$order{'{DAV:}descending'} ?  'descending' : 'ascending';
-                debug("orderby: prop=$prop, proptype=$proptype, type=$type");
-                my($ta,$tb,$cmp);
-                $ta = qq@getPropValue('$prop',\$\$a{fn},\$\$a{href})@;
-                $tb = qq@getPropValue('$prop',\$\$b{fn},\$\$b{href})@;
-                if ($SEARCH_SPECIALCONV{$proptype}) {
-                    $ta = $SEARCH_SPECIALCONV{$proptype}."($ta)";
-                    $tb = $SEARCH_SPECIALCONV{$proptype}."($tb)";
+        MatchComparator comp = new MatchComparator(requestParams);
+        if (xmldata.containsKey("{DAV:}orderby") && matches != null && matches.size() > 1) {
+            ArrayList<HashMap<String, Object>> orders = new ArrayList<HashMap<String,Object>>();
+            
+            HashMap<String, Object> orderby = null;
+            if (xmldata.get("{DAV:}orderby") instanceof HashMap<?, ?>) {
+                orderby = (HashMap<String, Object>)xmldata.get("{DAV:}orderby");
+                if (orderby != null) {
+                    Object ord = orderby.get("{DAV:}order");
+                    if (ord != null) {
+                        if (ord instanceof ArrayList<?>) {
+                            orders.addAll((ArrayList<HashMap<String, Object>>)ord);
+                        }
+                        else if (ord instanceof HashMap<?, ?>) {
+                            orders.add((HashMap<String, Object>)ord);
+                        }
+                    }
+                    
                 }
-                $cmp = $SEARCH_SPECIALOPS{$proptype}{cmp} || 'cmp';
-                $sortfunc.=" || " if $sortfunc ne "";
-                $sortfunc.="$ta $cmp $tb" if $type eq 'ascending';
-                $sortfunc.="$tb $cmp $ta" if $type eq 'descending';
             }
-    
-            debug("orderby: sortfunc=$sortfunc");
+            
+            Iterator<HashMap<String, Object>> itr = orders.iterator();
+            while (itr.hasNext()) {
+                HashMap<String, Object> order = itr.next();
+                
+                HashMap<String, Object> p = (HashMap<String, Object>)order.get("{DAV:}prop");
+                if (p != null) {
+                    Set<String> keys = p.keySet();
+                    ArrayList<String> props = new ArrayList<String>(keys);
+                    String prop = null;
+                    if (props.size() > 0) {
+                        prop = props.get(0);
+                    }
+                    
+                    if (prop == null) {
+                        prop = "{DAV:}displayname";
+                    }
+                    
+                    String proptype = ConfigService.SEARCH_PROPTYPES.get(prop);
+                    if (proptype == null) {
+                        proptype = ConfigService.SEARCH_PROPTYPES.get("default");
+                    }
+                    
+                    String type;
+                    if (order.get("{DAV:}descending") != null) {
+                        type = "descending";
+                    }
+                    else {
+                        type = "ascending";
+                    }
+                    
+                    Logger.debug("orderby: prop=" + prop + ", proptype=" + proptype + ", type=" + type);
+                    comp.addCondition(prop, proptype, type);
+                }
+            }
+            Logger.debug("orderby: sortfunc=$sortfunc");
         }
-    
-        debug("handleBasicSearch: matches=$#matches");
-        foreach my $match ( sort { eval($sortfunc) } @matches ) {
-            push @{$resps}, { href=> $$match{href}, propstat=>getPropStat($$match{fn},$$match{href},$propsref,$all,$noval) };
+        
+        int matchesCount = 0;
+        if (matches != null) {
+            matchesCount = matches.size();
         }
+        Logger.debug("handleBasicSearch: matches=" + matchesCount);
 
-	    
-	    
-*/	    
-	    // TODO: implement
-		
+        if (comp != null) {
+            Collections.sort(matches, comp);
+        }
+        Iterator<HashMap<String, Object>> itm = matches.iterator();
+        while (itm.hasNext()) {
+            HashMap<String, Object> match = itm.next();
+            HashMap<String, Object> resp = new HashMap<String, Object>();
+            resp.put("href", match.get("href"));
+            resp.put("propstat", StatusResponse.statusResponseListToHashMap(PropertiesHelper.getPropStat(requestParams, (String)match.get("fn"), (String)match.get("href"), propsref, all, noval)));
+            resps.add(resp);
+        }
 	}
 
 }
+
+class MatchComparator implements Comparator<HashMap<String, Object>> {
+    
+    private RequestParams requestParams;
+    private ArrayList<HashMap<String, String>> cond = new ArrayList<HashMap<String,String>>(); 
+    
+    public MatchComparator(RequestParams requestParams) {
+        this.requestParams = requestParams;
+    }
+    
+    public void addCondition(String prop, String proptype, String type) {
+        HashMap<String, String> c = new HashMap<String, String>();
+        c.put("prop", prop);
+        c.put("proptype", proptype);
+        c.put("type", type);
+        cond.add(c);
+    }
+    
+    public int compare(HashMap<String, Object> a, HashMap<String, Object> b) {
+        
+        if (cond.size() == 0) {
+            return 0;
+        }
+        
+        Iterator<HashMap<String, String>> it = cond.iterator();
+        while (it.hasNext()) {
+            HashMap<String, String> c = it.next();
+            if (checkCondition(a, b, c)) {
+                return 1;
+            }
+        }
+        
+        return -1;
+    }
+    
+    private boolean checkCondition(HashMap<String, Object> a, HashMap<String, Object> b,
+            HashMap<String, String> condition) {
+        
+        String prop = condition.get("prop");
+        String proptype = condition.get("proptype");
+        String type = condition.get("type");
+        String propa = PropertiesHelper.getPropValue(requestParams, prop, (String)a.get("fn"), (String)a.get("href"));
+        String propb = PropertiesHelper.getPropValue(requestParams, prop, (String)b.get("fn"), (String)b.get("href"));
+
+// TODO: finish comparison        
+        
+//        if ($SEARCH_SPECIALCONV{$proptype}) {
+//            $ta = $SEARCH_SPECIALCONV{$proptype}."($ta)";
+//            $tb = $SEARCH_SPECIALCONV{$proptype}."($tb)";
+//        }
+        
+//      $cmp = $SEARCH_SPECIALOPS{$proptype}{cmp} || 'cmp';
+
+        if (type.equals("ascending")) {
+            // return // $sortfunc.="$ta $cmp $tb"
+        }
+
+        if (type.equals("descending")) {
+            // return // $sortfunc.="$tb $cmp $ta"
+        }
+        
+        return false;
+        
+        /*                
+        my($ta,$tb,$cmp);
+        $ta = qq@getPropValue('$prop',\$\$a{fn},\$\$a{href})@;
+        $tb = qq@getPropValue('$prop',\$\$b{fn},\$\$b{href})@;
+        if ($SEARCH_SPECIALCONV{$proptype}) {
+            $ta = $SEARCH_SPECIALCONV{$proptype}."($ta)";
+            $tb = $SEARCH_SPECIALCONV{$proptype}."($tb)";
+        }
+        $cmp = $SEARCH_SPECIALOPS{$proptype}{cmp} || 'cmp';
+        $sortfunc.=" || " if $sortfunc ne "";
+        $sortfunc.="$ta $cmp $tb" if $type eq 'ascending';
+        $sortfunc.="$tb $cmp $ta" if $type eq 'descending';                
+*/              
+    }
+}
+

@@ -122,12 +122,10 @@ public class Properties implements Serializable {
                 return true;
             }
             catch (FileNotFoundException e) {
-                Logger.log("Exception on searization: " + e.getMessage());
-                e.printStackTrace();
+                Logger.log("Unable to serialize properties. Exception on searization: " + e.getMessage());
             }
             catch (IOException e) {
-                Logger.log("Exception on searization: " + e.getMessage());
-                e.printStackTrace();
+                Logger.log("Unable to serialize properties. Exception on searization: " + e.getMessage());
             }
         }
         
@@ -185,17 +183,11 @@ public class Properties implements Serializable {
             properties = new HashMap<String, String>();
         }
         
-        public FileProperties(String filename, FileProperties properties) {
+        public FileProperties(String filename, FileProperties fp) {
             this(filename);
             
-            if (properties != null) {
-                try {
-                    this.properties = (HashMap<String, String>)properties.clone();
-                }
-                catch (CloneNotSupportedException e) {
-                    Logger.log("Clone not supported: " + e);
-                    e.printStackTrace();
-                }
+            if (fp != null && fp.properties != null) {
+                this.properties = (HashMap<String, String>)fp.properties.clone();
             }
         }
         

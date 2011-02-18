@@ -170,7 +170,7 @@ public class RequestParams {
             createMultipartRequestWrapper();
         }
         
-        if (request != null) {
+        if (multipartRequest != null && request != null) {
             String param = multipartRequest.getParameter(name);
             
             return (param != null && !param.isEmpty());
@@ -198,7 +198,7 @@ public class RequestParams {
             createMultipartRequestWrapper();
         }
         
-        if (multipartRequestParamExists(param)) {
+        if (multipartRequest != null && multipartRequestParamExists(param)) {
             return multipartRequest.getParameterValues(param);
         }
         
@@ -207,7 +207,7 @@ public class RequestParams {
     
     public File getFile(String fn) {
 
-        if (fn != null) {
+        if (multipartRequest != null && fn != null) {
             return multipartRequest.getFile(fn);
         }
         

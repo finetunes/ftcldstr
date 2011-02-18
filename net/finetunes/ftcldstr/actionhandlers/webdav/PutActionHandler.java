@@ -37,14 +37,13 @@ public class PutActionHandler extends AbstractActionHandler {
         String status = "204 No Content";
         String type = "text/plain";
         String content = "";
-        String buffer;
         
-        Logger.debug("_PUT " + fn + "; dirname=" + FileOperationsService.splitFilename(fn)[0]);
+        Logger.debug("PUT " + fn + "; dirname=" + FileOperationsService.splitFilename(fn)[0]);
         
         if (requestParams.headerExists("Content-Range")) {
             status = "501 Not Implemented";
         }
-        else if (FileOperationsService.is_directory(FileOperationsService.dirname(fn)) && !FileOperationsService.is_file_writable(requestParams, fn)) {
+        else if (FileOperationsService.is_directory(FileOperationsService.dirname(fn)) && !FileOperationsService.is_file_writable(requestParams, FileOperationsService.dirname(fn))) {
             status = "403 Forbidden";
         }
         else if (PreconditionsHandler.preConditionFailed(requestParams, fn)) {

@@ -1,6 +1,7 @@
 package net.finetunes.ftcldstr.routines.fileoperations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import net.finetunes.ftcldstr.RequestParams;
@@ -15,7 +16,7 @@ public class BasicSearch {
 			String expr, 
 			String base, String href, 
 			int depth, int limit, 
-			ArrayList<String[]> matches, 
+			ArrayList<HashMap<String, Object>> matches, 
 			ArrayList<String> visited) {
 	    
 	    if (limit > 0 && matches != null && matches.size() >= limit) {
@@ -86,7 +87,7 @@ public class BasicSearch {
             String expr, 
             String base, String href, 
             int depth, int limit, 
-            ArrayList<String[]> matches) {
+            ArrayList<HashMap<String, Object>> matches) {
         doBasicSearch(requestParams, expr, base, href, depth, limit, matches, null);
     }
 }
