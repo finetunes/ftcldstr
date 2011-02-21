@@ -189,7 +189,7 @@ public class ACLActionHandler extends AbstractActionHandler {
                 
                 Logger.debug("ACL: old perm=" + String.format("%4o", mode) + ", new perm=" + String.format("%4o", newperm));
                 
-                if (!FileOperationsService.chmod(newperm, fn)) {
+                if (!FileOperationsService.chmod(requestParams, fn, newperm)) {
                     status = "403 Forbidden";
                     type = "text/plain";
                     content = "403 Forbidden";

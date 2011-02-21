@@ -10,7 +10,7 @@ import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 public class BasicSearch {
 
 	// TODO: clarify the type of expression param
-	// TODO: matches requires to be passes by reference
+	// TODO: matches are required to be passed by reference
 	public static void doBasicSearch(
 	        RequestParams requestParams,
 			String expr, 

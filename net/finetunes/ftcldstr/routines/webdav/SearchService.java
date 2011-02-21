@@ -90,7 +90,7 @@ public class SearchService {
         if (!isRecursive) {
             if (fullcount.getValue() == 0) {
                 content += "<h2>";
-                content += ConfigService.stringMessages.get("searchnothingfound") + "'" + RenderingHelper.HTMLEncode(search) + "'" + 
+                content += ConfigService.stringMessages.get("searchnothingfound") + "'" + RenderingHelper.escapeHTML(search) + "'" + 
                     ConfigService.stringMessages.get("searchgoback") + RenderingService.getQuickNavPath(ru);
                 content += "</h2>";
             }
@@ -100,7 +100,7 @@ public class SearchService {
                 if (fullcount.getValue() > 1) {
                     pkey = "searchresultsfor"; 
                 }
-                cc += fullcount.getValue() + " " + ConfigService.stringMessages.get(pkey) + "'" + RenderingHelper.HTMLEncode(search) + "'" +
+                cc += fullcount.getValue() + " " + ConfigService.stringMessages.get(pkey) + "'" + RenderingHelper.escapeHTML(search) + "'" +
                     ConfigService.stringMessages.get("searchgoback") + RenderingService.getQuickNavPath(ru);
                 cc += "</h2>";
                 

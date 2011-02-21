@@ -316,20 +316,7 @@ public class ConfigService {
      * DEFAULT: $CHARSET='utf-8';
      */
     public static final String CHARSET = "utf-8";
-/*    
- *  * FIXME: remove
-    # and Perl's UTF-8 pragma for the right string length:
-    # use utf8;
-    # no utf8;
-*/
   
-/*
- * FIXME: remove    
-    ## -- BUFSIZE
-    ## buffer size for read and write operations
-    $BUFSIZE = 1073741824;
-*/    
-
     /*
      * -- LOGFILE
      * simple log for file/folder modifications (PUT/MKCOL/DELETE/COPY/MOVE)
@@ -468,8 +455,6 @@ public class ConfigService {
      * this is neccessary if you enable the thumbnail cache ($ENABLE_THUMBNAIL_CACHE)
      * EXAMPLE: $THUMBNAIL_CACHEDIR=".thumbs";
      */
-    // FIXME: PZ: set the proper path here 
-    // public static final String THUMBNAIL_CACHEDIR = "/usr/local/www/tmp/thumbs";
     public static final String THUMBNAIL_CACHEDIR = "/usr/local/www/tmp/thumbs";
     
     /*
@@ -695,7 +680,7 @@ public class ConfigService {
             put("{DAV:}objectcount", "int");
             put("{DAV:}visiblecount", "int");
             put("{DAV:}acl", "xml");
-            put("{DAV:}acl-restrictions", "xml");
+            put("{DAV:}acl-restrictions", "c");
             put("{urn:ietf:params:xml:ns:carddav}addressbook-home-set", "xml");
             put("{urn:ietf:params:xml:ns:caldav}calendar-home-set", "xml");
             put("{DAV:}current-user-principal}", "xml");

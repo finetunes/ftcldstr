@@ -513,7 +513,7 @@ public class PropertiesActions {
         }
         
         if (prop.equals("name")) {
-            resp_200.putProp("name", RenderingHelper.HTMLEncode(FileOperationsService.basename(fn)));
+            resp_200.putProp("name", RenderingHelper.uri_escape(FileOperationsService.basename(fn)));
         }
         
         if (prop.equals("href")) {
@@ -521,7 +521,7 @@ public class PropertiesActions {
         }
         
         if (prop.equals("parentname")) {
-            resp_200.putProp("parentname", RenderingHelper.HTMLEncode(FileOperationsService.basename(FileOperationsService.dirname(uri))));
+            resp_200.putProp("parentname", RenderingHelper.uri_escape(FileOperationsService.basename(FileOperationsService.dirname(uri))));
         }
         
         if (prop.equals("isreadonly")) {
@@ -660,7 +660,7 @@ public class PropertiesActions {
         
         if (prop.equals("calendar-data")) {
             if (fn.toLowerCase().endsWith(".ics")) {
-                resp_200.putProp("calendar-data", RenderingHelper.HTMLEncode(FileOperationsService.getFileContent(requestParams, fn)));
+                resp_200.putProp("calendar-data", RenderingHelper.escapeHTML(FileOperationsService.getFileContent(requestParams, fn)));
             }
             else {
                 resp_404.putProp("calendar-data", null);
@@ -727,7 +727,7 @@ public class PropertiesActions {
         
         if (prop.equals("address-data")) {
             if (fn.toLowerCase().endsWith(".vcf")) {
-                resp_200.putProp("address-data", RenderingHelper.HTMLEncode(FileOperationsService.getFileContent(requestParams, fn)));
+                resp_200.putProp("address-data", RenderingHelper.escapeHTML(FileOperationsService.getFileContent(requestParams, fn)));
             }
             else {
                 resp_404.putProp("address-data", null);
@@ -735,7 +735,7 @@ public class PropertiesActions {
         }       
         
         if (prop.equals("addressbook-description")) {
-            resp_200.putProp("addressbook-description", RenderingHelper.HTMLEncode(FileOperationsService.basename(fn)));
+            resp_200.putProp("addressbook-description", RenderingHelper.uri_escape(FileOperationsService.basename(fn)));
         }
         
         if (prop.equals("supported-address-data")) {
@@ -857,7 +857,7 @@ public class PropertiesActions {
                         mode = stat.getMode() | 0111;
                     }
                     
-                    FileOperationsService.chmod(mode, fn);
+                    FileOperationsService.chmod(requestParams, fn, mode);
                     resp_200.setHref(ru);
                     resp_200.putPropstatProp("executable", executable);
                     resp_200.setPropstatStatus("HTTP/1.1 200 OK");

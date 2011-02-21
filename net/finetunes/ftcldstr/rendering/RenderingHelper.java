@@ -1,16 +1,13 @@
 package net.finetunes.ftcldstr.rendering;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 
 import net.finetunes.ftcldstr.RequestParams;
-import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 
@@ -63,14 +60,18 @@ public class RenderingHelper {
 	    return joinArray(ret, ""); 
 	}
 	
-    public static String HTMLEncode(String s) {
+	
+    /**
+     * Used for cgi->escapeHTML()
+     */
+    public static String escapeHTML(String s) {
         StringBuffer raus = new StringBuffer();
         char c;
 
         for (int oo = 0; s != null && oo < s.length(); oo++) {
             c = s.charAt(oo);
 
-            if (c < 65 || c > 122 || c == '\'' || c == '"') {
+            if ((c <= 0x27 && c!=0x20) || (c >=0x3c && c <= 0x3e) ||  c >= 0x7b || c == '\'' || c == '"') {
                 raus.append("&#");
                 raus.append((int) c);
                 raus.append(';');
@@ -82,9 +83,20 @@ public class RenderingHelper {
         return raus.toString();
     }
     
+    /**
+     * Used for uri_unescape
+     */
     public static String uri_unescape(String s) {
-        String r = "";
+        String r = s;
         
+        try {
+            URI uri = new URI(s);
+            r = uri.getPath();
+        }
+        catch (URISyntaxException e) {
+            Logger.log("Invalid URI: " + e.getMessage());
+        }
+/*        
         try {
             r = URLDecoder.decode(s, ConfigService.CHARSET);
         }
@@ -92,20 +104,27 @@ public class RenderingHelper {
             Logger.log("Exception: " + e.getMessage());
             e.printStackTrace();
         }
-        
+*/        
         return r;
     }
     
-    // $cgi->escape
+    /**
+     * Used for 
+     * * uri_escape()
+     * * cgi->escape()
+     */
     public static String uri_escape(String s) {
-        String r = "";
+        String r = s;
         
         try {
-            r = URLEncoder.encode(s, ConfigService.CHARSET);
+            URI uri = new URI(
+                    null, null, 
+                    "/booksearch/first book.pdf",
+                    null);
+            r = uri.toString();
         }
-        catch (UnsupportedEncodingException e) {
-            Logger.log("Exception: " + e.getMessage());
-            e.printStackTrace();
+        catch (URISyntaxException e) {
+            Logger.log("Invalid URI: " + e.getMessage());
         }
         
         return r;

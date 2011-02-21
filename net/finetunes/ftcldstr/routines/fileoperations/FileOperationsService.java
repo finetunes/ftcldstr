@@ -44,9 +44,9 @@ public class FileOperationsService {
 	    nsrc = nsrc.replaceFirst("/$", ""); // remove trailing slash for link test (-l)
 	    
 	    if (FileOperationsService.is_symbolic_link(requestParams, nsrc)) { // link
-	        if (!move || !FileOperationsService.rename(nsrc, dst)) {
+	        if (!move || !FileOperationsService.rename(requestParams, nsrc, dst)) {
 	            String orig = FileOperationsService.readlink(requestParams, nsrc);
-	            if ((!move || FileOperationsService.unlink(requestParams, nsrc)) && !FileOperationsService.symlink(orig, dst)) {
+	            if ((!move || FileOperationsService.unlink(requestParams, nsrc)) && !FileOperationsService.symlink(requestParams, orig, dst)) {
 	                return false;
 	            }
 	        }
@@ -58,7 +58,7 @@ public class FileOperationsService {
 	            dst += FileOperationsService.basename(src);
 	        }
 	        
-	        if (!move || !FileOperationsService.rename(src, dst)) {
+	        if (!move || !FileOperationsService.rename(requestParams, src, dst)) {
 
 	            try {
     	            InputStream in = FileOperationsService.getFileContentStream(requestParams, src);
@@ -102,7 +102,7 @@ public class FileOperationsService {
 	        }
 	        
 	        if (!move || DirectoryOperationsService.getDirInfo(requestParams, src, "realchildcount") > 0 ||
-	                !FileOperationsService.rename(src, dst)) {
+	                !FileOperationsService.rename(requestParams, src, dst)) {
 	            if (!FileOperationsService.file_exits(dst)) {
 	                FileOperationsService.mkdir(requestParams, dst);
 	            }
@@ -123,7 +123,7 @@ public class FileOperationsService {
 	                    return false;
 	                }
 	                
-	                if (!FileOperationsService.rmdir(src)) {
+	                if (!FileOperationsService.rmdir(requestParams, src)) {
 	                    return false;
 	                }
 	            }
@@ -162,7 +162,7 @@ public class FileOperationsService {
 	    }
 	    
 	    if (type.equals("s")) {
-	        FileOperationsService.chmod(mode, fn);
+	        FileOperationsService.chmod(requestParams, fn, mode);
 	    }
 	    else {
 	        StatData stat = FileOperationsService.stat(requestParams, fn);
@@ -175,7 +175,7 @@ public class FileOperationsService {
                 newmode = stat.getMode() ^ (stat.getMode() & mode);
             }
             
-            FileOperationsService.chmod(newmode, fn);
+            FileOperationsService.chmod(requestParams, fn, newmode);
 	    }
 	    
 	    String nfn = FileOperationsService.full_resolve(requestParams, fn);
@@ -387,11 +387,9 @@ public class FileOperationsService {
         return mkdir(requestParams, dirname, null);
     }    
     
-    public static boolean chmod(int mode, String filename) {
+    public static boolean chmod(RequestParams requestParams, String fn, int mode) {
         
-        // TODO: implement
-        return false;
-        
+        return WrappingUtilities.chmod(requestParams, fn, Integer.toOctalString(mode));
     }
     
     public static String full_resolve(RequestParams requestParams, String fn) {
@@ -445,24 +443,14 @@ public class FileOperationsService {
         return WrappingUtilities.unlink(requestParams, fn);
     }
     
-    public static boolean rmdir(String dirname) {
-        
-        // TODO: write errors in log if any
-        // as there is no way to get the error code
-        // without passing errRef param in this method
-        
-        // TODO: implement
-        return false;
+    public static boolean rmdir(RequestParams requestParams, String dirname) {
+
+        return WrappingUtilities.rmdir(requestParams, dirname);
     }
 
-    public static boolean rename(String src, String dst) {
+    public static boolean rename(RequestParams requestParams, String src, String dst) {
         
-        // TODO: write errors in log if any
-        // as there is no way to get the error code
-        // without passing errRef param in this method        
-        
-        // TODO: implement
-        return false;
+        return WrappingUtilities.rename(requestParams, src, dst);
     }    
     
     public static String readlink(RequestParams requestParams, String fn) {
@@ -477,14 +465,9 @@ public class FileOperationsService {
         return null;
     }      
     
-    public static boolean symlink(String src, String dst) {
+    public static boolean symlink(RequestParams requestParams, String src, String dst) {
         
-        // TODO: write errors in log if any
-        // as there is no way to get the error code
-        // without passing errRef param in this method        
-        
-        // TODO: implement
-        return false;
+        return WrappingUtilities.symlink(requestParams, src, dst);
     }          
     
     // creates a new file (or rewrites exising and writes content into it)

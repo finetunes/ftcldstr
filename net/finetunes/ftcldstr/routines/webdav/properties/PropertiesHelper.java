@@ -17,7 +17,7 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.Stat
 
 public class PropertiesHelper {
 	
-	public static String getPropValue(RequestParams requestParams, String prop, String fn, String uri) {
+	public static Object getPropValue(RequestParams requestParams, String prop, String fn, String uri) {
 	    
 	    
         StatusResponse r200 = new StatusResponse();
@@ -26,14 +26,14 @@ public class PropertiesHelper {
         String propname = new String(prop);
         propname = propname.replaceFirst("^\\{[^\\}]*\\}", "");
         
-        String propval = null;
+        Object propval = null;
         if (!ConfigService.PROTECTED_PROPS.contains(propname)) {
             propval = ConfigService.properties.getProperty(fn, prop);
         }
         
         if (propval == null) {
             PropertiesActions.getProperty(requestParams, fn, uri, propname, null, r200, r404);
-            propval = (String)r200.getProp("propname");
+            propval = (HashMap<String, Object>)r200.getProp(propname);
         }
 	    
         if (propval == null) {

@@ -3,6 +3,7 @@ package net.finetunes.ftcldstr.routines.webdav;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -18,6 +19,7 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.Stat
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesActions;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
 import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
+import net.finetunes.ftcldstr.routines.xml.XMLService;
 
 public class SearchHandler {
 
@@ -216,55 +218,55 @@ class MatchComparator implements Comparator<HashMap<String, Object>> {
         Iterator<HashMap<String, String>> it = cond.iterator();
         while (it.hasNext()) {
             HashMap<String, String> c = it.next();
-            if (checkCondition(a, b, c)) {
-                return 1;
+            int cc = checkCondition(a, b, c);
+            if (cc != 0) {
+                return cc;
             }
         }
         
-        return -1;
+        return 0;
     }
     
-    private boolean checkCondition(HashMap<String, Object> a, HashMap<String, Object> b,
+    private int checkCondition(HashMap<String, Object> a, HashMap<String, Object> b,
             HashMap<String, String> condition) {
         
         String prop = condition.get("prop");
         String proptype = condition.get("proptype");
+        if (proptype == null) {
+            proptype = "";
+        }
         String type = condition.get("type");
-        String propa = PropertiesHelper.getPropValue(requestParams, prop, (String)a.get("fn"), (String)a.get("href"));
-        String propb = PropertiesHelper.getPropValue(requestParams, prop, (String)b.get("fn"), (String)b.get("href"));
-
-// TODO: finish comparison        
+        Object propa = PropertiesHelper.getPropValue(requestParams, prop, (String)a.get("fn"), (String)a.get("href"));
+        Object propb = PropertiesHelper.getPropValue(requestParams, prop, (String)b.get("fn"), (String)b.get("href"));
+        String pca;
+        String pcb;
+        Date pda;
+        Date pdb;
         
-//        if ($SEARCH_SPECIALCONV{$proptype}) {
-//            $ta = $SEARCH_SPECIALCONV{$proptype}."($ta)";
-//            $tb = $SEARCH_SPECIALCONV{$proptype}."($tb)";
-//        }
-        
-//      $cmp = $SEARCH_SPECIALOPS{$proptype}{cmp} || 'cmp';
-
+        int asc = 1; // asc by default
         if (type.equals("ascending")) {
-            // return // $sortfunc.="$ta $cmp $tb"
+            asc = 1;
         }
-
         if (type.equals("descending")) {
-            // return // $sortfunc.="$tb $cmp $ta"
-        }
+            asc = -1;
+        }        
         
-        return false;
-        
-        /*                
-        my($ta,$tb,$cmp);
-        $ta = qq@getPropValue('$prop',\$\$a{fn},\$\$a{href})@;
-        $tb = qq@getPropValue('$prop',\$\$b{fn},\$\$b{href})@;
-        if ($SEARCH_SPECIALCONV{$proptype}) {
-            $ta = $SEARCH_SPECIALCONV{$proptype}."($ta)";
-            $tb = $SEARCH_SPECIALCONV{$proptype}."($tb)";
+        if (proptype.equals("dateTime")) {
+            pda = RenderingHelper.parseHTTPDate((String)propa);
+            pdb = RenderingHelper.parseHTTPDate((String)propb);
+            return asc * pda.compareTo(pdb);
         }
-        $cmp = $SEARCH_SPECIALOPS{$proptype}{cmp} || 'cmp';
-        $sortfunc.=" || " if $sortfunc ne "";
-        $sortfunc.="$ta $cmp $tb" if $type eq 'ascending';
-        $sortfunc.="$tb $cmp $ta" if $type eq 'descending';                
-*/              
+        else if (proptype.equals("xml")) {
+            pca = XMLService.convXML2Str((HashMap<String, Object>)propa);
+            pcb = XMLService.convXML2Str((HashMap<String, Object>)propb);
+            return asc * pca.compareTo(pcb);
+        }
+        else if (proptype.equals("int")) {
+            return asc * (Integer.parseInt((String)propa) - Integer.parseInt((String)propb));
+        }
+        else {
+            return asc * propa.toString().compareTo(propb.toString());
+        }
     }
 }
 

@@ -84,9 +84,9 @@ public class RebindActionHandler extends AbstractActionHandler {
                     FileOperationsService.unlink(requestParams, ndst);
                 }
                 
-                if (!FileOperationsService.rename(nsrc, ndst)) {
+                if (!FileOperationsService.rename(requestParams, nsrc, ndst)) {
                     String orig = FileOperationsService.readlink(requestParams, nsrc);
-                    if (!(FileOperationsService.symlink(orig, dst) && FileOperationsService.unlink(requestParams, nsrc))) {
+                    if (!(FileOperationsService.symlink(requestParams, orig, dst) && FileOperationsService.unlink(requestParams, nsrc))) {
                         status = "403 Forbidden";
                     }
                 }

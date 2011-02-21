@@ -281,7 +281,7 @@ public class GetActionHandler extends AbstractActionHandler {
             int p = 1;
             
             while (requestParams.getRequest().getParameter("p" + p) != null) {
-                params.add(RenderingHelper.HTMLEncode(requestParams.getRequest().getParameter("p" + p)));
+                params.add(RenderingHelper.escapeHTML(requestParams.getRequest().getParameter("p" + p)));
                 p++;
             }
             
@@ -613,9 +613,9 @@ public class GetActionHandler extends AbstractActionHandler {
             content += "<tr style=\"background-color: + " + bgcolor + "; text-align:left\">";
             content += "<th title=\"" + namespace + "\" style=\"vertical-align:top;\">" + NamespaceService.nonamespace(prop) + "</th>";
             // note: HTMLEncode is requered here
-            content += "<td title=\"" + RenderingHelper.HTMLEncode(title) + "\" style=\"vertical-align:bottom;\">";
+            content += "<td title=\"" + RenderingHelper.escapeHTML(title) + "\" style=\"vertical-align:bottom;\">";
             content += "<pre style=\"margin:0px; overflow:auto;\">";
-            content += RenderingHelper.HTMLEncode(value);
+            content += RenderingHelper.escapeHTML(value);
             content += "</pre>";
             content += "</td>";
             content += "</tr>";

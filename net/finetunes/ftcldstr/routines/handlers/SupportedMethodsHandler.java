@@ -10,7 +10,6 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 public class SupportedMethodsHandler {
 	
 	// returns methods list
-	// FIXME: try to find a more suitable wrapper for an array of strings 
 	public static ArrayList<String> getSupportedMethods(RequestParams requestParams, String path) {
 		
 	    ArrayList<String> methods = new ArrayList<String>();

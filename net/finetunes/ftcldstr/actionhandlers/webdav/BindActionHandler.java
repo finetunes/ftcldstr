@@ -82,7 +82,7 @@ public class BindActionHandler extends AbstractActionHandler {
                     FileOperationsService.unlink(requestParams, ndst);
                 }
                 
-                if (!FileOperationsService.symlink(src, dst)) {
+                if (!FileOperationsService.symlink(requestParams, src, dst)) {
                     status = "403 Forbidden";
                 }
             }

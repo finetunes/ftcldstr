@@ -93,17 +93,27 @@ public class WrappingUtilities {
             boolean logOnError) {
         return runBooleanCommand(requestParams, fn, command, logOnError, null);
     }
-    
+
     private static boolean runBooleanCommand(RequestParams requestParams, String fn, String command,
             boolean logOnError, ArrayList<String> err) {
         
+        return runBooleanCommand(requestParams, new String[]{fn}, command, logOnError, err);
+    }      
+    
+    private static boolean runBooleanCommand(RequestParams requestParams, String[] arg, String command,
+            boolean logOnError, ArrayList<String> err) {
+        
         CommonContentWrapper cw = new CommonContentWrapper(requestParams);
-        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), command, new String[]{fn});
+        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), command, arg);
 
         if (d != null && d.getExitCode() == 0) {
             return true;
         }
         else if (logOnError) {
+            String fn = "unknown";
+            if (arg.length > 0) {
+                fn = arg[0];
+            }
             Logger.log("Error running external command: " + command + " on file " + fn + "; " + d.getErrorMessage());
             if (err == null) {
                 err = new ArrayList<String>();
@@ -182,6 +192,22 @@ public class WrappingUtilities {
     public static boolean mkdir(RequestParams requestParams, String fn, ArrayList<String> err) {
         return runBooleanCommand(requestParams, fn, "mkdir", true, err);
     }
+    
+    public static boolean rmdir(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "rmdir", true);
+    }
+    
+    public static boolean rename(RequestParams requestParams, String src, String dst) {
+        return runBooleanCommand(requestParams, new String[]{src, dst}, "rename", true, null);
+    }    
+
+    public static boolean symlink(RequestParams requestParams, String src, String dst) {
+        return runBooleanCommand(requestParams, new String[]{src, dst}, "symlink", true, null);
+    }
+
+    public static boolean chmod(RequestParams requestParams, String fn, String mode) {
+        return runBooleanCommand(requestParams, new String[]{fn, mode}, "chmod", true, null);
+    }    
     
     public static String readFile(RequestParams requestParams, String fn) {
         

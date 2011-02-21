@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 public class StatusResponse {
     
-    // FIXME: create access methods if required
     private String status = null;
     private String href = null;
     private HashMap<String, Object> prop = null;
@@ -34,10 +33,6 @@ public class StatusResponse {
         
         return prop != null;
     }
-    
-//    public StatusResponse getPropStat() {
-//        return propstat;
-//    }
     
     public boolean propstatExists() {
         return propstat != null;
@@ -122,10 +117,6 @@ public class StatusResponse {
     public StatusResponse getPropstat() {
         return propstat;
     }    
-    
-//    public StatusResponse() {
-//        
-//    }
     
 /*
  * 

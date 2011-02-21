@@ -251,7 +251,7 @@ public class DirectoryOperationsService {
             }
             
             String nru = "";
-            nru = ru + RenderingHelper.HTMLEncode(filename);
+            nru = ru + RenderingHelper.uri_escape(filename);
             
             if (FileOperationsService.is_directory(full)) {
                 filename += "/";
@@ -287,7 +287,7 @@ public class DirectoryOperationsService {
                 list += String.format("%-11s", RenderingHelper.mode2str(requestParams, full, mode));
                 list += "</span>";
             }
-            list += " " + RenderingHelper.HTMLEncode(mimetype);
+            list += " " + RenderingHelper.escapeHTML(mimetype);
             list += "\n";
             
             count++;

@@ -1,9 +1,12 @@
 package net.finetunes.ftcldstr;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +39,7 @@ import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.InitializationService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.helper.SystemCalls;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
@@ -47,7 +51,6 @@ public class ActionServlet extends MServlet {
     
     public ActionServlet() {
         super();
-        InitializationService.init(getServletContext());
         initMethods();
     }
     

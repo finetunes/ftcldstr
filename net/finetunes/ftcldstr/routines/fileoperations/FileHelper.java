@@ -17,7 +17,6 @@ import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class FileHelper {
 	
-	// FIXME: find out what all these filename parameters mean
 	public static String getfancyfilename(
 	        RequestParams requestParams,
 			String full, String s,
@@ -47,11 +46,11 @@ public class FileHelper {
 	    if ((!FileOperationsService.is_directory(fn) && FileOperationsService.is_file_readable(requestParams, fn)) || 
 	            FileOperationsService.is_file_executable(requestParams, fn)) {
 	        ret = "<a href=\"" + full + "\" title=\"" + s + "\" style=\"padding:1px\">";
-	        ret += RenderingHelper.HTMLEncode(fntext);
+	        ret += RenderingHelper.escapeHTML(fntext);
 	        ret += "</a>";
 	    }
 	    else {
-	        ret = RenderingHelper.HTMLEncode(fntext);
+	        ret = RenderingHelper.escapeHTML(fntext);
 	    }
 	    
 	    if (s.length() > ConfigService.MAXFILENAMESIZE) {
@@ -209,7 +208,7 @@ public class FileHelper {
     	            }
     	        }
     	        
-    	        if (FileOperationsService.rmdir(f)) {
+    	        if (FileOperationsService.rmdir(requestParams, f)) {
     	            count++;
     	            if (!f.endsWith("/")) {
     	                f += "/";

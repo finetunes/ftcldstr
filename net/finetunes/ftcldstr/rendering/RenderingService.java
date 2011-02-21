@@ -1,9 +1,5 @@
 package net.finetunes.ftcldstr.rendering;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
 
@@ -24,7 +20,7 @@ public class RenderingService {
 
 	    String content = "";
 	    content += "<!DOCTYPE html>\n";
-	    content += "<head><title>" + RenderingHelper.HTMLEncode(title) + "</title>";
+	    content += "<head><title>" + RenderingHelper.escapeHTML(title) + "</title>";
 	    content += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=" + ConfigService.CHARSET + "\"/>";
 	    content += "<meta name=\"author\" content=\"Daniel Rohde\"/>";
 	    content += "</head><body>";
