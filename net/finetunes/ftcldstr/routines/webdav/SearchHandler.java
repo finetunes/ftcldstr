@@ -108,7 +108,8 @@ public class SearchHandler {
                 return;
             }
             
-            BasicSearch.doBasicSearch(requestParams, expr, base, href, depth, limit, matches);
+            BasicSearch.doBasicSearch(requestParams, expr, base, href, depth, limit, matches, null,
+                    null, xmldata.get("{DAV:}where"), null);
         }
         
         // orderby > order+ (caseless=(yes|no))> (prop|score), (ascending|descending)?

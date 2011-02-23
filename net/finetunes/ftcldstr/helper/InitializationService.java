@@ -71,15 +71,6 @@ public class InitializationService {
         
         // umask $UMASK; // TODO: PZ: how to implement this?
 
-        // TODO: PZ: how to handle this?
-        // ## before 'new CGI' to read POST requests:
-        // $ENV{REQUEST_METHOD}=$ENV{REDIRECT_REQUEST_METHOD} if (defined $ENV{REDIRECT_REQUEST_METHOD}) ;
-
-        /*
-        $CGI::POST_MAX = $POST_MAX_SIZE;
-        $CGI::DISABLE_UPLOADS = $ALLOW_POST_UPLOADS?0:1; // PZ: TODO: manual checking?
-*/
-        
         // supported DAV compliant classes:
         String DAV = "1";
         if (ConfigService.ENABLE_LOCK) {

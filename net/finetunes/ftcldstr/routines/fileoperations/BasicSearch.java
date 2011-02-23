@@ -17,7 +17,8 @@ public class BasicSearch {
 			String base, String href, 
 			int depth, int limit, 
 			ArrayList<HashMap<String, Object>> matches, 
-			ArrayList<String> visited) {
+			ArrayList<String> visited,
+			String op, Object xmlref, String superop) {
 	    
 	    if (limit > 0 && matches != null && matches.size() >= limit) {
 	        return;
@@ -75,19 +76,11 @@ public class BasicSearch {
 	                    if (depth != Integer.MAX_VALUE) {
 	                        dp = depth - 1;
 	                    }
-	                    doBasicSearch(requestParams, expr, base + sf, href + sf, dp, limit, matches, visited);
+	                    doBasicSearch(requestParams, expr, base + sf, href + sf, dp, limit, matches, visited,
+	                            op, xmlref, superop);
 	                }
 	            }
 	        }
 	    }
 	}	
-	
-    public static void doBasicSearch(
-            RequestParams requestParams,
-            String expr, 
-            String base, String href, 
-            int depth, int limit, 
-            ArrayList<HashMap<String, Object>> matches) {
-        doBasicSearch(requestParams, expr, base, href, depth, limit, matches, null);
-    }
 }
