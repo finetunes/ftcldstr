@@ -259,4 +259,32 @@ public class WrappingUtilities {
         return null;           
     }
     
+    public static String[] getOwnerNames(RequestParams requestParams, String username) {
+        
+        CommonContentWrapper cw = new CommonContentWrapper(requestParams);
+        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), "id", new String[]{username});
+
+        if (d == null || d.getExitCode() != 0) {
+            Logger.log("Error getting user info. Username: " + username + "; Error: " + d.getErrorMessage());
+            return null;
+        }
+        else {
+            String content = d.getContent();
+            if (content != null && !content.isEmpty()) {
+                content = content.replaceAll("(\\n|\\r|\\t| )", "");
+                String[] s = content.split(":");
+                if (s.length < 2) {
+                    Logger.log("Invalid uid/gid for user " + username + ": " + content);
+                    return null;
+                }
+                
+                String uid = s[0];
+                String gid = s[1];
+                return new String[]{uid, gid};
+            }
+        }
+        
+        return null;
+    }    
+    
 }

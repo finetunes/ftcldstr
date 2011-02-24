@@ -40,6 +40,7 @@ import net.finetunes.ftcldstr.helper.InitializationService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.helper.SystemCalls;
 import net.finetunes.ftcldstr.rendering.RenderingHelper;
+import net.finetunes.ftcldstr.routines.webdav.SearchService;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
 import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
@@ -52,6 +53,18 @@ public class ActionServlet extends MServlet {
     public ActionServlet() {
         super();
         initMethods();
+/*        
+<d:where>
+  <d:eq>
+    <d:prop>
+      <d:getcontentlength/>
+    </d:prop>
+    <d:literal>100</d:literal>
+  </d:eq>
+</d:where>
+        
+*/      
+        
     }
     
     public void destroy() {

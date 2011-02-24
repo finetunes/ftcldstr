@@ -38,11 +38,8 @@ public class SearchHandler {
         boolean all = ((Boolean)propFindElement[1]).booleanValue();
         boolean noval = ((Boolean)propFindElement[2]).booleanValue();
         
-        // TODO: implement
         // where > op > (prop,literal) 
-	    // my ($expr,$type) =  buildExprFromBasicSearchWhereClause(undef, $$xmldata{'{DAV:}where'});
-        String expr = "";
-        Logger.debug("SEARCH: call buildExpr: expr=" + expr);
+        // Logger.debug("SEARCH: call buildExpr: expr=");
 	    
         // from > scope+ > (href, depth, include-versions?)
         ArrayList<HashMap<String, Object>> scopes = new ArrayList<HashMap<String,Object>>();
@@ -108,7 +105,7 @@ public class SearchHandler {
                 return;
             }
             
-            BasicSearch.doBasicSearch(requestParams, expr, base, href, depth, limit, matches, null,
+            BasicSearch.doBasicSearch(requestParams, xmldata.get("{DAV:}where"), base, href, depth, limit, matches, null,
                     null, xmldata.get("{DAV:}where"), null);
         }
         

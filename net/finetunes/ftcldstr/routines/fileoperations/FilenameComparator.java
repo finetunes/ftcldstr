@@ -75,33 +75,20 @@ public class FilenameComparator implements Comparator<String> {
     
     private int compareStat(StatData astat, StatData bstat, String a, String b, int idx, boolean desc) {
         
-        int c = 0;
+        int asc = 1;
+        if (desc) {
+            asc = -1;
+        }
         switch (idx) {
         case 2: // mode
-            c = astat.getMode() - bstat.getMode();
-            if (desc) {
-                c = -c;
-            }
-            return c;
+            return (astat.getMode() - bstat.getMode()) * asc;
         case 7: // size
-            c = astat.getSize() - bstat.getSize();
-            if (desc) {
-                c = -c;
-            }
-            return c;
+            return (astat.getSize() - bstat.getSize()) * asc;
         case 9: // last modified
-            // TODO: implement
-            // depends on the returning type;
-            // Date?
-            break;
+            return (astat.getMtimeDate().compareTo(bstat.getMtimeDate())) * asc;
         }
         
-        c = a.compareToIgnoreCase(b);
-        if (desc) {
-            c = -c;
-        }
-        
-        return c;
+        return a.compareToIgnoreCase(b) * asc;
     }
 
 }

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import net.finetunes.ftcldstr.RequestParams;
+import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.routines.webdav.SearchService;
 import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class BasicSearch {
@@ -13,7 +15,7 @@ public class BasicSearch {
 	// TODO: matches are required to be passed by reference
 	public static void doBasicSearch(
 	        RequestParams requestParams,
-			String expr, 
+			Object whereref, 
 			String base, String href, 
 			int depth, int limit, 
 			ArrayList<HashMap<String, Object>> matches, 
@@ -39,16 +41,18 @@ public class BasicSearch {
 	    String filename = new String(base);
 	    String request_uri = new String(href);
 	    
-/*
- * TODO:	    
-    my $res = eval  $expr ;
-    if ($@) {
-        debug("doBasicSearch: problem in $expr: $@");
-    } elsif ($res) {
-        debug("doBasicSearch: $base MATCHED");
-        push @{$matches}, { fn=> $base, href=> $href };
-    }
-*/
+        Object[] rs = SearchService.buildExprFromBasicSearchWhereClause(null, whereref, null, 
+                requestParams, filename, request_uri);
+        
+        if (rs != null && rs.length > 0 && rs[0] instanceof Boolean && (Boolean)rs[0]) {
+            // matched
+            Logger.debug("doBasicSearch: " + base + " MATCHED");
+            HashMap<String, Object> match = new HashMap<String, Object>();
+            match.put("fn", base);
+            match.put("href", href);
+            matches.add(match);
+        }
+	    
 	    String nbase = FileOperationsService.full_resolve(requestParams, base);
 	    
 	    if (visited == null) {
@@ -76,7 +80,7 @@ public class BasicSearch {
 	                    if (depth != Integer.MAX_VALUE) {
 	                        dp = depth - 1;
 	                    }
-	                    doBasicSearch(requestParams, expr, base + sf, href + sf, dp, limit, matches, visited,
+	                    doBasicSearch(requestParams, whereref, base + sf, href + sf, dp, limit, matches, visited,
 	                            op, xmlref, superop);
 	                }
 	            }

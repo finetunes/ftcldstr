@@ -135,7 +135,26 @@ public class SearchService {
         return getSearchResult(requestParams, search, fn, ru, false, null, null);
     }
 	
-    // TODO: define xmlref type and return type
+    /*
+     * DEBUG:
+//    HashMap<String, Object> prop = new HashMap<String, Object>();
+//    prop.put("{DAV:}iscollection", null);
+//    HashMap<String, Object> eq = new HashMap<String, Object>();
+//    eq.put("{DAV:}prop", prop);
+//    eq.put("{DAV:}literal", 1); // try string
+//    HashMap<String, Object> where = new HashMap<String, Object>();
+//    where.put("{DAV:}eq", eq);
+//    
+//    Object[] rs = SearchService.buildExprFromBasicSearchWhereClause(null, where, null, 
+//            requestParams, "/home/zeitgeist/", "/");
+//    
+//    if (rs != null && rs.length > 0 && rs[0] instanceof Boolean && (Boolean)rs[0]) {
+//        System.out.println("ok");
+//    }
+//    else {
+//        System.out.println("not ok");
+//    }
+     */
     public static Object[] buildExprFromBasicSearchWhereClause(
             String op, Object xmlref, String superop,
             RequestParams requestParams, String filename, String request_uri) {
@@ -144,20 +163,17 @@ public class SearchService {
             xmlref = new HashMap<String, Object>();
         }
         
-        // FIXME
-        // expr
-        String type = null; // TODO: type?
+        String type = null;
         
         String ns = "{DAV:}";
         if (op == null) {
             ArrayList<String> ops;
             ops = new ArrayList<String>(((HashMap<String, Object>)xmlref).keySet());
             return buildExprFromBasicSearchWhereClause(ops.get(0), ((HashMap<String, Object>)xmlref).get(ops.get(0)), null,
-                    null, null, null);
+                    requestParams, filename, request_uri);
         }
         
         op = op.replaceFirst(Pattern.quote(ns), "");
-        // type = Boolean.class; // "bool"
         type = "bool";
         
         if (xmlref instanceof ArrayList<?>) {
@@ -165,8 +181,8 @@ public class SearchService {
             Iterator<Object> it = ((ArrayList)xmlref).iterator();
             while (it.hasNext()) {
                 Object oo = it.next();
-                Object[] r1 = buildExprFromBasicSearchWhereClause(op, oo, superop, null, null, null);
-                Object[] r2 = buildExprFromBasicSearchWhereClause(superop, null, superop, null, null, null);
+                Object[] r1 = buildExprFromBasicSearchWhereClause(op, oo, superop, requestParams, filename, request_uri);
+                Object[] r2 = buildExprFromBasicSearchWhereClause(superop, null, superop, requestParams, filename, request_uri);
                 
                 if (result == null) {
                     result = (Boolean)r1[0];
@@ -191,7 +207,7 @@ public class SearchService {
                 Iterator<String> it = keys.iterator();
                 while (it.hasNext()) {
                     String o = it.next();
-                    Object[] r1 = buildExprFromBasicSearchWhereClause(o, ((HashMap)xmlref).get(o), op, null, null, null);
+                    Object[] r1 = buildExprFromBasicSearchWhereClause(o, ((HashMap)xmlref).get(o), op, requestParams, filename, request_uri);
                     
                     if (result == null) {
                         result = (Boolean)r1[0];
@@ -216,7 +232,7 @@ public class SearchService {
         }
         else if (op.equals("not")) {
             ArrayList<String> k = new ArrayList<String>(((HashMap) xmlref).keySet());
-            Object[] r1 = buildExprFromBasicSearchWhereClause(k.get(0), ((HashMap)xmlref).get(k.get(0)), null, null, null, null);
+            Object[] r1 = buildExprFromBasicSearchWhereClause(k.get(0), ((HashMap)xmlref).get(k.get(0)), null, requestParams, filename, request_uri);
             return new Object[]{!((Boolean)r1[0]), null};
         }
         else if (op.equals("is-collection")) {
@@ -225,7 +241,7 @@ public class SearchService {
             return new Object[]{result, null};
         }
         else if (op.equals("is-defined")) {
-            Object[] r1 = buildExprFromBasicSearchWhereClause("{DAV:}prop", ((HashMap)xmlref).get("{DAV:}prop"), null, null, null, null);
+            Object[] r1 = buildExprFromBasicSearchWhereClause("{DAV:}prop", ((HashMap)xmlref).get("{DAV:}prop"), null, requestParams, filename, request_uri);
             Boolean result = null;
             if (r1[0] != null) {
                 result = !r1[0].toString().equals("__undef__");
@@ -237,8 +253,8 @@ public class SearchService {
         }
         else if (op.matches("(eq|lt|gt|lte|gte)")) {
             String o = op;
-            Object[] r1 = buildExprFromBasicSearchWhereClause("{DAV:}prop", ((HashMap)xmlref).get("{DAV:}prop"), null, null, null, null);
-            Object[] r2 = buildExprFromBasicSearchWhereClause("{DAV:}literal", ((HashMap)xmlref).get("{DAV:}literal"), null, null, null, null);
+            Object[] r1 = buildExprFromBasicSearchWhereClause("{DAV:}prop", ((HashMap)xmlref).get("{DAV:}prop"), null, requestParams, filename, request_uri);
+            Object[] r2 = buildExprFromBasicSearchWhereClause("{DAV:}literal", ((HashMap)xmlref).get("{DAV:}literal"), null, requestParams, filename, request_uri);
             Object ne2 = (String)r2[0];
             Object nt1 = (String)r1[1];
             // ne2 = ne2.replaceAll("'", "\\'"); // not needed for java
@@ -289,7 +305,7 @@ public class SearchService {
                 }
                 return new Object[]{result, null};
             }
-            else if (nt1.equals("date")) {
+            else if (nt1.equals("dateTime")) {
                 Boolean result = null;
                 if (op.equals("eq")) {
                     result = ((Date)arg1).equals((Date)arg2); 
@@ -330,8 +346,8 @@ public class SearchService {
             }
         }
         else if (op.equals("like")) {
-            Object[] r1 = buildExprFromBasicSearchWhereClause("{DAV:}prop", ((HashMap)xmlref).get("{DAV:}prop"), null, null, null, null);
-            Object[] r2 = buildExprFromBasicSearchWhereClause("{DAV:}literal", ((HashMap)xmlref).get("{DAV:}literal"), null, null, null, null);
+            Object[] r1 = buildExprFromBasicSearchWhereClause("{DAV:}prop", ((HashMap)xmlref).get("{DAV:}prop"), null, requestParams, filename, request_uri);
+            Object[] r2 = buildExprFromBasicSearchWhereClause("{DAV:}literal", ((HashMap)xmlref).get("{DAV:}literal"), null, requestParams, filename, request_uri);
             String ne1 = r1[0].toString();
             String ne2 = r2[0].toString();
 //          $ne2=~s/\//\\\//gs;     ## quote slashes 
@@ -386,120 +402,44 @@ public class SearchService {
             Boolean result = fileContent.matches("(?" + flags + ").*" + Pattern.quote(content) + ".*");
             return new Object[]{result, null};
         }
-        // TODO finish and check
-//        } elsif ($op eq 'prop') {
-//            my @props = keys %{$xmlref};
-//            $props[0] =~ s/'/\\'/sg;
-//            $expr = "getPropValue('$props[0]',\$filename,\$request_uri)";
-//            $type = $SEARCH_PROPTYPES{$props[0]} || $SEARCH_PROPTYPES{default};
-//            $expr = $SEARCH_SPECIALCONV{$type}."($expr)" if exists $SEARCH_SPECIALCONV{$type};
-//        } elsif ($op eq 'literal') {
-//            $expr = ref($xmlref) ne "" ? convXML2Str($xmlref) : $xmlref;
-//            $type = $op;
-//        } else {
-//            $expr= $xmlref;
-//            $type= $op;
-//        }
-//    
-//        return ($expr, $type);
-        
-        // TODO: implement
-        
-        return null;
-        
+        else if (op.equals("prop")) {
+            ArrayList<String> props = new ArrayList<String>(((HashMap<String, Object>)xmlref).keySet());
+            // $props[0] =~ s/'/\\'/sg;
+            
+            Object p = null;
+            if (props.size() > 0) {
+                p = PropertiesHelper.getPropValue(requestParams, props.get(0), filename, request_uri);
+            }
+            
+            type = ConfigService.SEARCH_PROPTYPES.get(props.get(0));
+            if (type == null) {
+                type = ConfigService.SEARCH_PROPTYPES.get("default");
+            }
+            
+            if (type.equals("dateTime")) {
+                p = RenderingHelper.parseHTTPDate((String)p);
+            }
+            else if (type.equals("xml")) {
+                p = XMLService.convXML2Str((HashMap<String, Object>)p);
+            }
+            
+            return new Object[]{p, type};
+        }
+        else if (op.equals("literal")) {
+            String result;
+            if (xmlref instanceof HashMap<?, ?>) {
+                result = XMLService.convXML2Str((HashMap<String, Object>)xmlref);
+            }
+            else {
+                result = xmlref.toString();
+            }
+            type = op;
+            return new Object[]{result, op};
+        }
+        else {
+            return new Object[]{xmlref, op};
+        }
     }    
-    
-	
-//	// TODO: define xmlref type and return type
-//	public static void buildExprFromBasicSearchWhereClause(
-//			String operator, /*xmlref, */ String superOperator) {
-//
-//    	    
-////        my ($op, $xmlref, $superop) = @_;
-////        my ($expr,$type) = ( '', '', undef);
-////        my $ns = '{DAV:}';
-////        if (!defined $op) {
-////            my @ops = keys %{$xmlref};
-////            return buildExprFromBasicSearchWhereClause($ops[0], $$xmlref{$ops[0]}); 
-////        }
-////    
-////        $op=~s/\Q$ns\E//;
-////        $type='bool';
-////    
-////        if (ref($xmlref) eq 'ARRAY') {  
-////            foreach my $oo (@{$xmlref}) {
-////                my ($ne,$nt) = buildExprFromBasicSearchWhereClause($op, $oo, $superop);
-////                my ($nes,$nts) = buildExprFromBasicSearchWhereClause($superop, undef, $superop);
-////                $expr.= $nes if $expr ne "";
-////                $expr.= "($ne)";
-////            }
-////            return $expr;
-////        }
-////    
-////        study $op;
-////        if ($op =~ /^(and|or)$/) {
-////            if (ref($xmlref) eq 'HASH') {
-////                foreach my $o (keys %{$xmlref}) {
-////                    $expr .= $op eq 'and' ? ' && ' : ' || ' if $expr ne "";
-////                    my ($ne, $nt) =  buildExprFromBasicSearchWhereClause($o, $$xmlref{$o}, $op);
-////                    $expr .= "($ne)";
-////                }
-////            } else {
-////                return $op eq 'and' ? ' && ' : ' || ';
-////            }
-////        } elsif ($op eq 'not') {
-////            my @k = keys %{$xmlref};
-////            my ($ne,$nt) = buildExprFromBasicSearchWhereClause($k[0], $$xmlref{$k[0]});
-////            $expr="!($ne)";
-////        } elsif ($op eq 'is-collection') {
-////            $expr="getPropValue('{DAV:}iscollection',\$filename,\$request_uri)==1";
-////        } elsif ($op eq 'is-defined') {
-////            my ($ne,$nt)=buildExprFromBasicSearchWhereClause('{DAV:}prop',$$xmlref{'{DAV:}prop'});
-////            $expr="$ne ne '__undef__'";
-////        } elsif ($op =~ /^(language-defined|language-matches)$/) {
-////            $expr='0!=0';
-////        } elsif ($op =~ /^(eq|lt|gt|lte|gte)$/) {
-////            my $o = $op;
-////            my ($ne1,$nt1) = buildExprFromBasicSearchWhereClause('{DAV:}prop',$$xmlref{'{DAV:}prop'});
-////            my ($ne2,$nt2) = buildExprFromBasicSearchWhereClause('{DAV:}literal', $$xmlref{'{DAV:}literal'});
-////            $ne2 =~ s/'/\\'/sg;
-////            $ne2 = $SEARCH_SPECIALCONV{$nt1} ? $SEARCH_SPECIALCONV{$nt1}."('$ne2')" : "'$ne2'";
-////            my $cl= $$xmlref{'caseless'} || $$xmlref{'{DAV:}caseless'} || 'yes';
-////            $expr = (($nt1 =~ /(string|xml)/ && $cl ne 'no')?"lc($ne1)":$ne1)
-////                          . ' '.($SEARCH_SPECIALOPS{$nt1}{$o} || $o).' '
-////                  . (($nt1 =~ /(string|xml)/ && $cl ne 'no')?"lc($ne2)":$ne2);
-////        } elsif ($op eq 'like') {
-////            my ($ne1,$nt1) = buildExprFromBasicSearchWhereClause('{DAV:}prop',$$xmlref{'{DAV:}prop'});
-////            my ($ne2,$nt2) = buildExprFromBasicSearchWhereClause('{DAV:}literal', $$xmlref{'{DAV:}literal'});
-////            $ne2=~s/\//\\\//gs;     ## quote slashes 
-////            $ne2=~s/(?<!\\)_/./gs;  ## handle unescaped wildcard _ -> .
-////            $ne2=~s/(?<!\\)%/.*/gs; ## handle unescaped wildcard % -> .*
-////            my $cl= $$xmlref{'caseless'} || $$xmlref{'{DAV:}caseless'} || 'yes';
-////            $expr = "$ne1 =~ /$ne2/s" . ($cl eq 'no'?'':'i');
-////        } elsif ($op eq 'contains') {
-////            my $content = ref($xmlref) eq "" ? $xmlref : $$xmlref{content};
-////            my $cl = ref($xmlref) eq "" ? 'yes' : ($$xmlref{caseless} || $$xmlref{'{DAV:}caseless'} || 'yes');
-////            $content=~s/\//\\\//g;
-////            $expr="getFileContent(\$filename) =~ /\\Q$content\\E/s".($cl eq 'no'?'':'i');
-////        } elsif ($op eq 'prop') {
-////            my @props = keys %{$xmlref};
-////            $props[0] =~ s/'/\\'/sg;
-////            $expr = "getPropValue('$props[0]',\$filename,\$request_uri)";
-////            $type = $SEARCH_PROPTYPES{$props[0]} || $SEARCH_PROPTYPES{default};
-////            $expr = $SEARCH_SPECIALCONV{$type}."($expr)" if exists $SEARCH_SPECIALCONV{$type};
-////        } elsif ($op eq 'literal') {
-////            $expr = ref($xmlref) ne "" ? convXML2Str($xmlref) : $xmlref;
-////            $type = $op;
-////        } else {
-////            $expr= $xmlref;
-////            $type= $op;
-////        }
-////    
-////        return ($expr, $type);
-//	    
-//	    // TODO: implement
-//		
-//	}
 	
 	public class IntegerRef {
 	    int value;

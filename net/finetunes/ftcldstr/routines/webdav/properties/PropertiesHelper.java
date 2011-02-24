@@ -33,7 +33,7 @@ public class PropertiesHelper {
         
         if (propval == null) {
             PropertiesActions.getProperty(requestParams, fn, uri, propname, null, r200, r404);
-            propval = (HashMap<String, Object>)r200.getProp(propname);
+            propval = r200.getProp(propname);
         }
 	    
         if (propval == null) {
