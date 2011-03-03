@@ -70,7 +70,7 @@ public class PropfindActionHandler extends AbstractActionHandler {
         
         String xml = requestParams.getRequestBody();
         
-        if (xml == null || xml.matches("\\s*")) {
+        if (xml == null || xml.matches("(?s)\\s*")) {
             xml = "<?xml version=\"1.0\" encoding=\"" + ConfigService.CHARSET + "\" ?>\n<D:propfind xmlns:D=\"DAV:\"><D:allprop/></D:propfind>";
         }
 
@@ -92,12 +92,12 @@ public class PropfindActionHandler extends AbstractActionHandler {
         // ACL, CalDAV, CardDAV, ...:
         if (ConfigService.PRINCIPAL_COLLECTION_SET != null && ConfigService.PRINCIPAL_COLLECTION_SET.length() > 1 &&
                 ru.endsWith(ConfigService.PRINCIPAL_COLLECTION_SET)) {
-            fn = fn.replaceAll(Pattern.quote(ConfigService.PRINCIPAL_COLLECTION_SET) + "$", "");
+            fn = fn.replaceAll("(?s)" + Pattern.quote(ConfigService.PRINCIPAL_COLLECTION_SET) + "$", "");
             depthstr = "0";
         }
         else if (ConfigService.CURRENT_USER_PRINCIPAL != null && ConfigService.CURRENT_USER_PRINCIPAL.length() > 1 &&
-                ru.matches(".*" + Pattern.quote(String.format(ConfigService.CURRENT_USER_PRINCIPAL, requestParams.getUsername())) + "/?")) {
-            fn = fn.replaceAll(Pattern.quote(String.format(ConfigService.CURRENT_USER_PRINCIPAL, requestParams.getUsername())) + "/?$", "");
+                ru.matches("(?s).*" + Pattern.quote(String.format(ConfigService.CURRENT_USER_PRINCIPAL, requestParams.getUsername())) + "/?")) {
+            fn = fn.replaceAll("(?s)" + Pattern.quote(String.format(ConfigService.CURRENT_USER_PRINCIPAL, requestParams.getUsername())) + "/?$", "");
             depthstr = "0";
         }
         

@@ -62,9 +62,9 @@ public class PropertiesActions {
     	        String ns = "";
     	        String nonsv = new String(nons);
     	        
-                nons = nons.replaceFirst("\\{([^\\}]*)\\}", "");
+                nons = nons.replaceFirst("(?s)\\{([^\\}]*)\\}", "");
                 if (!nons.isEmpty()) {
-                    Pattern p = Pattern.compile("\\{([^\\}]*)\\}");
+                    Pattern p = Pattern.compile("\\{([^\\}]*)\\}", Pattern.DOTALL);
                     Matcher m = p.matcher(nonsv);
                     if (m.find()) {
                         ns = m.group(1);
@@ -96,7 +96,7 @@ public class PropertiesActions {
                     Iterator<String> it2 = ConfigService.IGNORE_PROPS.iterator();
                     while (it2.hasNext()) {
                         String p = it2.next();
-                        if (p.matches(".*" + Pattern.quote(nons) + ".*")) {
+                        if (p.matches("(?s).*" + Pattern.quote(nons) + ".*")) {
                             grepfound = true;
                             break;
                         }
@@ -134,9 +134,9 @@ public class PropertiesActions {
     	        String ns = "";
     	        String nonsv = new String(nons);
     	        
-    	        nons = nons.replaceFirst("\\{([^}]*)\\}", "");
+    	        nons = nons.replaceFirst("(?s)\\{([^}]*)\\}", "");
     	        if (!nons.isEmpty()) {
-        	        Pattern p = Pattern.compile("\\{([^}]*)\\}");
+        	        Pattern p = Pattern.compile("\\{([^}]*)\\}", Pattern.DOTALL);
         	        Matcher m = p.matcher(nonsv);
         	        if (m.find()) {
         	            ns = m.group(1);
@@ -160,7 +160,7 @@ public class PropertiesActions {
                     
                     while (it2.hasNext() && !contains) {
                         String fp = it2.next();
-                        if (fp.matches(".*" + Pattern.quote(nons) + ".*")) {
+                        if (fp.matches("(?s).*" + Pattern.quote(nons) + ".*")) {
                             contains = true;
                             break;
                         }
@@ -168,7 +168,7 @@ public class PropertiesActions {
                     
                     while (it3.hasNext() && !contains) {
                         String fp = it3.next();
-                        if (fp.matches(".*" + Pattern.quote(nons) + ".*")) {
+                        if (fp.matches("(?s).*" + Pattern.quote(nons) + ".*")) {
                             contains = true;
                             break;
                         }
@@ -835,7 +835,7 @@ public class PropertiesActions {
 	    
 	    String ns = "";
 	    String pn = "";
-        Pattern p = Pattern.compile("^\\{([^\\}]+)\\}(.*)$");
+        Pattern p = Pattern.compile("^\\{([^\\}]+)\\}(.*)$", Pattern.DOTALL);
         Matcher m = p.matcher(propname);
         if (m.find()) {
             ns = m.group(1);
@@ -850,7 +850,7 @@ public class PropertiesActions {
                 if (executable != null) {
                     StatData stat = FileOperationsService.stat(requestParams, fn);
                     int mode;
-                    if (executable.matches(".*F.*")) {
+                    if (executable.matches("(?s).*F.*")) {
                         mode = stat.getMode() & 0666;
                     }
                     else {
@@ -918,7 +918,7 @@ public class PropertiesActions {
                     elementParentRef.get(propname) != null &&
                     ((HashMap<String, Object>)elementParentRef.get(propname)) != null &&
                     (((String)((HashMap<String, Object>)elementParentRef.get(propname)).get("xmlns")).isEmpty()) &&
-                            !n.matches("\\{[^\\}]*\\}.*")) {
+                            !n.matches("(?s)\\{[^\\}]*\\}.*")) {
                 n = "{}" + n;
             }
             

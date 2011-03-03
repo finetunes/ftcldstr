@@ -95,7 +95,7 @@ public class ActionServlet extends MServlet {
             try {
                 InitializationService.checkRunPermissions(requestParams);
                 // System.out.println("MServlet::service::METHOD: " + requestParams.getRequestedMethod());
-                Logger.debug("MServlet called with UID=" + SystemCalls.getCurrentProcessUid() + 
+                Logger.debug("MServlet called with UID=" + SystemCalls.getCurrentProcessUid(requestParams) + 
                         " (" + requestParams.getUsername() + ") method=" + requestParams.getRequestedMethod());
                 Logger.debug("User-Agent: " + requestParams.getHeader("User-Agent"));
                 

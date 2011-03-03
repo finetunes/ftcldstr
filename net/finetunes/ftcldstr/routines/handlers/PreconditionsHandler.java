@@ -40,13 +40,13 @@ public class PreconditionsHandler {
 	            
 	            Logger.debug(" - ie{token}=" + ietoken);
 	            
-	            if (ietoken.matches("(?i).*Not\\s+<DAV:no-lock>.*")) {
+	            if (ietoken.matches("(?is).*Not\\s+<DAV:no-lock>.*")) {
 	                nnl = true;
 	            }
-	            else if (ietoken.matches("(?i).*<DAV:no-lock>.*")) {
+	            else if (ietoken.matches("(?is).*<DAV:no-lock>.*")) {
 	                nl = true;
 	            }
-	            else if (ietoken.matches("(?i).*opaquelocktoken.*")) {
+	            else if (ietoken.matches("(?is).*opaquelocktoken.*")) {
 	                t = true;
 	            }
 	            

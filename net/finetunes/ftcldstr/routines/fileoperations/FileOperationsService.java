@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -236,13 +237,15 @@ public class FileOperationsService {
 
         return WrappingUtilities.getFileContentReadStream(requestParams, fn);
     }
-	
+
+    // TODO: does not support unicode names
     public static boolean is_directory(String filename) {
 
         File file = new File(filename);
         return file.isDirectory();
     }	
     
+    // TODO: does not support unicode names
     public static boolean file_exits(String filename) {
         
         File file = new File(filename);

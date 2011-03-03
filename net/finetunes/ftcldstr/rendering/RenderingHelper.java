@@ -119,7 +119,7 @@ public class RenderingHelper {
         try {
             URI uri = new URI(
                     null, null, 
-                    "/booksearch/first book.pdf",
+                    s,
                     null);
             r = uri.toString();
         }

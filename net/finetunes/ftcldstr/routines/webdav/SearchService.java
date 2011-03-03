@@ -173,7 +173,7 @@ public class SearchService {
                     requestParams, filename, request_uri);
         }
         
-        op = op.replaceFirst(Pattern.quote(ns), "");
+        op = op.replaceFirst("(?s)" + Pattern.quote(ns), "");
         type = "bool";
         
         if (xmlref instanceof ArrayList<?>) {
@@ -354,8 +354,8 @@ public class SearchService {
 //          $ne2=~s/(?<!\\)_/./gs;  ## handle unescaped wildcard _ -> .
 //          $ne2=~s/(?<!\\)%/.*/gs; ## handle unescaped wildcard % -> .*
             
-            ne2 = ne2.replaceAll("(?<!\\)_", "."); // ## handle unescaped wildcard _ -> .
-            ne2 = ne2.replaceAll("(?<!\\)%", ".*"); // ## handle unescaped wildcard % -> .*
+            ne2 = ne2.replaceAll("(?s)(?<!\\)_", "."); // ## handle unescaped wildcard _ -> .
+            ne2 = ne2.replaceAll("(?s)(?<!\\)%", ".*"); // ## handle unescaped wildcard % -> .*
             
             boolean caseless = false;
             if (((HashMap)xmlref).get("caseless") != null &&

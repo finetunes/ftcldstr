@@ -55,13 +55,10 @@ public class PostActionHandler extends AbstractActionHandler {
         String fn = requestParams.getPathTranslated();
         Logger.debug("POST: " + fn);
         
-        /*
-        FIXME: do we need this in java?
-        if (!$cgi->param('file_upload') && $cgi->cgi_error) {
-            printHeaderAndContent($cgi->cgi_error,undef,$cgi->cgi_error);   
-            exit 0;
-        }
-        */
+        // if (!$cgi->param('file_upload') && $cgi->cgi_error) {
+        //     printHeaderAndContent($cgi->cgi_error,undef,$cgi->cgi_error);   
+        //     exit 0;
+        // }
         
         String msg = null;
         String msgparam = null;

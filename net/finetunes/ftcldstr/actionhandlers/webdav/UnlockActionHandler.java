@@ -30,7 +30,7 @@ public class UnlockActionHandler extends AbstractActionHandler {
         String token = requestParams.getHeader("Lock-Token");
 
         if (token != null) {
-            token = token.replaceAll("[<>]", "");
+            token = token.replaceAll("(?s)[<>]", "");
         }
         Logger.debug("UNLOCK: " + fn + " (token=" + token + ")");
         

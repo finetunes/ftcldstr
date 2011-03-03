@@ -89,7 +89,7 @@ public class SearchActionHandler extends AbstractActionHandler {
                 Iterator<String> it = keys.iterator();
                 while (it.hasNext()) {
                     String s = it.next();
-                    if (s.matches(".*{DAV:}basicsearch.*")) {
+                    if (s.matches("(?s).*{DAV:}basicsearch.*")) {
                         HashMap<String, Object> sr = (HashMap<String, Object>)searchrequest.get(s);
                         SearchHandler.handleBasicSearch(requestParams, sr, resps, errors);
                     }

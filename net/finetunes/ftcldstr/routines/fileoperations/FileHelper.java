@@ -99,7 +99,7 @@ public class FileHelper {
 	        
             // Original code: $icon=$full.($full=~/\?.*/?';':'?').'action=thumb';
 	        icon = "?";
-	        if (full.matches(".*\\?.*")) {
+	        if (full.matches("(?s).*\\?.*")) {
 	            icon = ConfigService.URL_PARAM_SEPARATOR;
 	        }
 	        
@@ -115,7 +115,7 @@ public class FileHelper {
 	        }
 	    }
 	    
-	    if (q != null && q.matches(".*\\?.*")) {
+	    if (q != null && q.matches("(?s).*\\?.*")) {
 	        full += ConfigService.URL_PARAM_SEPARATOR + "action=props";
 	    }
 	    else {
@@ -179,7 +179,7 @@ public class FileHelper {
 	    String nf = new String(f);
 	    nf = nf.replaceAll("/$", "");
 	    
-	    if (LockingService.isAllowed(requestParams, f, true)) {
+	    if (!LockingService.isAllowed(requestParams, f, true)) {
 	        Logger.debug("Cannot delete '" + f + "': not allowed");
 	        errRef.add(new String[] {f, "Cannot delete " + f});
 	    }

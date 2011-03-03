@@ -24,7 +24,7 @@ public class PropertiesHelper {
         StatusResponse r404 = new StatusResponse();
         
         String propname = new String(prop);
-        propname = propname.replaceFirst("^\\{[^\\}]*\\}", "");
+        propname = propname.replaceFirst("(?s)^\\{[^\\}]*\\}", "");
         
         Object propval = null;
         if (!ConfigService.PROTECTED_PROPS.contains(propname)) {
@@ -68,7 +68,7 @@ public class PropertiesHelper {
 	        String xmlnsuri = "DAV:";
 	        String propname = new String(prop);
 	        
-            Pattern p = Pattern.compile("^\\{([^\\}]*)\\}(.*)$");
+            Pattern p = Pattern.compile("^\\{([^\\}]*)\\}(.*)$", Pattern.DOTALL);
             Matcher m = p.matcher(prop);
             if (m.find()) {
                 xmlnsuri = m.group(1);
@@ -100,7 +100,7 @@ public class PropertiesHelper {
             else if ((ConfigService.NAMESPACES.get(xmlnsuri) == null || liveSource.contains(propname)) && !ConfigService.PROTECTED_PROPS.contains(propname)) {
                 
                 String propparam;
-                if (prop.matches(".*\\{[^\\}]*\\}.*")) {
+                if (prop.matches("(?s).*\\{[^\\}]*\\}.*")) {
                     propparam = prop;
                 }
                 else {

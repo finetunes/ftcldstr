@@ -40,9 +40,7 @@ public class LockingService {
 	}
 	
 	public static boolean isLockable(String fn, HashMap<String, Object> xmldata) {
-	    // check lock and exclusive
-	    
-	    // FIXME: check types and data
+
 	    HashMap<String, Object> data = (HashMap<String, Object>)xmldata;
 	    HashMap<String, Object> lockdata = (HashMap<String, Object>)data.get("{DAV:}lockscope");
 	    Set<String> lockscopes = lockdata.keySet();
@@ -216,8 +214,8 @@ public class LockingService {
         
         String owner = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, dataRef, false);
         
-        locktype = locktype.replaceFirst("\\{[^\\}]+}", "");
-        lockscope = lockscope.replaceFirst("\\{[^\\}]+}", "");
+        locktype = locktype.replaceFirst("(?s)\\{[^\\}]+}", "");
+        lockscope = lockscope.replaceFirst("(?s)\\{[^\\}]+}", "");
         
         HashMap<String, Object> locktypekey = new HashMap<String, Object>();
         locktypekey.put(locktype, null);
@@ -462,7 +460,7 @@ public class LockingService {
 	                iftoken = "";
 	            }
 	            
-	            iftoken = iftoken.replaceAll("[\\<\\>\\s]+", "");
+	            iftoken = iftoken.replaceAll("(?s)[\\<\\>\\s]+", "");
 	            
 	            String status = "OK";
 	            if (!rowsRef.get(i).getToken().equals(iftoken)) {

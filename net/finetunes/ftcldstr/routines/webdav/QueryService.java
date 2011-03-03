@@ -26,12 +26,12 @@ public class QueryService {
             //          $rtag=$1;
             //      }
 	        
-	        if (header.matches("<([^>]+)>\\s*.*")) {
-	            rtag = header.replaceFirst("<([^>]+)>\\s*.*", "$1");
-	            header = header.replaceFirst("<([^>]+)>\\s*(.*)", "$2");
+	        if (header.matches("(?s)<([^>]+)>\\s*.*")) {
+	            rtag = header.replaceFirst("(?s)<([^>]+)>\\s*.*", "$1");
+	            header = header.replaceFirst("(?s)<([^>]+)>\\s*(.*)", "$2");
 	        }
 	        
-	        Pattern p = Pattern.compile("^\\((Not\\s*)?([^\\[\\)]+\\s*)?\\s*(\\[([^\\]\\)]+)\\])?\\)\\s*", Pattern.CASE_INSENSITIVE);
+	        Pattern p = Pattern.compile("^\\((Not\\s*)?([^\\[\\)]+\\s*)?\\s*(\\[([^\\]\\)]+)\\])?\\)\\s*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 	        Matcher m = p.matcher(header);
 	        
 	        while (m.find()) {

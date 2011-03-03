@@ -46,7 +46,7 @@ public class WrappingUtilities {
         else {
             String content = d.getContent();
             if (content != null && !content.isEmpty()) {
-                content = content.replaceAll("(\\n|\\r|\\t| )", "");
+                content = content.replaceAll("(?s)(\\n|\\r|\\t| )", "");
                 String[] s = content.split(";");
 
                 // data sample 
@@ -177,7 +177,7 @@ public class WrappingUtilities {
         else {
             String content = d.getContent();
             if (content != null && !content.isEmpty()) {
-                content = content.replaceAll("^(\\n|\\r|\\t| )", "").replaceAll("(\\n|\\r|\\t| )$", "");
+                content = content.replaceAll("^(?s)(\\n|\\r|\\t| )", "").replaceAll("(?s)(\\n|\\r|\\t| )$", "");
                 return content;
             }
         }
@@ -259,32 +259,66 @@ public class WrappingUtilities {
         return null;           
     }
     
-    public static String[] getOwnerNames(RequestParams requestParams, String username) {
+    public static String getGroupNameByGID(RequestParams requestParams, String gid) {
         
         CommonContentWrapper cw = new CommonContentWrapper(requestParams);
-        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), "id", new String[]{username});
+        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), "groupname", new String[]{gid});
 
         if (d == null || d.getExitCode() != 0) {
-            Logger.log("Error getting user info. Username: " + username + "; Error: " + d.getErrorMessage());
+            Logger.log("Error getting group name. GID: " + gid + "; Error: " + d.getErrorMessage());
             return null;
         }
         else {
             String content = d.getContent();
             if (content != null && !content.isEmpty()) {
-                content = content.replaceAll("(\\n|\\r|\\t| )", "");
-                String[] s = content.split(":");
-                if (s.length < 2) {
-                    Logger.log("Invalid uid/gid for user " + username + ": " + content);
-                    return null;
+                content = content.replaceAll("(?s)(\\n|\\r|\\t| )", "");
+                String[] groups = content.split("\\n");
+                for (int i = 0; i < groups.length; i++) {
+                    String[] s = groups[i].split(":");
+                    if (s.length < 3) {
+                        Logger.log("Invalid group entry for gid " + gid + ": " + content);
+                        return null;
+                    }
+                    
+                    if (s[2].equals(gid)) {
+                        return s[0];
+                    }
                 }
-                
-                String uid = s[0];
-                String gid = s[1];
-                return new String[]{uid, gid};
             }
         }
         
         return null;
-    }    
+    }      
+    
+    public static String getUserNameByUID(RequestParams requestParams, String uid) {
+        
+        CommonContentWrapper cw = new CommonContentWrapper(requestParams);
+        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), "username", new String[]{uid});
+
+        if (d == null || d.getExitCode() != 0) {
+            Logger.log("Error getting user name. UID: " + uid + "; Error: " + d.getErrorMessage());
+            return null;
+        }
+        else {
+            String content = d.getContent();
+            if (content != null && !content.isEmpty()) {
+                content = content.replaceAll("(?s)(\\n|\\r|\\t| )", "");
+                String[] groups = content.split("\\n");
+                for (int i = 0; i < groups.length; i++) {
+                    String[] s = groups[i].split(":");
+                    if (s.length < 3) {
+                        Logger.log("Invalid group entry for uid " + uid + ": " + content);
+                        return null;
+                    }
+                    
+                    if (s[2].equals(uid)) {
+                        return s[0];
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
     
 }

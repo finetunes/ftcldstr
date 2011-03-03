@@ -15,7 +15,7 @@ public class HomesetActions {
         String rmuser = requestParams.getUsername();
         
         if (!ConfigService.ADDRESSBOOK_HOME_SET.containsKey(rmuser)) {
-            rmuser = SystemCalls.getCurrentProcessUid();
+            rmuser = SystemCalls.getCurrentProcessUid(requestParams);
         }
         
         if (ConfigService.ADDRESSBOOK_HOME_SET.containsKey(rmuser)) {
@@ -35,7 +35,7 @@ public class HomesetActions {
         String rmuser = requestParams.getUsername();
         
         if (!ConfigService.CALENDAR_HOME_SET.containsKey(rmuser)) {
-            rmuser = SystemCalls.getCurrentProcessUid();
+            rmuser = SystemCalls.getCurrentProcessUid(requestParams);
         }
         
         if (ConfigService.CALENDAR_HOME_SET.containsKey(rmuser)) {

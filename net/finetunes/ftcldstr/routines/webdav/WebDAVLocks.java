@@ -18,8 +18,6 @@ import org.w3c.dom.Element;
 
 import net.finetunes.ftcldstr.helper.Logger;
 
-// PZ: TODO: make all the methods synchronized?
-
 public class WebDAVLocks implements Serializable {
     
     /*
@@ -68,10 +66,6 @@ public class WebDAVLocks implements Serializable {
      */
     public ArrayList<WebDAVLock> getLocks(String fn, String token) {
 
-        // PZ: FIXME: check this for multi-threading, as the method
-        // return references to locks, not new instances
-        // otherwise implement cloning
-        
         ArrayList<WebDAVLock> ref = new ArrayList<WebDAVLock>();
         Iterator<WebDAVLock> it = locks.iterator();
         
@@ -164,7 +158,7 @@ public class WebDAVLocks implements Serializable {
     /**
      * db_insert
      */
-    public boolean insertLock(String basefn, String fn, 
+    public synchronized boolean insertLock(String basefn, String fn, 
             String type, String scope, String token, 
             String depth, String timeout, 
             String owner) {
@@ -191,7 +185,7 @@ public class WebDAVLocks implements Serializable {
     /**
      * db_update
      */
-    public boolean updateLock(String basefn, String fn, String timeout) {
+    public synchronized boolean updateLock(String basefn, String fn, String timeout) {
         
         Logger.debug("updateLock(" + basefn + "," + fn + "," + timeout + ")");
         
@@ -207,7 +201,7 @@ public class WebDAVLocks implements Serializable {
     /**
      * db_delete
      */
-    public boolean deleteLock(String fn, String token) {
+    public synchronized boolean deleteLock(String fn, String token) {
         
         Logger.debug("deleteLock(" + fn + "," + token + ")");
         
@@ -244,7 +238,7 @@ public class WebDAVLocks implements Serializable {
     /**
      * db_delete
      */    
-    public boolean deleteLock(String fn) {
+    public synchronized boolean deleteLock(String fn) {
         return deleteLock(fn, null);
     }
     

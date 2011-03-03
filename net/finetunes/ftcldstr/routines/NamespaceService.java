@@ -22,7 +22,7 @@ public class NamespaceService {
 	public static String nonamespace(String prop) {
 	    
 	    if (prop != null) {
-	        prop = prop.replaceFirst("^\\{[^\\}]*\\}", "");
+	        prop = prop.replaceFirst("(?s)^\\{[^\\}]*\\}", "");
 	    }
 	    
 	    return prop;

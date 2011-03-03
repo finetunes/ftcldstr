@@ -178,7 +178,7 @@ public class InitializationService {
     
     public static void checkRunPermissions(RequestParams requestParams) {
         
-        String uid = SystemCalls.getCurrentProcessUid();
+        String uid = SystemCalls.getCurrentProcessUid(requestParams);
         if (ConfigService.FORBIDDEN_UID != null && ConfigService.FORBIDDEN_UID.contains(uid)) {
             Logger.debug("Forbidden UID");
             OutputService.printHeaderAndContent(requestParams, "403 Forbidden");

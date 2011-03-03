@@ -49,7 +49,7 @@ public class DeleteActionHandler extends AbstractActionHandler {
         String status = "204 No Content";
         // check all files are writeable and than remove it
         
-        Logger.debug("_DELETE: " + fn);
+        Logger.debug("DELETE: " + fn);
         
         ArrayList<HashMap<String, String>> resps = new ArrayList<HashMap<String,String>>(); 
         
@@ -60,7 +60,7 @@ public class DeleteActionHandler extends AbstractActionHandler {
                 (requestParams.getRequest().getQueryString() != null && !requestParams.getRequest().getQueryString().isEmpty())) {
             status = "400 Bad Request";
         }
-        else if (LockingService.isAllowed(requestParams, fn)) {
+        else if (!LockingService.isAllowed(requestParams, fn)) {
             status = "423 Locked";
         }
         else {

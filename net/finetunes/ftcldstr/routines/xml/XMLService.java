@@ -46,7 +46,7 @@ public class XMLService {
                         
                         attr += " " + ConfigService.DATATYPES.get(e);
                         
-                        m = checkCondition("(\\w+):dt", ConfigService.DATATYPES.get(e));
+                        m = checkCondition("(?s)(\\w+):dt", ConfigService.DATATYPES.get(e));
                         
                         if (m != null) {
                             if (ConfigService.NAMESPACEABBR.containsKey(m.group(1)) && 
@@ -55,13 +55,13 @@ public class XMLService {
                             }
                         }
                     }
-                    m = checkCondition("\\{([^\\}]*)\\}", e);
+                    m = checkCondition("(?s)\\{([^\\}]*)\\}", e);
                     
                     if (m != null) {
                         ns = m.group(1);
                         if (ConfigService.NAMESPACES.containsKey(ns) && 
                                 ConfigService.NAMESPACES.get(ns) != null) {
-                            m = checkCondition("\\{[^\\}]*\\}", el);
+                            m = checkCondition("(?s)\\{[^\\}]*\\}", el);
                             if (m != null) {
                                 el = m.replaceAll("");
                             }
@@ -69,19 +69,19 @@ public class XMLService {
                         } else {
                             uns = new String(ns);
                             euns = e;
-                            m = checkCondition("\\{[^\\}]*\\}", euns);
+                            m = checkCondition("(?s)\\{[^\\}]*\\}", euns);
                             if (m != null) {
                                 euns = m.replaceAll("");
                             }
                         }
                     }
                     String el_end = new String(el);
-                    m = checkCondition(" .*$", el_end);
+                    m = checkCondition("(?s) .*$", el_end);
                     if (m != null) {
                         el_end = m.replaceAll("");
                     } 
                     String euns_end = new String(euns);
-                    m = checkCondition(" .*$", euns_end);
+                    m = checkCondition("(?s) .*$", euns_end);
                     if (m != null) {
                         euns_end = m.replaceAll("");
                     } 
@@ -194,8 +194,8 @@ public class XMLService {
         return createXML(namespaceElements, dataRef, false);
     }
     
-    private static Matcher checkCondition (String regExp, String input) {
-        Pattern pattern = Pattern.compile(regExp);
+    private static Matcher checkCondition(String regExp, String input) {
+        Pattern pattern = Pattern.compile(regExp, Pattern.DOTALL);
         Matcher m = pattern.matcher(input);
         return m.find()? m : null;
     }

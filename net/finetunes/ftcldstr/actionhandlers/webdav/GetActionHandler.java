@@ -596,7 +596,7 @@ public class GetActionHandler extends AbstractActionHandler {
             String value = XMLService.createXML(namespaceElements, r200.getProp(prop), true);
             String namespace = NamespaceService.getNameSpaceUri(prop);
             
-            Pattern p = Pattern.compile("^\\{([^\\}]*)\\}");
+            Pattern p = Pattern.compile("^\\{([^\\}]*)\\}", Pattern.DOTALL);
             Matcher m = p.matcher(prop);
             if (m.find()) {
                 namespace = m.group(1);

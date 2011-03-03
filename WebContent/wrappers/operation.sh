@@ -5,6 +5,7 @@ COMMAND=$2
 ARG1=$3
 ARG2=${4}
 RESULT=0
+export LC_ALL=en_US.UTF-8
 case $COMMAND in
     "list")
     cmd="ls -1A ${ARG1}"
@@ -76,11 +77,14 @@ case $COMMAND in
     "chmod")
     cmd="chmod ${ARG2} ${ARG1}"
     ;;
-    "id")
-    cmd="id ${ARG1} | sed 's/^uid=\\([0-9]\\+\\)\\S*\\sgid=\\([0-9]\\+\\)\\S*.*/\\1:\\2/'"
-    ;;
     "rmdir")
     cmd="rmdir $ARG1"
+    ;;
+    "groupname")
+    cmd="cat /etc/group | grep ':${ARG1}:'"
+    ;;
+    "username")
+    cmd="getent passwd ${ARG1}"
     ;;
 esac
 export SHELL=/bin/bash

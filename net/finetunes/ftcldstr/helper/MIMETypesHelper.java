@@ -20,7 +20,7 @@ public class MIMETypesHelper {
     	    Iterator<String> it = keys.iterator();
     	    while (it.hasNext()) {
     	        String k = it.next();
-                if (k.matches("(?i).*\\b" + Pattern.quote(extension) + "\\b.*")) {
+                if (k.matches("(?is).*\\b" + Pattern.quote(extension) + "\\b.*")) {
     	            return ConfigService.MIMETYPES.get(k);
     	        }
     	    }

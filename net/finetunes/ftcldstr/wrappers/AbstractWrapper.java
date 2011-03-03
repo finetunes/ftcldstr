@@ -40,13 +40,6 @@ public class AbstractWrapper {
             Logger.debug("Calling external command (params hidden): " + cl);
         }
         
-//        String[] c = new String[] {
-//                "/var/cache/jetty/Jetty_0_0_0_0_8080_root.war____.cwywpb/webapp/wrappers/operation.sh",
-//                "zeitgeist",
-//                "list",
-//                "/"
-//        };
-        
         return commands.toArray(new String[0]);
     }
     
@@ -123,7 +116,9 @@ public class AbstractWrapper {
                 args.add(command);
             }
             
-            args.addAll(Arrays.asList(arg));
+            if (arg != null) {
+                args.addAll(Arrays.asList(arg));
+            }
             String[] commands = buildCommandList(args.toArray(new String[0]), allowlog);
             return commands;
         }        

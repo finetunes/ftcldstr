@@ -11,8 +11,6 @@ import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class BasicSearch {
 
-	// TODO: clarify the type of expression param
-	// TODO: matches are required to be passed by reference
 	public static void doBasicSearch(
 	        RequestParams requestParams,
 			Object whereref, 

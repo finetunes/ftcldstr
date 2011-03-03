@@ -63,7 +63,7 @@ public class DirectoryOperationsService {
     	            }
     	            
     	            String nbase = base + sf;
-    	            if (FileOperationsService.is_plain_file(requestParams, fn + sf) && sf.matches(".*\\." + Pattern.quote(suffix) + ".*")) {
+    	            if (FileOperationsService.is_plain_file(requestParams, fn + sf) && sf.matches("(?s).*\\." + Pattern.quote(suffix) + ".*")) {
     	                hrefs.add(nbase);
     	            }
     	            
@@ -226,7 +226,7 @@ public class DirectoryOperationsService {
 	    
 	    if (filter != null && !filter.isEmpty()) {
     	    try {
-    	        Pattern pattern = Pattern.compile(filter);
+    	        Pattern pattern = Pattern.compile(filter, Pattern.DOTALL);
     	    }
     	    catch (PatternSyntaxException e) {
     	        filter = Pattern.quote(filter);
@@ -258,7 +258,7 @@ public class DirectoryOperationsService {
                 nru += "/";
             }
             
-            if (filter != null && !filter.isEmpty() && !filename.matches("(?i).*" + filter + ".*")) {
+            if (filter != null && !filter.isEmpty() && !filename.matches("(?is).*" + filter + ".*")) {
                 continue;
             }
             
@@ -283,7 +283,7 @@ public class DirectoryOperationsService {
                 list += " ";
                 list += "<span " +
                       " style=\"" + RenderingHelper.getmodecolors(requestParams, full, mode) + "\"" +
-                      " title=\"" + String.format("mode: %04o, uid: %s (%s), gid: %s (%s)", mode & 07777, SystemCalls.getpwuid(uid), uid, SystemCalls.getgrgid(gid), gid) + "\">";
+                      " title=\"" + String.format("mode: %04o, uid: %s (%s), gid: %s (%s)", mode & 07777, SystemCalls.getpwuid(requestParams, uid), uid, SystemCalls.getgrgid(requestParams, gid), gid) + "\">";
                 list += String.format("%-11s", RenderingHelper.mode2str(requestParams, full, mode));
                 list += "</span>";
             }

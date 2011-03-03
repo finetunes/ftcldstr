@@ -58,7 +58,7 @@ public class BindActionHandler extends AbstractActionHandler {
             String src = ConfigService.DOCUMENT_ROOT + href;
             String dst = requestParams.getPathTranslated() + segment;
             
-            String ndst = new String(dst).replaceFirst("/$", "");
+            String ndst = new String(dst).replaceFirst("(?s)/$", "");
             
             if (!FileOperationsService.file_exits(src)) {
                 status = "404 Not Found";
