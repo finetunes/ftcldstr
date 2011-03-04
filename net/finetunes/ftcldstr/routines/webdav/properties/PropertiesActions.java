@@ -229,7 +229,7 @@ public class PropertiesActions {
 	    
 	    if (prop.equals("getcontenttype")) {
 	        String contentType = "";
-	        if (FileOperationsService.is_directory(fn)) {
+	        if (FileOperationsService.is_directory(requestParams, fn)) {
 	            contentType = "httpd/unix-directory";
 	        }
 	        else {
@@ -251,7 +251,7 @@ public class PropertiesActions {
         }
         
         if (prop.equals("resourcetype")) {
-            if (!FileOperationsService.is_directory(fn)) {
+            if (!FileOperationsService.is_directory(requestParams, fn)) {
                 resp_200.putProp("resourcetype", null);
             }
             else {
@@ -367,7 +367,7 @@ public class PropertiesActions {
         if (prop.equals("childcount")) {
             
             int dirinfo = 0;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 dirinfo = DirectoryOperationsService.getDirInfo(requestParams, fn, prop); 
             }
             resp_200.putProp("childcount", dirinfo);
@@ -379,7 +379,7 @@ public class PropertiesActions {
         
         if (prop.equals("isfolder")) {
             int isfolder = 0;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 isfolder = 1;
             }
             resp_200.putProp("isfolder", isfolder);
@@ -400,7 +400,7 @@ public class PropertiesActions {
         if (prop.equals("hassubs")) {
             
             int hassubs = 0;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 hassubs = DirectoryOperationsService.getDirInfo(requestParams, fn, prop); 
             }
             resp_200.putProp("hassubs", hassubs);
@@ -409,7 +409,7 @@ public class PropertiesActions {
         if (prop.equals("nosubs")) {
             
             int nosubs = 0;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 if (FileOperationsService.is_file_writable(requestParams, fn)) {
                     nosubs = 1;
                 }
@@ -426,7 +426,7 @@ public class PropertiesActions {
         if (prop.equals("objectcount")) {
             
             int objectcount = 0;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 objectcount = DirectoryOperationsService.getDirInfo(requestParams, fn, prop); 
             }
             resp_200.putProp("objectcount", objectcount);
@@ -439,7 +439,7 @@ public class PropertiesActions {
         if (prop.equals("visiblecount")) {
             
             int visiblecount = 0;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 visiblecount = DirectoryOperationsService.getDirInfo(requestParams, fn, prop); 
             }
             resp_200.putProp("visiblecount", visiblecount);
@@ -448,7 +448,7 @@ public class PropertiesActions {
         if (prop.equals("iscollection")) {
             
             int iscollection = 0;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 iscollection = 1;
             }
             resp_200.putProp("iscollection", iscollection);
@@ -456,7 +456,7 @@ public class PropertiesActions {
         
         if (prop.equals("isFolder")) {
             int isFolder = 0;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 isFolder = 1;
             }
             resp_200.putProp("isFolder", isFolder);
@@ -464,7 +464,7 @@ public class PropertiesActions {
         
         if (prop.equals("authoritative-directory")) {
             String ad = "f";
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 ad = "t";
             }
             resp_200.putProp("authoritative-directory", ad);
@@ -542,7 +542,7 @@ public class PropertiesActions {
 
         if (prop.equals("getcontentclass")) {
             String c;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 c = "urn:content-classes:folder";
             }
             else {
@@ -553,7 +553,7 @@ public class PropertiesActions {
 
         if (prop.equals("contentclass")) {
             String c;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 c = "urn:content-classes:folder";
             }
             else {

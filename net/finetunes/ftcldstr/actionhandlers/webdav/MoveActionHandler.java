@@ -47,14 +47,14 @@ public class MoveActionHandler extends AbstractActionHandler {
         if (destination == null || destination.isEmpty() || (fn.equals(destination))) {
             status = "403 Forbidden";
         }
-        else if (FileOperationsService.file_exits(destination) && overwrite.equals("F")) {
+        else if (FileOperationsService.file_exits(requestParams, destination) && overwrite.equals("F")) {
             status = "412 Precondition Failed";
         }
-        else if (!FileOperationsService.is_directory(FileOperationsService.dirname(destination))) {
+        else if (!FileOperationsService.is_directory(requestParams, FileOperationsService.dirname(destination))) {
             status = "409 Conflict - " + FileOperationsService.dirname(destination);
         }
-        else if (!LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(fn)) ||
-                !LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(destination))) {
+        else if (!LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(requestParams, fn)) ||
+                !LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(requestParams, destination))) {
             status = "423 Locked";
         }
         else {
@@ -62,7 +62,7 @@ public class MoveActionHandler extends AbstractActionHandler {
                 FileOperationsService.unlink(requestParams, destination);
             }
             
-            if (FileOperationsService.file_exits(destination)) {
+            if (FileOperationsService.file_exits(requestParams, destination)) {
                 status = "204 No Content";
             }
             

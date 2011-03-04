@@ -34,7 +34,7 @@ public class FileHelper {
 	        full = "/";
 	    }
 	    
-	    if (q != null && !q.isEmpty() && fn != null && !fn.isEmpty() && FileOperationsService.is_directory(fn)) {
+	    if (q != null && !q.isEmpty() && fn != null && !fn.isEmpty() && FileOperationsService.is_directory(requestParams, fn)) {
 	        full += "?" + q;
 	    }
 	    
@@ -43,7 +43,7 @@ public class FileHelper {
 	        fntext = s.substring(0, ConfigService.MAXFILENAMESIZE - 3);
 	    }
 	    
-	    if ((!FileOperationsService.is_directory(fn) && FileOperationsService.is_file_readable(requestParams, fn)) || 
+	    if ((!FileOperationsService.is_directory(requestParams, fn) && FileOperationsService.is_file_readable(requestParams, fn)) || 
 	            FileOperationsService.is_file_executable(requestParams, fn)) {
 	        ret = "<a href=\"" + full + "\" title=\"" + s + "\" style=\"padding:1px\">";
 	        ret += RenderingHelper.escapeHTML(fntext);
@@ -151,10 +151,10 @@ public class FileHelper {
 	        
 	        Logger.debug("moveToTrash(" + fn + ")->/dev/null = " + ret);
 	    }
-	    else if (FileOperationsService.file_exits(ConfigService.TRASH_FOLDER) || FileOperationsService.mkdir(requestParams, ConfigService.TRASH_FOLDER)) {
-	        if (FileOperationsService.file_exits(trash)) {
+	    else if (FileOperationsService.file_exits(requestParams, ConfigService.TRASH_FOLDER) || FileOperationsService.mkdir(requestParams, ConfigService.TRASH_FOLDER)) {
+	        if (FileOperationsService.file_exits(requestParams, trash)) {
 	            int i = 0;
-	            while (FileOperationsService.file_exits(trash)) {
+	            while (FileOperationsService.file_exits(requestParams, trash)) {
 	                // find unused trash folder
 	                trash = ConfigService.TRASH_FOLDER + etag + (i++) + "/"; 
 	            }
@@ -193,7 +193,7 @@ public class FileHelper {
 	            errRef.add(new String[] {f, "Cannot delete '" + f + "': see log for details"});
 	        }
 	    }
-	    else if (FileOperationsService.is_directory(f)) {
+	    else if (FileOperationsService.is_directory(requestParams, f)) {
 	        ArrayList<String> files = WrappingUtilities.getFileList(requestParams, f);
 	        if (files != null) {
     	        Iterator<String> it = files.iterator();
@@ -201,7 +201,7 @@ public class FileHelper {
     	            String sf = it.next();
     	            if (!sf.matches("(\\.|\\.\\.)")) {
     	                String full = f + sf;
-    	                if (FileOperationsService.is_directory(full) && !full.endsWith("/")) {
+    	                if (FileOperationsService.is_directory(requestParams, full) && !full.endsWith("/")) {
     	                    full += "/";
     	                }
     	                count += FileHelper.deltree(requestParams, full, errRef);
@@ -225,7 +225,7 @@ public class FileHelper {
 	            errRef.add(new String[] {f, "Cannot open '" + f + "': see log for details"});
 	        }
 	    }
-	    else if (FileOperationsService.file_exits(f)) {
+	    else if (FileOperationsService.file_exits(requestParams, f)) {
 	        if (FileOperationsService.unlink(requestParams, f)) {
 	            count++;
 	            ConfigService.properties.deleteProperties(f);

@@ -23,11 +23,11 @@ public class FilenameComparator implements Comparator<String> {
         String fp_a = pathTranslated + a;
         String fp_b = pathTranslated + b;
         
-        if (FileOperationsService.is_directory(fp_a) && !FileOperationsService.is_directory(b)) {
+        if (FileOperationsService.is_directory(requestParams, fp_a) && !FileOperationsService.is_directory(requestParams, b)) {
             return -1;
         }
         
-        if (!FileOperationsService.is_directory(fp_a) && FileOperationsService.is_directory(b)) {
+        if (!FileOperationsService.is_directory(requestParams, fp_a) && FileOperationsService.is_directory(requestParams, b)) {
             return 1;
         }
         

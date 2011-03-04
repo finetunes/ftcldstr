@@ -53,7 +53,7 @@ public class DeleteActionHandler extends AbstractActionHandler {
         
         ArrayList<HashMap<String, String>> resps = new ArrayList<HashMap<String,String>>(); 
         
-        if (!FileOperationsService.file_exits(fn)) {
+        if (!FileOperationsService.file_exits(requestParams, fn)) {
             status = "404 Not Found";
         }
         else if (requestParams.getRequestURI().matches(".*\\#.*") && !fn.matches(".*\\#.*") || 

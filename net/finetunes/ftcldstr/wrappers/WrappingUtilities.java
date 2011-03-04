@@ -33,11 +33,11 @@ public class WrappingUtilities {
         return files;
     }
     
-    public static StatData stat(RequestParams requestParams, String fn) {
+    public static StatData getStatData(RequestParams requestParams, String fn, String command) {
         
         StatData statData = new FileOperationsService().new StatData();
         CommonContentWrapper rdw = new CommonContentWrapper(requestParams);
-        CommonWrapperResult d = rdw.runCommand(requestParams, requestParams.getUsername(), "stat", new String[]{fn});
+        CommonWrapperResult d = rdw.runCommand(requestParams, requestParams.getUsername(), command, new String[]{fn});
 
         if (d == null || d.getExitCode() != 0) {
             Logger.log("Error getting stat info. File: " + fn + "; Error: " + d.getErrorMessage());
@@ -70,6 +70,14 @@ public class WrappingUtilities {
         }
         
         return statData;        
+    }    
+    
+    public static StatData stat(RequestParams requestParams, String fn) {
+        return getStatData(requestParams, fn, "stat");
+    }
+    
+    public static StatData lstat(RequestParams requestParams, String fn) {
+        return getStatData(requestParams, fn, "lstat");
     }
     
     public static boolean isUserValid(RequestParams requestParams, String username, String password) {
@@ -125,6 +133,14 @@ public class WrappingUtilities {
         
         return false;
     }    
+    
+    public static boolean checkFileExists(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "exists");
+    }
+    
+    public static boolean checkFileIsDirectory(RequestParams requestParams, String fn) {
+        return runBooleanCommand(requestParams, fn, "isDirectory");
+    }
     
     public static boolean checkFileIsPlain(RequestParams requestParams, String fn) {
         return runBooleanCommand(requestParams, fn, "isPlain");

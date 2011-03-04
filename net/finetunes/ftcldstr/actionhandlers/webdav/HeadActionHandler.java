@@ -34,11 +34,11 @@ public class HeadActionHandler extends AbstractActionHandler {
         
         String fn = requestParams.getPathTranslated();
 
-        if (FileOperationsService.is_directory(fn)) {
+        if (FileOperationsService.is_directory(requestParams, fn)) {
             Logger.debug("HEAD: " + fn + " is a folder!");
             OutputService.printHeaderAndContent(requestParams, "200 OK", "httpd/unix-directory");
         }
-        else if (FileOperationsService.file_exits(fn)) {
+        else if (FileOperationsService.file_exits(requestParams, fn)) {
             Logger.debug("HEAD: " + fn + " exists!");
             OutputService.printFileHeader(requestParams, fn);
         }

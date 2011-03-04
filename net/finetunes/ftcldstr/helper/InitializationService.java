@@ -157,11 +157,11 @@ public class InitializationService {
         }
 */
 
-        if (FileOperationsService.is_directory(pathTranslated) && !pathTranslated.endsWith(pathSeparator)) {
+        if (FileOperationsService.is_directory(params, pathTranslated) && !pathTranslated.endsWith(pathSeparator)) {
             pathTranslated += pathSeparator;
         }
         
-        if (FileOperationsService.is_directory(pathTranslated) && !requestURI.endsWith("/")) {
+        if (FileOperationsService.is_directory(params, pathTranslated) && !requestURI.endsWith("/")) {
             requestURI += "/";
         }
         

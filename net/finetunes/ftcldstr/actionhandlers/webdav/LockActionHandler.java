@@ -83,11 +83,11 @@ public class LockActionHandler extends AbstractActionHandler {
         }
         
         String token = "opaquelocktoken:" + GeneratorService.getuuid(fn);
-        if (!FileOperationsService.file_exits(fn) && !FileOperationsService.file_exits(FileOperationsService.dirname(fn))) {
+        if (!FileOperationsService.file_exits(requestParams, fn) && !FileOperationsService.file_exits(requestParams, FileOperationsService.dirname(fn))) {
             status = "409 Conflict";
             type = "text/plain";
         }
-        else if (!LockingService.isLockable(fn, xmldata)) {
+        else if (!LockingService.isLockable(requestParams, fn, xmldata)) {
             Logger.debug("LOCK: not lockable ... but...");
             if (LockingService.isAllowed(requestParams, fn)) {
                 status = "200 OK";
@@ -102,7 +102,7 @@ public class LockActionHandler extends AbstractActionHandler {
                 type = "text/plain";
             }
         }
-        else if (!FileOperationsService.file_exits(fn)) {
+        else if (!FileOperationsService.file_exits(requestParams, fn)) {
             if (FileOperationsService.create_file(requestParams, fn, "")) {
                 HashMap<String, Object> resp = LockingService.lockResource(requestParams, fn, ru, xmldata, depth, timeout, token);
                 if (resp != null && resp.get("multistatus") != null) {

@@ -104,7 +104,7 @@ public class PropfindActionHandler extends AbstractActionHandler {
         if (FileOperationsService.is_hidden(fn)) {
             // do nothing
         }
-        else if (FileOperationsService.file_exits(fn)) {
+        else if (FileOperationsService.file_exits(requestParams, fn)) {
             Object[] propFindElement = PropertiesActions.handlePropFindElement(requestParams, xmldata);
             ArrayList<String> props = (ArrayList<String>)propFindElement[0];
             boolean all = ((Boolean)propFindElement[1]).booleanValue();

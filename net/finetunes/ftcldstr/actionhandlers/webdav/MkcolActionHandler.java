@@ -76,10 +76,10 @@ public class MkcolActionHandler extends AbstractActionHandler {
             }
         }
         
-        if (FileOperationsService.file_exits(fn)) {
+        if (FileOperationsService.file_exits(requestParams, fn)) {
             status = "405 Method Not Allowed";
         }
-        else if (!FileOperationsService.file_exits(FileOperationsService.dirname(fn))) {
+        else if (!FileOperationsService.file_exits(requestParams, FileOperationsService.dirname(fn))) {
             status = "409 Conflict";
         }
         else if (!FileOperationsService.is_file_writable(requestParams, FileOperationsService.dirname(fn))) {
@@ -89,10 +89,10 @@ public class MkcolActionHandler extends AbstractActionHandler {
             Logger.debug("MKCOL: not allowed!");
             status = "423 Locked";
         }
-        else if (FileOperationsService.file_exits(fn)) {
+        else if (FileOperationsService.file_exits(requestParams, fn)) {
             status = "409 Conflict";
         }
-        else if (FileOperationsService.is_directory(FileOperationsService.dirname(fn))) {
+        else if (FileOperationsService.is_directory(requestParams, FileOperationsService.dirname(fn))) {
             Logger.debug("MKCOL: create " + fn);
             
             if (FileOperationsService.mkdir(requestParams, fn)) {

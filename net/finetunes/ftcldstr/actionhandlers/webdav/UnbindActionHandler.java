@@ -46,7 +46,7 @@ public class UnbindActionHandler extends AbstractActionHandler {
         else {
             String segment = (String)xmldata.get("{DAV:}segment");
             String dst = requestParams.getPathTranslated() + segment;
-            if (!FileOperationsService.file_exits(dst)) {
+            if (!FileOperationsService.file_exits(requestParams, dst)) {
                 status = "404 Not Found";
             }
             else if (!FileOperationsService.is_symbolic_link(requestParams, dst)) {

@@ -43,7 +43,7 @@ public class PutActionHandler extends AbstractActionHandler {
         if (requestParams.headerExists("Content-Range")) {
             status = "501 Not Implemented";
         }
-        else if (FileOperationsService.is_directory(FileOperationsService.dirname(fn)) && !FileOperationsService.is_file_writable(requestParams, FileOperationsService.dirname(fn))) {
+        else if (FileOperationsService.is_directory(requestParams, FileOperationsService.dirname(fn)) && !FileOperationsService.is_file_writable(requestParams, FileOperationsService.dirname(fn))) {
             status = "403 Forbidden";
         }
         else if (PreconditionsHandler.preConditionFailed(requestParams, fn)) {
@@ -54,8 +54,8 @@ public class PutActionHandler extends AbstractActionHandler {
         }
         // #} elsif (defined $ENV{HTTP_EXPECT} && $ENV{HTTP_EXPECT} =~ /100-continue/) {
         // #   $status='417 Expectation Failed';
-        else if (FileOperationsService.is_directory(FileOperationsService.dirname(fn))) {
-            if (!FileOperationsService.file_exits(fn)) {
+        else if (FileOperationsService.is_directory(requestParams, FileOperationsService.dirname(fn))) {
+            if (!FileOperationsService.file_exits(requestParams, fn)) {
                 Logger.debug("PUT: created...");
                 status = "201 Created";
                 type = "text/html";

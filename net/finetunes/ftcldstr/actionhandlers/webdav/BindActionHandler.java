@@ -60,13 +60,13 @@ public class BindActionHandler extends AbstractActionHandler {
             
             String ndst = new String(dst).replaceFirst("(?s)/$", "");
             
-            if (!FileOperationsService.file_exits(src)) {
+            if (!FileOperationsService.file_exits(requestParams, src)) {
                 status = "404 Not Found";
             }
-            else if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_symbolic_link(requestParams, ndst)) {
+            else if (FileOperationsService.file_exits(requestParams, dst) && !FileOperationsService.is_symbolic_link(requestParams, ndst)) {
                 status = "403 Forbidden";
             }
-            else if (FileOperationsService.file_exits(dst) && FileOperationsService.is_symbolic_link(requestParams, ndst) &&
+            else if (FileOperationsService.file_exits(requestParams, dst) && FileOperationsService.is_symbolic_link(requestParams, ndst) &&
                     overwrite.equals("F")) {
                 status = "403 Forbidden";
             }

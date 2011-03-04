@@ -37,7 +37,7 @@ public class UnlockActionHandler extends AbstractActionHandler {
         if (token == null) {
             status = "400 Bad Request";
         }
-        else if (LockingService.isLocked(fn)) {
+        else if (LockingService.isLocked(requestParams, fn)) {
             if (LockingService.unlockResource(fn, token)) {
                 status = "204 No Content";
             }

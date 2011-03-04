@@ -72,7 +72,7 @@ public class ReportActionHandler extends AbstractActionHandler {
             type = "text/plain";
             content = "400 Bad Request";
         }
-        else if (!FileOperationsService.file_exits(fn)) {
+        else if (!FileOperationsService.file_exits(requestParams, fn)) {
             status = "404 Not Found";
             type = "text/plain";
             content = "404 Not Found";
@@ -226,14 +226,14 @@ public class ReportActionHandler extends AbstractActionHandler {
                     String nfn = ConfigService.DOCUMENT_ROOT + nhref;
                     Logger.debug("REPORT: nfn=" + nfn + ", href=" + href);
                     
-                    if (!FileOperationsService.file_exits(nfn)) {
+                    if (!FileOperationsService.file_exits(requestParams, nfn)) {
                         HashMap<String, Object> resp = new HashMap<String, Object>();
                         resp.put("href", href);
                         resp.put("status", "HTTP/1.1 404 Not Found");
                         resps.add(resp);
                         continue;
                     }
-                    else if (FileOperationsService.is_directory(nfn)) {
+                    else if (FileOperationsService.is_directory(requestParams, nfn)) {
                         HashMap<String, Object> resp = new HashMap<String, Object>();
                         resp.put("href", href);
                         resp.put("status", "HTTP/1.1 403 Forbidden");

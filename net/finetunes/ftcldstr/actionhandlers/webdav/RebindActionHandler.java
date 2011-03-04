@@ -60,16 +60,16 @@ public class RebindActionHandler extends AbstractActionHandler {
             String nsrc = new String(src).replaceFirst("/$", "");
             String ndst = new String(dst).replaceFirst("/$", "");
             
-            if (!FileOperationsService.file_exits(src)) {
+            if (!FileOperationsService.file_exits(requestParams, src)) {
                 status = "404 Not Found";
             }
             else if (!FileOperationsService.is_symbolic_link(requestParams, nsrc)) {
                 status = "403 Forbidden";
             }
-            else if (FileOperationsService.file_exits(dst) && !overwrite.equals("T")) {
+            else if (FileOperationsService.file_exits(requestParams, dst) && !overwrite.equals("T")) {
                 status = "403 Forbidden";
             }
-            else if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_symbolic_link(requestParams, ndst)) {
+            else if (FileOperationsService.file_exits(requestParams, dst) && !FileOperationsService.is_symbolic_link(requestParams, ndst)) {
                 status = "403 Forbidden";
             }
             else {

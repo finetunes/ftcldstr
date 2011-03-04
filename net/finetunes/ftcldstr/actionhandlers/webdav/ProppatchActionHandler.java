@@ -36,10 +36,10 @@ public class ProppatchActionHandler extends AbstractActionHandler {
         String type = "text/plain";
         String content = "";
         
-        if (FileOperationsService.file_exits(fn) && !LockingService.isAllowed(requestParams, fn)) {
+        if (FileOperationsService.file_exits(requestParams, fn) && !LockingService.isAllowed(requestParams, fn)) {
             status = "423 Locked";
         }
-        else if (FileOperationsService.file_exits(fn)) {
+        else if (FileOperationsService.file_exits(requestParams, fn)) {
             
             String xml = requestParams.getRequestBody();
             

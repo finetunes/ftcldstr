@@ -17,7 +17,7 @@ public class GetlibActionHandler extends AbstractActionHandler {
         String content = "";
         HashMap<String, String> params = new HashMap<String, String>();
         
-        if (!FileOperationsService.file_exits(fn)) {
+        if (!FileOperationsService.file_exits(requestParams, fn)) {
             status = "404 Not Found";
             type = "text/plain";
         }

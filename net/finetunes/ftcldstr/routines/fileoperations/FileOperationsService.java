@@ -32,12 +32,12 @@ public class FileOperationsService {
 			boolean move) {
 	    
 	    // src exists and readable?
-	    if (!FileOperationsService.file_exits(src) || !FileOperationsService.is_file_readable(requestParams, src)) {
+	    if (!FileOperationsService.file_exits(requestParams, src) || !FileOperationsService.is_file_readable(requestParams, src)) {
 	       return false; 
 	    }
 	    
 	    // dst writeable?
-	    if (FileOperationsService.file_exits(dst) && !FileOperationsService.is_file_writable(requestParams, dst)) {
+	    if (FileOperationsService.file_exits(requestParams, dst) && !FileOperationsService.is_file_writable(requestParams, dst)) {
 	        return false;
 	    }
 	    
@@ -52,7 +52,7 @@ public class FileOperationsService {
 	            }
 	        }
 	    } else if (FileOperationsService.is_plain_file(requestParams, src)) { // file
-	        if (FileOperationsService.is_directory(dst)) {
+	        if (FileOperationsService.is_directory(requestParams, dst)) {
 	            if (!dst.endsWith("/")) {
 	                dst += "/";
 	            }
@@ -88,7 +88,7 @@ public class FileOperationsService {
 	            }
 	        }
 	    }
-	    else if (FileOperationsService.is_directory(src)) {
+	    else if (FileOperationsService.is_directory(requestParams, src)) {
 	        // cannot write folders to files:
 	        if (FileOperationsService.is_plain_file(requestParams, dst)) {
 	            return false;
@@ -104,7 +104,7 @@ public class FileOperationsService {
 	        
 	        if (!move || DirectoryOperationsService.getDirInfo(requestParams, src, "realchildcount") > 0 ||
 	                !FileOperationsService.rename(requestParams, src, dst)) {
-	            if (!FileOperationsService.file_exits(dst)) {
+	            if (!FileOperationsService.file_exits(requestParams, dst)) {
 	                FileOperationsService.mkdir(requestParams, dst);
 	            }
 	            
@@ -191,7 +191,7 @@ public class FileOperationsService {
 	    
 	    visited.add(nfn);
 	    
-	    if (recurse && FileOperationsService.is_directory(fn)) {
+	    if (recurse && FileOperationsService.is_directory(requestParams, fn)) {
 	        
 	    }
 	    
@@ -201,7 +201,7 @@ public class FileOperationsService {
             while (it.hasNext()) {
                 String f = it.next();
                 
-                if (FileOperationsService.is_directory(fn + f) && !f.endsWith("/")) {
+                if (FileOperationsService.is_directory(requestParams, fn + f) && !f.endsWith("/")) {
                     f += "/";
                 }
                 
@@ -238,18 +238,24 @@ public class FileOperationsService {
         return WrappingUtilities.getFileContentReadStream(requestParams, fn);
     }
 
-    // TODO: does not support unicode names
-    public static boolean is_directory(String filename) {
+    public static boolean is_directory(RequestParams requestParams, String fn) {
 
-        File file = new File(filename);
-        return file.isDirectory();
+        // The following code is faster, but
+        // doesn't fully support unicode names
+        // File file = new File(filename);
+        // return file.isDirectory();
+        
+        return WrappingUtilities.checkFileIsDirectory(requestParams, fn);
     }	
     
-    // TODO: does not support unicode names
-    public static boolean file_exits(String filename) {
+    public static boolean file_exits(RequestParams requestParams, String fn) {
         
-        File file = new File(filename);
-        return file.exists();
+        // The following code is faster, but
+        // doesn't fully support unicode names
+        // File file = new File(filename);
+        // return file.exists();
+
+        return WrappingUtilities.checkFileExists(requestParams, fn);
     }
 
     // determines whether the file is a plain file (not a link, directory, pipe, etc.)
@@ -364,7 +370,7 @@ public class FileOperationsService {
     }   
     
     // returns the result of lstat unix funtion
-    public static Object[] lstat(String filename) {
+    public static StatData lstat(RequestParams requestParams, String fn) {
         
         // If the file is a symbolic link, it returns the information for the link, 
         // rather than the file it points to. Otherwise, it returns the information 
@@ -372,12 +378,8 @@ public class FileOperationsService {
         
         // ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, 
         // $atime,$mtime,$ctime,$blksize,$blocks) = stat($filename);
-        
-        // TODO: implement
-        // return true;
-        
-        return new Object[] {0, 0, "0888", 0, 0, 0, 0, 0, 0, "", 0, 0, 0};
-        
+
+        return WrappingUtilities.lstat(requestParams, fn);
     }       
     
     public static boolean mkdir(RequestParams requestParams, String dirname, ArrayList<String> err) {

@@ -27,10 +27,10 @@ public class LockingService {
 	    return ConfigService.locks.fnStartingLocksExist(fn + "\\");
 	}
 	
-	public static boolean isLocked(String fn) {
+	public static boolean isLocked(RequestParams requestParams, String fn) {
 	    
 	    if (fn != null) {
-    	    if (FileOperationsService.is_directory(fn) && !fn.endsWith("/")) {
+    	    if (FileOperationsService.is_directory(requestParams, fn) && !fn.endsWith("/")) {
     	        fn += "/";
     	    }
     	    return ConfigService.locks.fnLocksExists(fn);
@@ -39,7 +39,7 @@ public class LockingService {
 		return false;
 	}
 	
-	public static boolean isLockable(String fn, HashMap<String, Object> xmldata) {
+	public static boolean isLockable(RequestParams requestParams, String fn, HashMap<String, Object> xmldata) {
 
 	    HashMap<String, Object> data = (HashMap<String, Object>)xmldata;
 	    HashMap<String, Object> lockdata = (HashMap<String, Object>)data.get("{DAV:}lockscope");
@@ -51,10 +51,10 @@ public class LockingService {
 	    
 	    List<WebDAVLock> rowsRef = null;
 
-	    if (!FileOperationsService.file_exits(fn)) {
+	    if (!FileOperationsService.file_exits(requestParams, fn)) {
 	        rowsRef = ConfigService.locks.getLocks(FileOperationsService.dirname(fn) + "/");
 	    }
-	    else if (FileOperationsService.is_directory(fn)) {
+	    else if (FileOperationsService.is_directory(requestParams, fn)) {
             rowsRef = ConfigService.locks.getLocksStartingFrom(fn);
 	    }
 	    else {
@@ -276,7 +276,7 @@ public class LockingService {
         
         visited.add(nfn);
         
-        if (FileOperationsService.is_directory(fn) && (depth == Integer.MAX_VALUE || depth > 0)) {
+        if (FileOperationsService.is_directory(requestParams, fn) && (depth == Integer.MAX_VALUE || depth > 0)) {
             Logger.debug("lockResource: depth=" + depth);
             
             ArrayList<String> files = WrappingUtilities.getFileList(requestParams, fn);
@@ -289,7 +289,7 @@ public class LockingService {
                         String nru = ru + f;
                         String nfnn = fn + f;
                         
-                        if (FileOperationsService.is_directory(nfnn)) {
+                        if (FileOperationsService.is_directory(requestParams, nfnn)) {
                             nru += "/";
                             nfnn += "/";
                         }
@@ -416,7 +416,7 @@ public class LockingService {
 	
 	public static boolean isAllowed(RequestParams requestParams, String fn, boolean recurse) {
 	    
-	    if (!FileOperationsService.file_exits(fn)) {
+	    if (!FileOperationsService.file_exits(requestParams, fn)) {
 	        fn = FileOperationsService.dirname(fn) + "/";
 	    }
 	    
@@ -436,7 +436,7 @@ public class LockingService {
 	        rowsRef = ConfigService.locks.getLocks(fn);
 	    }
 	    
-	    if (FileOperationsService.file_exits(fn) && !FileOperationsService.is_file_writable(requestParams, fn)) {
+	    if (FileOperationsService.file_exits(requestParams, fn) && !FileOperationsService.is_file_writable(requestParams, fn)) {
 	        // not writeable
 	        return false;
 	    }
@@ -523,7 +523,7 @@ public class LockingService {
         }
         
         WebDAVLock row = rows.get(0);
-        if (FileOperationsService.is_directory(fn)) {
+        if (FileOperationsService.is_directory(requestParams, fn)) {
             
             Logger.debug("inheritLock: " + fn + " is a collection");
             
@@ -541,7 +541,7 @@ public class LockingService {
                     }
                     
                     String full = fn + f;
-                    if (FileOperationsService.is_directory(full) && !full.endsWith("/")) {
+                    if (FileOperationsService.is_directory(requestParams, full) && !full.endsWith("/")) {
                         full += "/";
                         
                         ConfigService.locks.insertLock(row.getBasefn(), full, row.getType(), 

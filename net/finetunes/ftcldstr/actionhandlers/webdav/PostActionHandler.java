@@ -125,7 +125,7 @@ public class PostActionHandler extends AbstractActionHandler {
                         
                         String newname = requestParams.getMultipartRequestParam("newname");
                         
-                        if (files.length > 1 && !FileOperationsService.is_directory(fn + newname)) {
+                        if (files.length > 1 && !FileOperationsService.is_directory(requestParams, fn + newname)) {
                             OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
                             return;
                         }
@@ -237,7 +237,7 @@ public class PostActionHandler extends AbstractActionHandler {
                 System.err.println("Error: Unable to perform redirect (" + rt + "): " + e.getMessage());
             }
         }
-        else if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_directory(fn) && requestParams.multipartRequestParamExists("file_upload")) {
+        else if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_directory(requestParams, fn) && requestParams.multipartRequestParamExists("file_upload")) {
 
             ArrayList<String> filelist = new ArrayList<String>();
             String[] files = requestParams.getMultipartRequestParamValues("file_upload");
@@ -369,7 +369,7 @@ public class PostActionHandler extends AbstractActionHandler {
         print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam,$errmsg,$msgparam)); 
 */
         }
-        else if (ConfigService.ENABLE_CALDAV_SCHEDULE && FileOperationsService.is_directory(fn)) {
+        else if (ConfigService.ENABLE_CALDAV_SCHEDULE && FileOperationsService.is_directory(requestParams, fn)) {
             // ## NOT IMPLEMENTED YET // was original perl code;
         }
         else {

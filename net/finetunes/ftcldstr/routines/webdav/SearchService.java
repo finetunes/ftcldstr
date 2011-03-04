@@ -83,7 +83,7 @@ public class SearchService {
                     }
                     
                     String nru = ru + RenderingHelper.uri_escape(filename);
-                    if (FileOperationsService.is_directory(full)) {
+                    if (FileOperationsService.is_directory(requestParams, full)) {
                         full += "/";
                         nru += "/";
                         content += getSearchResult(requestParams, search, full, nru, true, fullcount, visited);

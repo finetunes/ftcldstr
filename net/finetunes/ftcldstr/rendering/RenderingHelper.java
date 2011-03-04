@@ -10,6 +10,7 @@ import java.util.Date;
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
+import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 
 public class RenderingHelper {
 	
@@ -31,13 +32,15 @@ public class RenderingHelper {
 	public static String mode2str(RequestParams requestParams, String fn, int m) {
 		
 	    if (FileOperationsService.is_symbolic_link(requestParams, fn)) {
-	        m = Integer.parseInt((String)FileOperationsService.lstat(fn)[2]); 
+	        
+	        StatData lstat = FileOperationsService.lstat(requestParams, fn);
+	        m = lstat.getMode();
 	    }
 	    
 	    String[] ret = new String[10];
 	    Arrays.fill(ret, "-");
 
-        if (FileOperationsService.is_directory(fn)) { ret[0] = "d"; }
+        if (FileOperationsService.is_directory(requestParams, fn)) { ret[0] = "d"; }
         if (FileOperationsService.is_block_special_file(requestParams, fn)) { ret[0] = "b"; }
         if (FileOperationsService.is_character_special_file(requestParams, fn)) { ret[0] = "c"; }
         if (FileOperationsService.is_symbolic_link(requestParams, fn)) { ret[0] = "l"; }

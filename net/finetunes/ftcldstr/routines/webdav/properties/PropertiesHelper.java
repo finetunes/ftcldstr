@@ -76,7 +76,7 @@ public class PropertiesHelper {
             }
             
             ArrayList<String> liveSource;
-            if (FileOperationsService.is_directory(fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 liveSource = ConfigService.KNOWN_COLL_LIVE_PROPS; 
             }
             else {
@@ -84,7 +84,7 @@ public class PropertiesHelper {
             }
             
             ArrayList<String> liveSourceN;
-            if (FileOperationsService.is_directory(nfn)) {
+            if (FileOperationsService.is_directory(requestParams, nfn)) {
                 liveSourceN = ConfigService.KNOWN_COLL_LIVE_PROPS; 
             }
             else {
@@ -123,7 +123,7 @@ public class PropertiesHelper {
             }
             
             ArrayList<String> liveSourceNP;
-            if (FileOperationsService.is_directory(nfn)) {
+            if (FileOperationsService.is_directory(requestParams, nfn)) {
                 liveSourceNP = ConfigService.KNOWN_COLL_PROPS; 
             }
             else {

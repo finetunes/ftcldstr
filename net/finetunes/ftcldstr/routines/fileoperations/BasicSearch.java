@@ -28,11 +28,11 @@ public class BasicSearch {
 	        return;
 	    }
 	    
-	    if (FileOperationsService.is_directory(base) && !base.endsWith("/")) {
+	    if (FileOperationsService.is_directory(requestParams, base) && !base.endsWith("/")) {
 	        base += "/";
 	    }
 	    
-	    if (FileOperationsService.is_directory(base) && !href.endsWith("/")) {
+	    if (FileOperationsService.is_directory(requestParams, base) && !href.endsWith("/")) {
 	        href += "/";
 	    }
 	    
@@ -62,7 +62,7 @@ public class BasicSearch {
 	    }
 	    
 	    visited.add(nbase);
-	    if (FileOperationsService.is_directory(base)) {
+	    if (FileOperationsService.is_directory(requestParams, base)) {
 	        ArrayList<String> files = WrappingUtilities.getFileList(requestParams, base);
 	        
 	        if (files != null) {

@@ -14,7 +14,7 @@ public class PreconditionsHandler {
 	
 	public static boolean preConditionFailed(RequestParams requestParams, String fn) {
 	    
-	    if (!FileOperationsService.file_exits(fn)) {
+	    if (!FileOperationsService.file_exits(requestParams, fn)) {
 	        fn = FileOperationsService.dirname(fn) + "/";
 	    }
 	    

@@ -58,17 +58,17 @@ public class CopyActionHandler extends AbstractActionHandler {
         if (destination == null || destination.isEmpty() || (fn.equals(destination))) {
             status = "403 Forbidden";
         }
-        else if (FileOperationsService.file_exits(destination) && overwrite.equals("F")) {
+        else if (FileOperationsService.file_exits(requestParams, destination) && overwrite.equals("F")) {
             status = "412 Precondition Failed";
         }
-        else if (!FileOperationsService.is_directory(FileOperationsService.dirname(destination))) {
+        else if (!FileOperationsService.is_directory(requestParams, FileOperationsService.dirname(destination))) {
             status = "409 Conflict - " + destination;
         }
-        else if (!LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(fn))) {
+        else if (!LockingService.isAllowed(requestParams, destination, FileOperationsService.is_directory(requestParams, fn))) {
             status = "423 Locked";
         }
-        else if (FileOperationsService.is_directory(fn) && depth == 0) {
-            if (FileOperationsService.file_exits(destination)) {
+        else if (FileOperationsService.is_directory(requestParams, fn) && depth == 0) {
+            if (FileOperationsService.file_exits(requestParams, destination)) {
                 status = "204 No Content";
             }
             else {
@@ -82,7 +82,7 @@ public class CopyActionHandler extends AbstractActionHandler {
             }
         }
         else {
-            if (FileOperationsService.file_exits(destination)) {
+            if (FileOperationsService.file_exits(requestParams, destination)) {
                 status = "204 No Content";
             }
             

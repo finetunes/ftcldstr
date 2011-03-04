@@ -58,7 +58,7 @@ public class DirectoryOperationsService {
     	        String sf = it.next();
     	        
     	        if (!sf.matches("(\\.|\\.\\.)")) {
-    	            if (FileOperationsService.is_directory(fn + sf)) {
+    	            if (FileOperationsService.is_directory(requestParams, fn + sf)) {
     	                sf += "/";
     	            }
     	            
@@ -67,7 +67,7 @@ public class DirectoryOperationsService {
     	                hrefs.add(nbase);
     	            }
     	            
-    	            if (depth != 0 && FileOperationsService.is_directory(fn + sf)) {
+    	            if (depth != 0 && FileOperationsService.is_directory(requestParams, fn + sf)) {
     	                readDirBySuffix(requestParams, fn + sf, nbase, hrefs, suffix, depth - 1, visited);
     	            }
     	            // ## add only files with requested components 
@@ -243,7 +243,7 @@ public class DirectoryOperationsService {
             }
             
             String mimetype;
-            if (FileOperationsService.is_directory(full)) {
+            if (FileOperationsService.is_directory(requestParams, full)) {
                 mimetype = "< folder >";
             }
             else {
@@ -253,7 +253,7 @@ public class DirectoryOperationsService {
             String nru = "";
             nru = ru + RenderingHelper.uri_escape(filename);
             
-            if (FileOperationsService.is_directory(full)) {
+            if (FileOperationsService.is_directory(requestParams, full)) {
                 filename += "/";
                 nru += "/";
             }
@@ -291,7 +291,7 @@ public class DirectoryOperationsService {
             list += "\n";
             
             count++;
-            if (FileOperationsService.is_directory(full)) {
+            if (FileOperationsService.is_directory(requestParams, full)) {
                 foldercount++;
             }
             
@@ -358,11 +358,11 @@ public class DirectoryOperationsService {
                     realchildcount++;
                     if (!FileOperationsService.is_hidden(fn + "/" + f)) {
                         childcount++;
-                        if (!FileOperationsService.is_directory(fn + "/" + f) && !f.startsWith(".")) {
+                        if (!FileOperationsService.is_directory(requestParams, fn + "/" + f) && !f.startsWith(".")) {
                             visiblecount++;
                         }
                         
-                        if (!FileOperationsService.is_directory(fn + "/" + f)) {
+                        if (!FileOperationsService.is_directory(requestParams, fn + "/" + f)) {
                             objectcount++;
                         }
                     }
@@ -428,7 +428,7 @@ public class DirectoryOperationsService {
 	    }
 	    
 	    visited.add(nfn);
-	    if (depth != 0 && FileOperationsService.is_directory(nfn)) {
+	    if (depth != 0 && FileOperationsService.is_directory(requestParams, nfn)) {
 	        List<String> files = WrappingUtilities.getFileList(requestParams, nfn);
 	        if (files != null) {
     	        String order = requestParams.getRequest().getParameter("order");
@@ -446,7 +446,7 @@ public class DirectoryOperationsService {
                     }
                     
                     String fru = ru + RenderingHelper.uri_escape(f);
-                    if (FileOperationsService.is_directory(nfn + "/" + f) && !fru.endsWith("/")) {
+                    if (FileOperationsService.is_directory(requestParams, nfn + "/" + f) && !fru.endsWith("/")) {
                         fru += "/";
                     }
                     

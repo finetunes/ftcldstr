@@ -75,10 +75,10 @@ public class GetActionHandler extends AbstractActionHandler {
         if (FileOperationsService.is_hidden(fn)) {
             OutputService.printHeaderAndContent(requestParams, "404 Not Found", "text/plain", "404 - NOT FOUND");
         }
-        else if (FileOperationsService.is_directory(fn) && !ConfigService.FANCYINDEXING) {
+        else if (FileOperationsService.is_directory(requestParams, fn) && !ConfigService.FANCYINDEXING) {
             OutputService.printHeaderAndContent(requestParams, "404 Not Found", "text/plain", "404 - NOT FOUND");
         }
-        else if (FileOperationsService.file_exits(fn) && 
+        else if (FileOperationsService.file_exits(requestParams, fn) && 
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("davmount")) {
             doDavmountRequest(requestParams, fn);
         }
@@ -87,18 +87,18 @@ public class GetActionHandler extends AbstractActionHandler {
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("thumb")) {
             doThumbnailRequest(requestParams, fn);
         }
-        else if (FileOperationsService.file_exits(fn) &&
+        else if (FileOperationsService.file_exits(requestParams, fn) &&
                 requestParams.getRequest().getParameter("action") != null && requestParams.getRequest().getParameter("action").equals("props")) {
             doFilePropertiesRequest(requestParams, fn);
         }
-        else if (FileOperationsService.is_directory(fn)) {
+        else if (FileOperationsService.is_directory(requestParams, fn)) {
             doFileIsDirectory(requestParams, fn);
         }
-        else if (FileOperationsService.file_exits(fn) &&
+        else if (FileOperationsService.file_exits(requestParams, fn) &&
                 !FileOperationsService.is_file_readable(requestParams, fn)) {
             OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
         }
-        else if (FileOperationsService.file_exits(fn)) {
+        else if (FileOperationsService.file_exits(requestParams, fn)) {
             doFileExists(requestParams, fn);
         }
         else {
@@ -115,7 +115,7 @@ public class GetActionHandler extends AbstractActionHandler {
         String bn = FileOperationsService.splitFilename(fn)[1];
         
         su = su.replaceFirst(Pattern.quote(bn) + "/?", ""); // $su =~ s/\Q$bn\E\/?//;
-        if (FileOperationsService.is_directory(fn) && !bn.endsWith("/")) {
+        if (FileOperationsService.is_directory(requestParams, fn) && !bn.endsWith("/")) {
             bn += "/";
         }
         
@@ -138,13 +138,13 @@ public class GetActionHandler extends AbstractActionHandler {
             uniqname = uniqname.replaceAll("/", "_");
             
             String cachefile = ConfigService.THUMBNAIL_CACHEDIR + "/" + uniqname + ".thumb";
-            if (!FileOperationsService.file_exits(ConfigService.THUMBNAIL_CACHEDIR)) {
+            if (!FileOperationsService.file_exits(requestParams, ConfigService.THUMBNAIL_CACHEDIR)) {
                 FileOperationsService.mkdir(requestParams, ConfigService.THUMBNAIL_CACHEDIR);
             }
             
             StatData statfn = FileOperationsService.stat(requestParams, fn);
             StatData statcf = FileOperationsService.stat(requestParams, cachefile);
-            if (!FileOperationsService.file_exits(cachefile) || statfn.getMtimeDate().after(statcf.getMtimeDate())) {
+            if (!FileOperationsService.file_exits(requestParams, cachefile) || statfn.getMtimeDate().after(statcf.getMtimeDate())) {
                 
                 try {
                     BufferedImage image = ImageIO.read(FileOperationsService.getFileContentStream(requestParams, fn));
@@ -521,7 +521,7 @@ public class GetActionHandler extends AbstractActionHandler {
         }
         
         content += "<h1>";
-        if (FileOperationsService.is_directory(fn)) {
+        if (FileOperationsService.is_directory(requestParams, fn)) {
             content += RenderingService.getQuickNavPath(ru, QueryService.getQueryParams(requestParams));
         }
         else {

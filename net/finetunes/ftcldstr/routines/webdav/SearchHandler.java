@@ -95,7 +95,7 @@ public class SearchHandler {
             
             Logger.debug("handleBasicSearch: base=" + base + " (href=" + href + "), depth=" + depth + ", limit=" + limit + "\n");
             
-            if (!FileOperationsService.file_exits(base)) {
+            if (!FileOperationsService.file_exits(requestParams, base)) {
                 HashMap<String, Object> response = new HashMap<String, Object>();
                 response.put("href", href);
                 response.put("status", "HTTP/1.1 404 Not Found");

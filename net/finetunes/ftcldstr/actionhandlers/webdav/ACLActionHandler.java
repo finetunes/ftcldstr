@@ -51,7 +51,7 @@ public class ACLActionHandler extends AbstractActionHandler {
             type = "text/plain";
             content = "400 Bad Request";
         }
-        else if (!FileOperationsService.file_exits(fn)) {
+        else if (!FileOperationsService.file_exits(requestParams, fn)) {
             status = "404 Not Found";
             type = "text/plain";
             content = "404 Not Found";

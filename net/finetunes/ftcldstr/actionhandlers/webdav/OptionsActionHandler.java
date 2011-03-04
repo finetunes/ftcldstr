@@ -37,8 +37,8 @@ public class OptionsActionHandler extends AbstractActionHandler {
         String status = "200 OK";
         String type;
         
-        if (FileOperationsService.file_exits(fn)) {
-            if (FileOperationsService.is_directory(fn)) {
+        if (FileOperationsService.file_exits(requestParams, fn)) {
+            if (FileOperationsService.is_directory(requestParams, fn)) {
                 type = "httpd/unix-directory";
             }
             else {
