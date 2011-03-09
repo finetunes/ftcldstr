@@ -160,14 +160,16 @@ public class PropertiesHelper {
         return getPropStat(requestParams, fn, uri, props, false, false);
     }
 	
-	public static String getETag(RequestParams requestParams, String file) {
+	public static String getETag(RequestParams requestParams, String file, StatData stat) {
 		
 	    if (file == null) {
 	        file = requestParams.getPathTranslated();
 	    }
 	    
-        // my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($file);
-	    StatData stat = FileOperationsService.stat(requestParams, file);
+	    if (stat == null) {
+	        // my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($file);
+	        stat = FileOperationsService.stat(requestParams, file);
+	    }
         int size = stat.getSize();
         long mtime = stat.getMtime(); 
 	    

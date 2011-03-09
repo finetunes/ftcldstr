@@ -90,7 +90,7 @@ public class FileHelper {
 	    String onmouseover = "";
 	    String onmouseout = "";
 	    String align = "";
-	    String id = PropertiesHelper.getETag(requestParams, fn);
+	    String id = PropertiesHelper.getETag(requestParams, fn, null);
 	    
 	    id = id.replaceAll("\"", "");
 
@@ -137,7 +137,7 @@ public class FileHelper {
 	public static boolean moveToTrash(RequestParams requestParams, String fn) {
 	    
 	    boolean ret = false;
-	    String etag = PropertiesHelper.getETag(requestParams, fn);
+	    String etag = PropertiesHelper.getETag(requestParams, fn, null);
 	    etag = etag.replaceAll("\"", "");
 	    String trash = ConfigService.TRASH_FOLDER + etag + "/";
 	    

@@ -239,7 +239,7 @@ public class PropertiesActions {
 	    }
 	    
         if (prop.equals("getetag")) {
-            resp_200.putProp("getetag", PropertiesHelper.getETag(requestParams, fn));
+            resp_200.putProp("getetag", PropertiesHelper.getETag(requestParams, fn, stat));
         }	    
 
         if (prop.equals("getlastmodified")) {
@@ -668,7 +668,7 @@ public class PropertiesActions {
         }
 
         if (prop.equals("getctag")) {
-            resp_200.putProp("getctag", PropertiesHelper.getETag(requestParams, fn));
+            resp_200.putProp("getctag", PropertiesHelper.getETag(requestParams, fn, stat));
         }        
 
         if (prop.equals("current-user-principal")) {
@@ -722,7 +722,7 @@ public class PropertiesActions {
         }              
         
         if (prop.equals("schedule-tag")) {
-            resp_200.putProp("schedule-tag", PropertiesHelper.getETag(requestParams, fn));
+            resp_200.putProp("schedule-tag", PropertiesHelper.getETag(requestParams, fn, stat));
         }       
         
         if (prop.equals("address-data")) {
@@ -821,7 +821,7 @@ public class PropertiesActions {
         }           
         
         if (prop.equals("resource-id")) {
-            String e = PropertiesHelper.getETag(requestParams, FileOperationsService.full_resolve(requestParams, fn));
+            String e = PropertiesHelper.getETag(requestParams, FileOperationsService.full_resolve(requestParams, fn), null);
             e = e.replaceAll("\"", "");
             resp_200.putProp("resource-id", "urn:uuid:" + e);
         }           

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
 import net.finetunes.ftcldstr.routines.webdav.properties.StatusResponse;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties.FileProperties;
 import net.finetunes.ftcldstr.routines.xml.XMLService;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 /**
  * The GET method means retrieve whatever information (in the form of an
@@ -133,6 +135,7 @@ public class GetActionHandler extends AbstractActionHandler {
             width = ConfigService.ICON_WIDTH;
         }
         
+        StatData statfn = FileOperationsService.stat(requestParams, fn);
         if (ConfigService.ENABLE_THUMBNAIL_CACHE) {
             String uniqname = fn;
             uniqname = uniqname.replaceAll("/", "_");
@@ -142,7 +145,6 @@ public class GetActionHandler extends AbstractActionHandler {
                 FileOperationsService.mkdir(requestParams, ConfigService.THUMBNAIL_CACHEDIR);
             }
             
-            StatData statfn = FileOperationsService.stat(requestParams, fn);
             StatData statcf = FileOperationsService.stat(requestParams, cachefile);
             if (!FileOperationsService.file_exits(requestParams, cachefile) || statfn.getMtimeDate().after(statcf.getMtimeDate())) {
                 
@@ -178,7 +180,7 @@ public class GetActionHandler extends AbstractActionHandler {
                 int contentLength = stat.getSize();
                 requestParams.getResponse().setStatus(200);
                 requestParams.getResponse().addHeader("Content-Type", MIMETypesHelper.getMIMEType(fn));
-                requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, cachefile));
+                requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, cachefile, statcf));
                 requestParams.getResponse().addHeader("Content-Length", String.valueOf(contentLength));
                 
                 try {
@@ -198,7 +200,7 @@ public class GetActionHandler extends AbstractActionHandler {
         else {
             requestParams.getResponse().setStatus(200);
             requestParams.getResponse().addHeader("Content-Type", MIMETypesHelper.getMIMEType(fn));
-            requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, fn));
+            requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, fn, statfn));
             
             try {
                 BufferedImage image = ImageIO.read(FileOperationsService.getFileContentStream(requestParams, fn));

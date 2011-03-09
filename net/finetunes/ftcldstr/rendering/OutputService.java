@@ -51,7 +51,7 @@ public class OutputService {
 	    
 	    requestParams.getResponse().addHeader("Content-Type", type + "; charset=" + ConfigService.CHARSET);
 	    requestParams.getResponse().addHeader("Content-Length", String.valueOf(getContentLength(content)));
-	    requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, requestParams.getPathTranslated()));
+	    requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, requestParams.getPathTranslated(), null));
 
         if (requestParams.getRequest().getHeader("Translate") != null) {
             requestParams.getResponse().addHeader("Translate", "f");
@@ -193,7 +193,7 @@ public class OutputService {
         requestParams.getResponse().setStatus(200);
         requestParams.getResponse().addHeader("Content-Type", MIMETypesHelper.getMIMEType(fn));
         requestParams.getResponse().addHeader("Content-Length", String.valueOf(stat.getSize()));
-        requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, fn));
+        requestParams.getResponse().addHeader("ETag", PropertiesHelper.getETag(requestParams, fn, stat));
         
         Date lastModified = stat.getMtimeDate(); 
         

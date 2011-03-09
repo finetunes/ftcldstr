@@ -240,22 +240,18 @@ public class FileOperationsService {
 
     public static boolean is_directory(RequestParams requestParams, String fn) {
 
-        // The following code is faster, but
-        // doesn't fully support unicode names
-        // File file = new File(filename);
-        // return file.isDirectory();
+        File file = new File(fn);
+        return file.isDirectory();
         
-        return WrappingUtilities.checkFileIsDirectory(requestParams, fn);
+        // return WrappingUtilities.checkFileIsDirectory(requestParams, fn);
     }	
     
     public static boolean file_exits(RequestParams requestParams, String fn) {
         
-        // The following code is faster, but
-        // doesn't fully support unicode names
-        // File file = new File(filename);
-        // return file.exists();
+        File file = new File(fn);
+        return file.exists();
 
-        return WrappingUtilities.checkFileExists(requestParams, fn);
+        // return WrappingUtilities.checkFileExists(requestParams, fn);
     }
 
     // determines whether the file is a plain file (not a link, directory, pipe, etc.)
@@ -400,7 +396,17 @@ public class FileOperationsService {
     public static String full_resolve(RequestParams requestParams, String fn) {
         
         // Returns the filename of $file with all links in the path resolved.
-        return WrappingUtilities.fullResolveSymbolicLink(requestParams, fn);
+        
+        try {
+            File file = new File(fn);
+            return file.getCanonicalPath();
+        }
+        catch (IOException e) {
+            Logger.log("Exception on resolving the link: " + fn + ". Error message: " + e.getMessage());
+            return fn;
+        }
+        
+        // return WrappingUtilities.fullResolveSymbolicLink(requestParams, fn);
     }
     
     // returns stream to write the file contents to
