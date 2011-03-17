@@ -87,8 +87,8 @@ public class OutputService {
             e.printStackTrace();
         }
         catch (IOException e) {
-            System.err.println("Unable to get output stream for writing.");
-            e.printStackTrace();
+            System.err.println("Unable to get output stream for writing. Exception: " + e.getMessage());
+            return;
         }
         finally {
             if (pw != null) {
@@ -118,8 +118,8 @@ public class OutputService {
                 e.printStackTrace();
             }
             catch (IOException e) {
-                System.err.println("Unable to get output stream for writing.");
-                e.printStackTrace();
+                System.err.println("Unable to get output stream for writing. Exception message: " + e.getMessage());
+                return;
             }
             finally {
                 if (buf != null) {

@@ -212,7 +212,7 @@ public class LockingService {
             }
         }
         
-        String owner = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, dataRef, false);
+        String owner = XMLService.createXML(ConfigService.NAMESPACEELEMENTS, dataRef, true);
         
         locktype = locktype.replaceFirst("(?s)\\{[^\\}]+}", "");
         lockscope = lockscope.replaceFirst("(?s)\\{[^\\}]+}", "");
@@ -347,21 +347,21 @@ public class LockingService {
             }
             else {
                 HashMap<String, Object> multistatus = null; 
-                if (!resp.containsKey("multistatus")) {
+                if (resp.containsKey("multistatus") && resp.get("multistatus") != null) {
+                    multistatus = (HashMap<String, Object>)resp.get("multistatus");
+                }
+                else {
                     multistatus = new HashMap<String, Object>();
                     resp.put("multistatus", multistatus);
                 }
-                else {
-                    multistatus = (HashMap<String, Object>)resp.get("multistatus");
-                }
                 
                 ArrayList<Object> response = null;
-                if (!multistatus.containsKey("response") && multistatus.get("response") != null) {
-                     response = new ArrayList<Object>();
-                     multistatus.put("response", response);
+                if (multistatus.containsKey("response") && multistatus.get("response") != null) {
+                    response = (ArrayList<Object>)multistatus.get("response");
                 }
                 else {
-                    response = (ArrayList<Object>)multistatus.get("response");
+                    response = new ArrayList<Object>();
+                    multistatus.put("response", response);
                 }
                 
                 HashMap<String, Object> r = new HashMap<String, Object>();
