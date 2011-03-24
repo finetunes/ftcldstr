@@ -50,12 +50,10 @@
 	</target>
 
 	<target name="all" depends="war" description="Recompile from scratch">
-		<copy file="${jarname}" todir="//10.64.3.53/git/" />
 	</target>
 
 
 	<target name="clean" description="Delete all files created by compile">
-		<delete file="//10.64.3.53/git/${jarname}" />
 		<delete dir="${dist}" />
 	</target>
 </project>

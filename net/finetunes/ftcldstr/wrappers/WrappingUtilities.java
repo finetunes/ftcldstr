@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.rendering.RenderingHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService.StatData;
 
@@ -118,11 +119,7 @@ public class WrappingUtilities {
             return true;
         }
         else if (logOnError) {
-            String fn = "unknown";
-            if (arg.length > 0) {
-                fn = arg[0];
-            }
-            Logger.log("Error running external command: " + command + " on file " + fn + "; " + d.getErrorMessage());
+            Logger.log("Error running external command: " + command + " with arguments: {" + RenderingHelper.joinArray(arg, ", ") + "}; " + d.getErrorMessage());
             if (err == null) {
                 err = new ArrayList<String>();
             }
@@ -223,6 +220,15 @@ public class WrappingUtilities {
 
     public static boolean chmod(RequestParams requestParams, String fn, String mode) {
         return runBooleanCommand(requestParams, new String[]{fn, mode}, "chmod", true, null);
+    }
+    
+    public static boolean umask(RequestParams requestParams, String umask) {
+        return runBooleanCommand(requestParams, new String[]{umask}, "umask", true, null);
+    }    
+    
+    public static boolean utime(RequestParams requestParams, String fn,
+            String atime, String mtime) {
+        return runBooleanCommand(requestParams, new String[]{fn, atime, mtime}, "utime", true, null);
     }    
     
     public static String readFile(RequestParams requestParams, String fn) {
@@ -241,15 +247,15 @@ public class WrappingUtilities {
         }
         
         return "";           
-    }    
+    }
     
-    public static InputStream getFileContentReadStream(RequestParams requestParams, String fn) {
+    public static InputStream getContentInputStream(RequestParams requestParams, String command, String path) {
         
         CommonContentWrapper cw = new CommonContentWrapper(requestParams);
-        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), "read", new String[]{fn});
+        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), command, new String[]{path});
 
         if (d == null || d.getInputStream() == null) {
-            Logger.log("Unable to read file content. File: " + fn);
+            Logger.log("Unable to obtain output stream. Command: " + command + "; path: " + path);
         }
         else {
             InputStream is = d.getInputStream();
@@ -258,6 +264,14 @@ public class WrappingUtilities {
         
         return null;           
     }
+    
+    public static InputStream getFileContentReadStream(RequestParams requestParams, String fn) {
+        return getContentInputStream(requestParams, "read", fn);
+    }    
+    
+    public static InputStream getZippedContentReadStream(RequestParams requestParams, String path) {
+        return getContentInputStream(requestParams, "zip", path);
+    }    
     
     public static OutputStream getFileContentWriteStream(RequestParams requestParams, String fn) {
         

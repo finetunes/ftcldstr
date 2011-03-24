@@ -244,25 +244,11 @@ public class FileHelper {
 	
 	public static Object[] getQuota() {
 
-	    /*
-	    // usage
-        ql = (Integer)quota[0];
-        qu = (Integer)quota[1];
-        
-        if (ql != null && qu != null) {
-            
-        }	  
-        */
+	    // return new Object[] {ql, qu};
 	    
-	    // test data
-	    Integer a = 237732444;
-	    Integer b = 19212231;
-	    
-	    return new Object[] {a, b};
-	    
-		// TODO: implement
-		// return new Object[]{};
-		
+	    // not implemented
+        Logger.log("Quota request. Quotas are not implemented.");
+	    return null;
 	}
 
 }

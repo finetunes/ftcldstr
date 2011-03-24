@@ -114,19 +114,20 @@ public class DirectoryOperationsService {
             Integer ql;
             Integer qu;
             Object[] quota = FileHelper.getQuota();
-            ql = (Integer)quota[0];
-            qu = (Integer)quota[1];
-            
-            if (ql != null && qu != null) {
-                ql = ql / 1048576;
-                qu = qu / 1048576;
-                content += "<div style=\"padding-left:30px;font-size:0.8em;\">";
-                content += ConfigService.stringMessages.get("quotalimit") + ql.intValue() + " MB,";
-                content += ConfigService.stringMessages.get("quotaused") + qu.intValue() + " MB,";
-                content += ConfigService.stringMessages.get("quotaavailable") + (ql.intValue() - qu.intValue()) + " MB,";
-                content += "</div>";
+            if (quota != null && quota.length >= 2 && quota[0] != null && quota[1] != null) {
+                ql = (Integer)quota[0];
+                qu = (Integer)quota[1];
+                
+                if (ql != null && qu != null) {
+                    ql = ql / 1048576;
+                    qu = qu / 1048576;
+                    content += "<div style=\"padding-left:30px;font-size:0.8em;\">";
+                    content += ConfigService.stringMessages.get("quotalimit") + ql.intValue() + " MB,";
+                    content += ConfigService.stringMessages.get("quotaused") + qu.intValue() + " MB,";
+                    content += ConfigService.stringMessages.get("quotaavailable") + (ql.intValue() - qu.intValue()) + " MB,";
+                    content += "</div>";
+                }
             }
-            
         }
         
         list = "\n";

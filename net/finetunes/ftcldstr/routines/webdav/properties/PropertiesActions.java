@@ -331,7 +331,7 @@ public class PropertiesActions {
             
             Object[] quota = FileHelper.getQuota();
             
-            if (quota.length >= 2 && quota[0] != null && quota[1] != null) {
+            if (quota != null && quota.length >= 2 && quota[0] != null && quota[1] != null) {
                 int ql = ((Integer)quota[0]).intValue();
                 int qu = ((Integer)quota[1]).intValue();
                 
@@ -883,7 +883,7 @@ public class PropertiesActions {
                     atime = RenderingHelper.parseHTTPDate(lastaccesstime);
                 }
                 
-                FileOperationsService.utime(atime, mtime, fn);
+                FileOperationsService.utime(requestParams, atime, mtime, fn);
                 resp_200.setHref(ru);
                 if (elementParentRef.containsKey("{DAV:}getlastmodified")) {
                     resp_200.putPropstatProp("getlastmodified", getlastmodified);

@@ -14,6 +14,7 @@ import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.WebDAVLocks;
 import net.finetunes.ftcldstr.routines.webdav.properties.Properties;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 public class InitializationService {
     
@@ -37,40 +38,6 @@ public class InitializationService {
         ConfigService.ROOT_PATH = rootPath;
         initProps();
         
-/*
-        use strict;
-        #use warnings;
-
-        use CGI;
-
-        use File::Basename;
-
-        use File::Spec::Link;
-
-        use XML::Simple;
-        use Date::Parse;
-        use POSIX qw(strftime);
-
-        use URI::Escape;
-        use OSSP::uuid;
-        use Digest::MD5;
-
-        use DBI;
-
-        use Quota;
-
-        use Archive::Zip;
-
-        use Graphics::Magick;
-
-        do($CONFIGFILE) if defined $CONFIGFILE && -e $CONFIGFILE;
-
-        ## flush immediately:
-        $|=1;
-*/
-        
-        // umask $UMASK; // TODO: PZ: how to implement this?
-
         // supported DAV compliant classes:
         String DAV = "1";
         if (ConfigService.ENABLE_LOCK) {
@@ -547,6 +514,13 @@ public class InitializationService {
                 "getcontentlength",
                 "executable" 
                 ));        
+    }
+    
+    public synchronized static void initUmaskSettings(RequestParams requestParams) {
+        if (!requestParams.isUmaskInitialized()) {
+            WrappingUtilities.umask(requestParams, String.format("%03o", ConfigService.UMASK));
+            requestParams.setUmaskInitialized(true);
+        }
     }
 
 }

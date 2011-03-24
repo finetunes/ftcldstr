@@ -27,6 +27,7 @@ public class RequestParams {
     private ServletContext servletContext;
     private String username = "anonymous"; // logged as
     private String userIP = "0.0.0.0";
+    private boolean umaskInitialized = false;
     
     private MultipartRequest multipartRequest;
     
@@ -244,6 +245,12 @@ public class RequestParams {
     }
     public void setUserIP(String userIP) {
         this.userIP = userIP;
+    }
+    public boolean isUmaskInitialized() {
+        return umaskInitialized;
+    }
+    public synchronized void setUmaskInitialized(boolean umaskInitialized) {
+        this.umaskInitialized = umaskInitialized;
     }
     
     

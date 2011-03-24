@@ -291,10 +291,10 @@ public class PostActionHandler extends AbstractActionHandler {
         }
         else if (ConfigService.ALLOW_ZIP_DOWNLOAD && requestParams.multipartRequestParamExists("zip")) {
             
-            // won't work recursively
-            // perhaps using system buil-in functions will be a better approach
-            // TODO: implement
-            
+//            // won't work recursively
+//            // perhaps using system buil-in functions will be a better approach
+//            // TODO: implement
+//            
 //            byte[] buf = new byte[1024];
 //            
 //            try {

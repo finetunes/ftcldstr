@@ -1,9 +1,10 @@
 #!/bin/bash
-#use: isplain.sh <username> <command> <arg1> <arg2>
+#use: isplain.sh <username> <command> <arg1> <arg2> <arg3>
 USERNAME=$1
 COMMAND=$2
 ARG1=${3}
 ARG2=${4}
+ARG3=${5}
 RESULT=0
 export LC_ALL=en_US.UTF-8
 case $COMMAND in
@@ -91,6 +92,19 @@ case $COMMAND in
     ;;
     "username")
     cmd="getent passwd '${ARG1}'"
+    ;;
+    "umask")
+    cmd="umask '${ARG1}'"
+    ;;
+    "utime")
+    cmd="utime ${ARG2} ${ARG3} '${ARG1}'"
+    ;;
+    "zip")
+    cmd="zip -r - '${ARG1}'"
+    ;;
+    "unzip")
+    # cmd="TMP=`tempfile`; exec > ${TMP} cat && unzip ${TMP} -d ${ARG1}; rm ${TMP}"
+    cmd="unzip ${ARG1} -d ${ARG2}"
     ;;
 esac
 export SHELL=/bin/bash

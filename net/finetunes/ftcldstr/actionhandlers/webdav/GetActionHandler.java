@@ -109,7 +109,6 @@ public class GetActionHandler extends AbstractActionHandler {
         }
     }
     
-    // FIXME: check
     private void doDavmountRequest(RequestParams requestParams, String fn) {
         
         // my $su = $ENV{REDIRECT_SCRIPT_URI} || $ENV{SCRIPT_URI};
@@ -245,7 +244,7 @@ public class GetActionHandler extends AbstractActionHandler {
             String search = requestParams.getRequest().getParameter("search");
             
             String form = "";
-            form += "<form method=\"get\">"; // PZ: FIXME: form action missing?
+            form += "<form method=\"get\">";
 
             form += "<div style=\"text-align:right;font-size:0.8em;padding:2px 0 0 0;border:0;margin:0;\">";
             form += ConfigService.stringMessages.get("search");
@@ -510,7 +509,6 @@ public class GetActionHandler extends AbstractActionHandler {
 
         // PZ: original perl code
         // my $fullparent = dirname($REQUEST_URI) .'/';
-        // PZ: a strange trick, since dirname() may work wrong for some names
         
         String ru = requestParams.getRequestURI();
         String[] sf = FileOperationsService.splitFilename(ru);

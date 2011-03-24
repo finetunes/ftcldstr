@@ -19,6 +19,7 @@ import sun.org.mozilla.javascript.internal.WrapFactory;
 
 import net.finetunes.ftcldstr.RequestParams;
 import net.finetunes.ftcldstr.helper.ConfigService;
+import net.finetunes.ftcldstr.helper.InitializationService;
 import net.finetunes.ftcldstr.helper.Logger;
 import net.finetunes.ftcldstr.rendering.OutputService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesActions;
@@ -385,6 +386,7 @@ public class FileOperationsService {
     
     public static boolean mkdir(RequestParams requestParams, String dirname) {
         
+        InitializationService.initUmaskSettings(requestParams);
         return mkdir(requestParams, dirname, null);
     }    
     
@@ -409,9 +411,10 @@ public class FileOperationsService {
         // return WrappingUtilities.fullResolveSymbolicLink(requestParams, fn);
     }
     
-    // returns stream to write the file contents to
+    // returns stream to write the file content to
     public static OutputStream getFileWriteStream(RequestParams requestParams, String fn) {
         
+        InitializationService.initUmaskSettings(requestParams);
         return WrappingUtilities.getFileContentWriteStream(requestParams, fn);
     }
     
@@ -505,9 +508,15 @@ public class FileOperationsService {
     }
     
     // sets access and modification time of a file
-    public static boolean utime(java.util.Date atime, java.util.Date mtime, String fn) {
-        // TODO: implement
-        // perl code: utime($atime,$mtime,$fn);
+    public static boolean utime(RequestParams requestParams, java.util.Date atime, java.util.Date mtime, String fn) {
+        
+        if (atime != null && mtime != null) {
+            long autime = atime.getTime() / 1000;
+            long mutime = mtime.getTime() / 1000;
+            
+            return WrappingUtilities.utime(requestParams, fn, String.valueOf(autime), String.valueOf(mutime));
+        }
+        
         return false;
     }
     

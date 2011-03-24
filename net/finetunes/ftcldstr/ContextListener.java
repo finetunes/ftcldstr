@@ -5,6 +5,7 @@ import javax.servlet.ServletContextListener;
 
 import net.finetunes.ftcldstr.helper.InitializationService;
 import net.finetunes.ftcldstr.helper.Logger;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 /**
  * Starts initialisation of the servlet as soon as 

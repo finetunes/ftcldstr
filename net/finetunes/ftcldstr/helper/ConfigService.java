@@ -45,7 +45,7 @@ public class ConfigService {
      * (it does not change permission of existing files/folders):
      * DEFAULT: $UMASK = 0002; # read/write/execute for users and groups, others get read/execute permissions
      */
-    public static final int UMASK = 0022; // TODO: use it for file operations
+    public static final int UMASK = 0022;
     
     /*
      * -- MIMETYPES
