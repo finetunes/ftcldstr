@@ -229,7 +229,14 @@ public class WrappingUtilities {
     public static boolean utime(RequestParams requestParams, String fn,
             String atime, String mtime) {
         return runBooleanCommand(requestParams, new String[]{fn, atime, mtime}, "utime", true, null);
+    }
+
+    public static boolean unzip(RequestParams requestParams, String fn, String destPath) {
+        
+        return runBooleanCommand(requestParams, new String[]{fn, destPath}, "unzip", true, null);
     }    
+    
+    
     
     public static String readFile(RequestParams requestParams, String fn) {
         
@@ -249,10 +256,10 @@ public class WrappingUtilities {
         return "";           
     }
     
-    public static InputStream getContentInputStream(RequestParams requestParams, String command, String path) {
+    public static InputStream getContentInputStream(RequestParams requestParams, String command, String path, String params) {
         
         CommonContentWrapper cw = new CommonContentWrapper(requestParams);
-        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), command, new String[]{path});
+        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), command, new String[]{path, params});
 
         if (d == null || d.getInputStream() == null) {
             Logger.log("Unable to obtain output stream. Command: " + command + "; path: " + path);
@@ -266,20 +273,20 @@ public class WrappingUtilities {
     }
     
     public static InputStream getFileContentReadStream(RequestParams requestParams, String fn) {
-        return getContentInputStream(requestParams, "read", fn);
+        return getContentInputStream(requestParams, "read", fn, null);
     }    
     
-    public static InputStream getZippedContentReadStream(RequestParams requestParams, String path) {
-        return getContentInputStream(requestParams, "zip", path);
+    public static InputStream getZippedContentReadStream(RequestParams requestParams, String basePath, String pathList) {
+        return getContentInputStream(requestParams, "zip", basePath, pathList);
     }    
     
-    public static OutputStream getFileContentWriteStream(RequestParams requestParams, String fn) {
+    public static OutputStream getContentOutputStream(RequestParams requestParams, String command, String path) {
         
         CommonContentWrapper cw = new CommonContentWrapper(requestParams);
-        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), "write", new String[]{fn});
+        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), command, new String[]{path});
 
         if (d == null || d.getOutputStream() == null) {
-            Logger.log("Unable to get file output stream. File: " + fn);
+            Logger.log("Unable to get an output stream. Path: " + path);
         }
         else {
             OutputStream os = d.getOutputStream();
@@ -288,6 +295,11 @@ public class WrappingUtilities {
         
         return null;           
     }
+    
+    public static OutputStream getFileContentWriteStream(RequestParams requestParams, String fn) {
+        
+        return getContentOutputStream(requestParams, "write", fn);
+    }    
     
     public static String getGroupNameByGID(RequestParams requestParams, String gid) {
         

@@ -422,6 +422,14 @@ public class FileOperationsService {
     public static boolean writeFileFromStream(RequestParams requestParams, String fn, FileInputStream fis) {
         if (fn != null && fis != null) {
             OutputStream outStream = getFileWriteStream(requestParams, fn);
+            return writeContentFromStream(fis, outStream);
+        }
+        
+        return false;
+    }
+
+    public static boolean writeContentFromStream(FileInputStream fis, OutputStream outStream) {
+        if (outStream != null && fis != null) {
             BufferedInputStream buf = null;
             try {
                 buf = new BufferedInputStream(fis);
@@ -449,8 +457,7 @@ public class FileOperationsService {
         }
         
         return false;
-    }
-        
+    }    
     
     public static boolean unlink(RequestParams requestParams, String fn) {
         

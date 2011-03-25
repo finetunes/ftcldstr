@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -213,7 +215,23 @@ public class RequestParams {
         }
         
         return null;
-    }       
+    }
+    
+    public ArrayList<String> getFileNames() {
+
+        if (multipartRequest == null) {
+            createMultipartRequestWrapper();
+        }        
+        
+        ArrayList<String> files = null;
+        if (multipartRequest != null) {
+            java.util.Enumeration<String> names = multipartRequest.getFileNames();
+            files = Collections.list(names);
+        }
+        
+        return files;
+    }    
+        
     
     private void createMultipartRequestWrapper() {
         try {

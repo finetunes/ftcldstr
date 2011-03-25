@@ -100,11 +100,10 @@ case $COMMAND in
     cmd="utime ${ARG2} ${ARG3} '${ARG1}'"
     ;;
     "zip")
-    cmd="zip -r - '${ARG1}'"
+    cmd="tar -cf - -C '${ARG1}' ${ARG2} | gzip"
     ;;
     "unzip")
-    # cmd="TMP=`tempfile`; exec > ${TMP} cat && unzip ${TMP} -d ${ARG1}; rm ${TMP}"
-    cmd="unzip ${ARG1} -d ${ARG2}"
+    cmd="gzip -dc '${ARG1}' | tar -xf - -C '${ARG2}'"
     ;;
 esac
 export SHELL=/bin/bash

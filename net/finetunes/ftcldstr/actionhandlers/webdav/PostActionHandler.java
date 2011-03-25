@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -24,6 +25,7 @@ import net.finetunes.ftcldstr.routines.fileoperations.FileHelper;
 import net.finetunes.ftcldstr.routines.fileoperations.FileOperationsService;
 import net.finetunes.ftcldstr.routines.webdav.QueryService;
 import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
+import net.finetunes.ftcldstr.wrappers.WrappingUtilities;
 
 /**
  * The POST method is used to request that the origin server accept the
@@ -46,10 +48,6 @@ import net.finetunes.ftcldstr.routines.webdav.properties.PropertiesHelper;
 
 public class PostActionHandler extends AbstractActionHandler {
 
-    // TODO: check all params here,
-    // as perl handles normal params and multipart data in the same way,
-    // but they should be treated differetntly in java
-    // "Content-Type: multipart/form-data"
     public void handle(final RequestParams requestParams) {
 
         String fn = requestParams.getPathTranslated();
@@ -82,8 +80,8 @@ public class PostActionHandler extends AbstractActionHandler {
             String fileList = RenderingHelper.joinArray(files, ",");
             Logger.debug("POST: file management " + fileList);
             
-            if (requestParams.requestParamExists("delete")) {
-                if (files.length > 0) {
+            if (requestParams.multipartRequestParamExists("delete")) {
+                if (files != null && files.length > 0) {
                     
                     int count = 0;
                     for (int i = 0; i < files.length; i++) {
@@ -119,7 +117,7 @@ public class PostActionHandler extends AbstractActionHandler {
                 }
             }
             else if (requestParams.multipartRequestParamExists("rename")) {
-                if (files.length > 0) {
+                if (files != null && files.length > 0) {
                     if (requestParams.multipartRequestParamExists("newname")) {
                         
                         
@@ -181,7 +179,7 @@ public class PostActionHandler extends AbstractActionHandler {
                 }
             }
             else if (requestParams.multipartRequestParamExists("changeperm")) {
-                if (files.length > 0) {
+                if (files != null && files.length > 0) {
                     
                     int mode = 0000;
                     String[] fp_user = requestParams.getMultipartRequestParamValues("fp_user");
@@ -237,137 +235,157 @@ public class PostActionHandler extends AbstractActionHandler {
                 System.err.println("Error: Unable to perform redirect (" + rt + "): " + e.getMessage());
             }
         }
-        else if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_directory(requestParams, fn) && requestParams.multipartRequestParamExists("file_upload")) {
+        else if (ConfigService.ALLOW_POST_UPLOADS && FileOperationsService.is_directory(requestParams, fn) && requestParams.multipartRequestParamExists("filesubmit")) {
 
             ArrayList<String> filelist = new ArrayList<String>();
-            String[] files = requestParams.getMultipartRequestParamValues("file_upload");
-            for (int i = 0; i < files.length; i++) {
-                String filename = files[i];
-                if (filename.isEmpty()) {
-                    continue;
+            ArrayList<String> files = requestParams.getFileNames();
+            if (files != null) {
+                Iterator<String> it = files.iterator();
+                while (it.hasNext()) {
+                    String filename = it.next();
+                    if (filename.isEmpty()) {
+                        continue;
+                    }
+                    
+                    File f = requestParams.getFile(filename);
+
+                    String rfn = new String(f.getName());
+                    rfn = rfn.replaceAll("\\\\", "/"); // # fix M$ Windows backslashes
+                    String destination = fn + FileOperationsService.basename(rfn);
+                    Logger.debug("POST: save " + f.getName() + " to " + destination + ".");
+                    filelist.add(FileOperationsService.basename(rfn));
+                    FileInputStream is = null;
+                    try {
+                        is = new FileInputStream(f);
+                    }
+                    catch (FileNotFoundException e) {
+                        Logger.log("Exception: Unable to read the file. " + e.getMessage());
+                    }
+                    
+                    if (!(is != null && FileOperationsService.writeFileFromStream(requestParams, destination, is))) {
+                        OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
+                        break;
+                    }
                 }
                 
-                String rfn = new String(filename);
-                rfn = rfn.replaceAll("\\", "/"); // # fix M$ Windows backslashes
-                String destination = fn + FileOperationsService.basename(rfn);
-                Logger.debug("POST: save " + filename + " to " + destination + ".");
-                filelist.add(FileOperationsService.basename(rfn));
-                File f = requestParams.getFile(filename);
-                FileInputStream is = null;
-                try {
-                    is = new FileInputStream(f);
-                }
-                catch (FileNotFoundException e) {
-                    Logger.log("Exception: Unable to read the file. " + e.getMessage());
-                }
-                
-                if (!(is != null && FileOperationsService.writeFileFromStream(requestParams, destination, is))) {
-                    OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
-                    break;
-                }
-            }
-            
-            if (filelist.size() > 0) {
-                if (filelist.size() > 1) {
-                    msg = "uploadmulti";
+                if (filelist.size() > 0) {
+                    if (filelist.size() > 1) {
+                        msg = "uploadmulti";
+                    }
+                    else {
+                        msg = "uploadsingle";
+                    }
+
+                    String m = RenderingHelper.joinArray(filelist.toArray(new String[]{}), ", ");
+                    if (m.length() > 150) {
+                        m = m.substring(0, 150);
+                    }
+
+                    msgparam = "p1=" + filelist.size() + ConfigService.URL_PARAM_SEPARATOR +
+                        "p2=" + RenderingHelper.uri_escape(m);
                 }
                 else {
-                    msg = "uploadsingle";
+                    errmsg = "uploadnothingerr"; 
                 }
-                
-                msgparam = "p1=" + filelist.size() + ConfigService.URL_PARAM_SEPARATOR +
-                    "p2=" + RenderingHelper.uri_escape(RenderingHelper.joinArray(filelist.toArray(new String[]{}), ", ").substring(0, 150));
-            }
-            else {
-                errmsg = "uploadnothingerr"; 
-            }
-
-            try {
-                requestParams.getResponse().sendRedirect(redirtarget + RenderingService.createMsgQuery(msg, msgparam, errmsg, msgparam));
-            }
-            catch (IOException e) {
-                Logger.log("Exception: Unable to perform redirect. " + e.getMessage());
+    
+                try {
+                    requestParams.getResponse().sendRedirect(redirtarget + RenderingService.createMsgQuery(msg, msgparam, errmsg, msgparam));
+                }
+                catch (IOException e) {
+                    Logger.log("Exception: Unable to perform redirect. " + e.getMessage());
+                }
             }
         }
         else if (ConfigService.ALLOW_ZIP_DOWNLOAD && requestParams.multipartRequestParamExists("zip")) {
             
-//            // won't work recursively
-//            // perhaps using system buil-in functions will be a better approach
-//            // TODO: implement
-//            
-//            byte[] buf = new byte[1024];
-//            
-//            try {
-//                String zfn = FileOperationsService.basename(fn) + ".zip";
-//                zfn = zfn.replaceAll(" ", "_");
-//                ZipOutputStream out = new ZipOutputStream(requestParams.getResponse().getOutputStream());
-//                
-//                requestParams.getResponse().setStatus(200);
-//                requestParams.getResponse().addHeader("Content-Type", "application/zip");
-//                requestParams.getResponse().addHeader("Content-Disposition", "attachment; filename=" + zfn);
-//                
-//                String[] files = requestParams.getMultipartRequestParamValues("file");
-//                for (int i = 0; i < files.length; i++) {
-//                    String file = files[i];
-//                    String filename = fn + file;
-//                    FileInputStream in = new FileInputStream(filename);
-//                    out.putNextEntry(new ZipEntry(filename));
-//                    
-//                    int len;
-//                    while ((len = in.read(buf)) > 0) {
-//                        out.write(buf, 0, len);
-//                    }
-//                    
-//                    out.closeEntry();
-//                    in.close();
-//                }
-//                // out.close(); // shoud be closed later
-//            }
-//            catch (IOException e) {
-//                Logger.log("Exception on creating an archive: " + e.getMessage());
-//            }
+            try {
+                String zfn = FileOperationsService.basename(fn) + ".tar.gz";
+                zfn = zfn.replaceAll(" ", "_");
+                ZipOutputStream out = new ZipOutputStream(requestParams.getResponse().getOutputStream());
+                
+                requestParams.getResponse().setStatus(200);
+                requestParams.getResponse().addHeader("Content-Type", "application/x-gzip");
+                requestParams.getResponse().addHeader("Content-Disposition", "attachment; filename=" + zfn);
+                
+                String[] files = requestParams.getMultipartRequestParamValues("file");
+                ArrayList<String> filesToArchive = new ArrayList<String>();
+                
+                if (files != null) {
+                    for (int i = 0; i < files.length; i++) {
+                        String file = files[i];
+                        // String filename = fn + file;
+                        String filename = file; // fn is passed as tar argument (-C)
+                        filesToArchive.add(filename);
+                    }
+                    
+                    String fileList = RenderingHelper.joinArray(filesToArchive.toArray(new String[]{}), "' '");
+                    if (fileList != null && !fileList.isEmpty()) {
+                        fileList = "'" + fileList + "'";
+                        OutputService.printContentStream(requestParams, WrappingUtilities.getZippedContentReadStream(requestParams, fn, fileList)); 
+                    }
+                }
+            }
+            catch (IOException e) {
+                Logger.log("Exception on creating an archive: " + e.getMessage());
+            }
         }
         else if (ConfigService.ALLOW_ZIP_UPLOAD && requestParams.multipartRequestParamExists("uncompress")) {
             
-            //  my @zipfiles;
-//            String[] files = requestParams.getMultipartRequestParamValues("zipfile_upload");
-//            for (int i = 0; i < files.length; i++) {
-//                String fh = files[i];
-//                String rfn = new String(fh);
-//                rfn = rfn.replaceAll("\\", "/"); // # fix M$ Windows backslashes
-//                rfn = FileOperationsService.basename(rfn);
-//                
-//            }
-            
-            
-            
-/*
-// TODO
-        my @zipfiles;
-        foreach my $fh ($cgi->param('zipfile_upload')) {
-            my $rfn= $fh;
-            $rfn=~s/\\/\//g; # fix M$ Windows backslashes
-            $rfn=basename($rfn);
-            if (open(F,">$PATH_TRANSLATED$rfn")) {
-                push @zipfiles, $rfn;
-                print F $_ while (<$fh>);
-                close(F);
-                my $zip = Archive::Zip->new();
-                my $status = $zip->read($PATH_TRANSLATED.$rfn);
-                if ($status eq $zip->AZ_OK) {
-                    $zip->extractTree(undef, $PATH_TRANSLATED);
-                    unlink($PATH_TRANSLATED.$rfn);
-                }
-            }
-        }
-        if ($#zipfiles>-1) {
-            $msg=($#zipfiles>0)?'zipuploadmulti':'zipuploadsingle';
-            $msgparam='p1='.($#zipfiles+1).';p2='.$cgi->escape(substr(join(', ',@zipfiles), 0, 150));
-        } else {
-            $errmsg='zipuploadnothingerr';
-        }
-        print $cgi->redirect($redirtarget.createMsgQuery($msg,$msgparam,$errmsg,$msgparam)); 
-*/
+          ArrayList<String> files = requestParams.getFileNames();
+          ArrayList<String> uploadedFiles = new ArrayList<String>();
+          //    requestParams.getMultipartRequestParamValues("zipfile_upload");
+          if (files != null) {
+              Iterator<String> it = files.iterator();
+              while (it.hasNext()) {
+                  String fh = it.next();
+                  String rfn = new String(fh);
+                  rfn = rfn.replaceAll("\\\\", "/"); // # fix M$ Windows backslashes
+                  rfn = FileOperationsService.basename(rfn);
+                  
+                  File f = requestParams.getFile(fh);
+                  uploadedFiles.add(f.getName());
+                  FileInputStream is = null;
+                  try {
+                      is = new FileInputStream(f);
+                  }
+                  catch (FileNotFoundException e) {
+                      Logger.log("Exception: Unable to read the file: " + fh + ". Message: " + e.getMessage());
+                  }              
+                  
+                  FileOperationsService.writeFileFromStream(requestParams, f.getAbsolutePath(), is);
+                  WrappingUtilities.unzip(requestParams, f.getAbsolutePath(), fn);
+                  FileOperationsService.unlink(requestParams, f.getAbsolutePath());
+              }
+          }
+
+          if (uploadedFiles != null && uploadedFiles.size() > 0) {
+              if (uploadedFiles.size() > 1) {
+                  msg = "zipuploadmulti";
+              }
+              else {
+                  msg = "zipuploadsingle"; 
+              }
+              
+              String m = RenderingHelper.joinArray(uploadedFiles.toArray(new String[]{}), ", ");
+              if (m.length() > 150) {
+                  m = m.substring(0, 150);
+              }
+              
+              msgparam = "p1=" + (files.size()) + ConfigService.URL_PARAM_SEPARATOR +
+                  "p2=" + RenderingHelper.uri_escape(m);
+          }
+          else {
+              errmsg = "zipuploadnothingerr";
+          }
+          
+          String rt = redirtarget + RenderingService.createMsgQuery(msg, msgparam, errmsg, msgparam); 
+          try {
+              requestParams.getResponse().sendRedirect(rt);
+          }
+          catch (IOException e) {
+              Logger.log("Error: Unable to perform redirect (" + rt + "): " + e.getMessage());
+              System.err.println("Error: Unable to perform redirect (" + rt + "): " + e.getMessage());
+          }
         }
         else if (ConfigService.ENABLE_CALDAV_SCHEDULE && FileOperationsService.is_directory(requestParams, fn)) {
             // ## NOT IMPLEMENTED YET // was original perl code;

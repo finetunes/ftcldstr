@@ -214,10 +214,10 @@ public class InitializationService {
         strings.put("deletefilestext", " selected files/folders");
         strings.put("deletefilesconfirm", "Do you really want to delete selected files/folders?");
         strings.put("zipdownloadbutton", "Download");
-        strings.put("zipdownloadtext", " selected files/folders (zip archive)");
-        strings.put("zipuploadtext", "Upload zip archive: ");
+        strings.put("zipdownloadtext", " selected files/folders (tar.gz archive)");
+        strings.put("zipuploadtext", "Upload tar.gz archive: ");
         strings.put("zipuploadbutton", "Upload & Extract");
-        strings.put("zipuploadconfirm", "Do you really want to upload zip, extract it and replace existing files?");
+        strings.put("zipuploadconfirm", "Do you really want to upload tar.gz, extract it and replace existing files?");
         strings.put("fileuploadtext", "File: ");
         strings.put("fileuploadbutton", "Upload");
         strings.put("fileuploadmore", "more");
@@ -239,9 +239,9 @@ public class InitializationService {
         strings.put("msg_uploadsingle", "%s file (%s) uploaded successfully.");
         strings.put("msg_uploadmulti", "%s files (%s) uploaded successfully.");
         strings.put("msg_uploadnothingerr", "Please select a local file (Browse ...) for upload.");
-        strings.put("msg_zipuploadsingle", "%s zip archive (%s) uploaded successfully.");
-        strings.put("msg_zipuploadmulti", "%s zip archives (%s) uploaded successfully.");
-        strings.put("msg_zipuploadnothingerr", "Please select a local zip archive (Browse...) for upload.");
+        strings.put("msg_zipuploadsingle", "%s tar.gz archive (%s) uploaded successfully.");
+        strings.put("msg_zipuploadmulti", "%s tar.gz archives (%s) uploaded successfully.");
+        strings.put("msg_zipuploadnothingerr", "Please select a local tar.gz archive (Browse...) for upload.");
         strings.put("clickforfullsize", "Click for full size");
         strings.put("permissions", "Permissions");
         strings.put("user", "user: ");
