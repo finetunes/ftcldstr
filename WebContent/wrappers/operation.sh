@@ -6,6 +6,7 @@ ARG1=${3}
 ARG2=${4}
 ARG3=${5}
 RESULT=0
+
 export LC_ALL=en_US.UTF-8
 case $COMMAND in
     "list")
@@ -104,6 +105,13 @@ case $COMMAND in
     ;;
     "unzip")
     cmd="gzip -dc '${ARG1}' | tar -xf - -C '${ARG2}'"
+    ;;
+    "id")
+    cmd="id '${ARG1}'"
+    ;;
+    "chown")
+    cmd="chown ${ARG2}:${ARG3} '${ARG1}'"
+    USERNAME="root"
     ;;
 esac
 export SHELL=/bin/bash

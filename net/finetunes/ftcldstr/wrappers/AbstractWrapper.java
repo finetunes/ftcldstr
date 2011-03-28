@@ -90,7 +90,7 @@ public class AbstractWrapper {
         catch (IOException e) {
             result = new AsyncCallResult(null, null, null);
         }
-        
+
         return result;
     }    
     
@@ -163,7 +163,4 @@ public class AbstractWrapper {
         
         return null;
     }        
-    
-    
-
 }

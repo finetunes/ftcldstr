@@ -12,6 +12,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.finetunes.ftcldstr.helper.ConfigService;
 import net.finetunes.ftcldstr.helper.Logger;
 
 import com.oreilly.servlet.MultipartRequest;
@@ -235,7 +236,7 @@ public class RequestParams {
     
     private void createMultipartRequestWrapper() {
         try {
-            MultipartRequest m = new MultipartRequest(getRequest(), getPathTranslated());
+            MultipartRequest m = new MultipartRequest(getRequest(), getPathTranslated(), ConfigService.POST_MAX_SIZE);
             setMultipartRequest(m);
         }
         catch (IOException e) {

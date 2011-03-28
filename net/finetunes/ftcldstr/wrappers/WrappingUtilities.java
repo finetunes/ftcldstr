@@ -259,7 +259,14 @@ public class WrappingUtilities {
     public static InputStream getContentInputStream(RequestParams requestParams, String command, String path, String params) {
         
         CommonContentWrapper cw = new CommonContentWrapper(requestParams);
-        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), command, new String[]{path, params});
+        String[] p;
+        if (params != null) {
+            p = new String[]{path, params}; 
+        }
+        else {
+            p = new String[]{path};
+        }
+        AsyncCallResult d = cw.runAsyncCommand(requestParams, requestParams.getUsername(), command, p);
 
         if (d == null || d.getInputStream() == null) {
             Logger.log("Unable to obtain output stream. Command: " + command + "; path: " + path);
@@ -362,5 +369,37 @@ public class WrappingUtilities {
         
         return null;
     }
+    
+    public static String getUserGroupName(RequestParams requestParams, String username) {
+        
+        CommonContentWrapper cw = new CommonContentWrapper(requestParams);
+        CommonWrapperResult d = cw.runCommand(requestParams, requestParams.getUsername(), "id", new String[]{username});
+
+        if (d == null || d.getExitCode() != 0) {
+            Logger.log("Error getting user group. Username: " + username + "; Error: " + d.getErrorMessage());
+            return null;
+        }
+        else {
+            String content = d.getContent();
+            if (content != null && !content.isEmpty()) {
+                String groupname = content.replaceAll("(?s).* gid=[\\d]{1,6}\\((.*?)\\).*", "$1");
+                if (groupname.equals(content)) {
+                    Logger.log("Unable to get group name for username: " + username);
+                    return null;
+                }
+                
+                return groupname;
+            }
+        }
+        
+        return null;
+    }
+    
+    public static boolean chown(RequestParams requestParams, String fn,
+            String user, String group) {
+        return runBooleanCommand(requestParams, new String[]{fn, user, group}, "chown", true, null);
+    }
+
+    
     
 }

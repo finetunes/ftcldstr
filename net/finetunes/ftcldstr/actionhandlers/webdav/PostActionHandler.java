@@ -183,30 +183,36 @@ public class PostActionHandler extends AbstractActionHandler {
                     
                     int mode = 0000;
                     String[] fp_user = requestParams.getMultipartRequestParamValues("fp_user");
-                    for (int i = 0; i < fp_user.length; i++) {
-                        String userperm = fp_user[i];
-                        if (userperm.equals("r") && ConfigService.PERM_USER.contains("r")) { mode = mode | 0400; }
-                        if (userperm.equals("w") && ConfigService.PERM_USER.contains("w")) { mode = mode | 0200; }
-                        if (userperm.equals("x") && ConfigService.PERM_USER.contains("x")) { mode = mode | 0100; }
-                        if (userperm.equals("s") && ConfigService.PERM_USER.contains("s")) { mode = mode | 04000; }
+                    if (fp_user != null) {
+                        for (int i = 0; i < fp_user.length; i++) {
+                            String userperm = fp_user[i];
+                            if (userperm.equals("r") && ConfigService.PERM_USER.contains("r")) { mode = mode | 0400; }
+                            if (userperm.equals("w") && ConfigService.PERM_USER.contains("w")) { mode = mode | 0200; }
+                            if (userperm.equals("x") && ConfigService.PERM_USER.contains("x")) { mode = mode | 0100; }
+                            if (userperm.equals("s") && ConfigService.PERM_USER.contains("s")) { mode = mode | 04000; }
+                        }
                     }
                     
                     String[] fp_group = requestParams.getMultipartRequestParamValues("fp_group");
-                    for (int i = 0; i < fp_group.length; i++) {
-                        String userperm = fp_group[i];
-                        if (userperm.equals("r") && ConfigService.PERM_GROUP.contains("r")) { mode = mode | 0040; }
-                        if (userperm.equals("w") && ConfigService.PERM_GROUP.contains("w")) { mode = mode | 0020; }
-                        if (userperm.equals("x") && ConfigService.PERM_GROUP.contains("x")) { mode = mode | 0010; }
-                        if (userperm.equals("s") && ConfigService.PERM_GROUP.contains("s")) { mode = mode | 02000; }
+                    if (fp_group != null) {
+                        for (int i = 0; i < fp_group.length; i++) {
+                            String userperm = fp_group[i];
+                            if (userperm.equals("r") && ConfigService.PERM_GROUP.contains("r")) { mode = mode | 0040; }
+                            if (userperm.equals("w") && ConfigService.PERM_GROUP.contains("w")) { mode = mode | 0020; }
+                            if (userperm.equals("x") && ConfigService.PERM_GROUP.contains("x")) { mode = mode | 0010; }
+                            if (userperm.equals("s") && ConfigService.PERM_GROUP.contains("s")) { mode = mode | 02000; }
+                        }
                     }
                     
                     String[] fp_others = requestParams.getMultipartRequestParamValues("fp_others");
-                    for (int i = 0; i < fp_others.length; i++) {
-                        String userperm = fp_others[i];
-                        if (userperm.equals("r") && ConfigService.PERM_USER.contains("r")) { mode = mode | 0004; }
-                        if (userperm.equals("w") && ConfigService.PERM_USER.contains("w")) { mode = mode | 0002; }
-                        if (userperm.equals("x") && ConfigService.PERM_USER.contains("x")) { mode = mode | 0001; }
-                        if (userperm.equals("t") && ConfigService.PERM_USER.contains("t")) { mode = mode | 01000; }
+                    if (fp_others != null) {
+                        for (int i = 0; i < fp_others.length; i++) {
+                            String userperm = fp_others[i];
+                            if (userperm.equals("r") && ConfigService.PERM_USER.contains("r")) { mode = mode | 0004; }
+                            if (userperm.equals("w") && ConfigService.PERM_USER.contains("w")) { mode = mode | 0002; }
+                            if (userperm.equals("x") && ConfigService.PERM_USER.contains("x")) { mode = mode | 0001; }
+                            if (userperm.equals("t") && ConfigService.PERM_USER.contains("t")) { mode = mode | 01000; }
+                        }
                     }
                     
                     msg = "changeperm";
@@ -261,11 +267,15 @@ public class PostActionHandler extends AbstractActionHandler {
                     catch (FileNotFoundException e) {
                         Logger.log("Exception: Unable to read the file. " + e.getMessage());
                     }
+ 
+                    // this code is not required since all the uploaded files
+                    // are stored under path translated location automatically
+                    // if (!(is != null && FileOperationsService.writeFileFromStream(requestParams, destination, is))) {
+                    //     OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
+                    //     break;
+                    // }
                     
-                    if (!(is != null && FileOperationsService.writeFileFromStream(requestParams, destination, is))) {
-                        OutputService.printHeaderAndContent(requestParams, "403 Forbidden", "text/plain", "403 Forbidden");
-                        break;
-                    }
+                    FileOperationsService.setUploadedFileOwner(requestParams, destination);
                 }
                 
                 if (filelist.size() > 0) {
@@ -353,6 +363,7 @@ public class PostActionHandler extends AbstractActionHandler {
                   }              
                   
                   FileOperationsService.writeFileFromStream(requestParams, f.getAbsolutePath(), is);
+                  FileOperationsService.setUploadedFileOwner(requestParams, f.getAbsolutePath());
                   WrappingUtilities.unzip(requestParams, f.getAbsolutePath(), fn);
                   FileOperationsService.unlink(requestParams, f.getAbsolutePath());
               }

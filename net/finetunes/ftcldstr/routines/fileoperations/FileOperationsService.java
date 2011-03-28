@@ -432,19 +432,29 @@ public class FileOperationsService {
         if (outStream != null && fis != null) {
             BufferedInputStream buf = null;
             try {
-                buf = new BufferedInputStream(fis);
-                int readBytes = 0;
-                
-                while ((readBytes = buf.read()) != -1) {
-                    outStream.write(readBytes);            
-                }
-                
-                return true;
+                byte[] buffer = new byte[8192];
+                int length;
+                while ((length = fis.read(buffer)) >= 0) {
+                    outStream.write(buffer, 0, length);
+                }                
             }
             catch (IOException e) {
                 Logger.log("Exception: Unable write the output file." + e.getMessage());
             }
             finally {
+                try {
+                    fis.close();
+                }
+                catch (IOException e) {
+                    
+                }
+                try {
+                    outStream.close();
+                }
+                catch (IOException e) {
+                    
+                }
+                
                 if (buf != null) {
                     try {
                         buf.close();
@@ -522,6 +532,25 @@ public class FileOperationsService {
             long mutime = mtime.getTime() / 1000;
             
             return WrappingUtilities.utime(requestParams, fn, String.valueOf(autime), String.valueOf(mutime));
+        }
+        
+        return false;
+    }
+    
+    // changes the owner of an uploaded file to the user who uploaded it.
+    // automatically an uploaded file gets the root as an owner if
+    // the server it running under root permissions
+    public static boolean setUploadedFileOwner(RequestParams requestParams, String fn) {
+        
+        String username = requestParams.getUsername();
+        String groupname = WrappingUtilities.getUserGroupName(requestParams, username);
+        
+        if (fn != null && username != null && groupname != null) {
+            if (!WrappingUtilities.chown(requestParams, fn, username, groupname)) {
+                return false;
+            }
+            
+            return FileOperationsService.chmod(requestParams, fn, 0777 - ConfigService.UMASK);
         }
         
         return false;
